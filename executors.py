@@ -55,3 +55,22 @@ class MockExecutor(AbstractTestExecutor):
         time.sleep(5)
 
         return test_outcome, description, execution_data
+
+class BeamngExecutor (AbstractTestExecutor):
+
+    def _execute(self, the_test):
+        # Ensure we do not execute anything longer than the time budget
+        super()._execute(the_test)
+
+        print("Executing the test")
+
+        test_outcome = "FAIL"
+        description = "Not implemented"
+        execution_data = []
+
+        return test_outcome, description, execution_data
+
+
+if __name__ == '__main__':
+    executor = BeamngExecutor()
+    executor.execute_test()
