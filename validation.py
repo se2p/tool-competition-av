@@ -8,7 +8,7 @@ class TestValidator:
 
     def is_not_self_intersecting(self, the_test):
         road_polygon = RoadPolygon.from_nodes(the_test)
-        road_polygon.is_valid()
+        return road_polygon.is_valid()
 
     def is_not_overlapping(self, the_test):
         pass
@@ -20,7 +20,9 @@ class TestValidator:
         return max_x - min_x <= self.map_size and max_y - min_y <= self.map_size
 
     def is_right_type(self, the_test):
-        pass
+        check = type(the_test) is list
+        return check
+
 
     def validate_test(self, the_test):
 
@@ -31,9 +33,12 @@ class TestValidator:
             is_valid = False
             validation_msg = "Not entirely inside the map boundaries"
             return is_valid, validation_msg
-        if self.is_not_self_intersecting(the_test):
+        if not self.is_not_self_intersecting(the_test):
            is_valid = False
            validation_msg = "The road is self-intersecting"
            return is_valid, validation_msg
+        if not self.is_right_type(the_test):
+            is_valid = False
+            validation_msg = "Wrong type"
 
         return is_valid, validation_msg
