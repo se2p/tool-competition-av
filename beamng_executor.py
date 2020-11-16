@@ -42,7 +42,6 @@ class BeamngExecutor(AbstractTestExecutor):
         super().__init__(time_budget, map_size)
         self.brewer: BeamNGBrewer = None
 
-
     def _execute(self, the_test):
         # Ensure we do not execute anything longer than the time budget
         super()._execute(the_test)

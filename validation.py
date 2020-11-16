@@ -1,10 +1,14 @@
+from self_driving.road_polygon import RoadPolygon
+
+
 class TestValidator:
 
     def __init__(self, map_size):
         self.map_size = map_size
 
     def is_not_self_intersecting(self, the_test):
-        pass
+        road_polygon = RoadPolygon.from_nodes(the_test)
+        road_polygon.is_valid()
 
     def is_not_overlapping(self, the_test):
         pass
@@ -27,5 +31,9 @@ class TestValidator:
             is_valid = False
             validation_msg = "Not entirely inside the map boundaries"
             return is_valid, validation_msg
+        if self.is_not_self_intersecting(the_test):
+           is_valid = False
+           validation_msg = "The road is self-intersecting"
+           return is_valid, validation_msg
 
         return is_valid, validation_msg
