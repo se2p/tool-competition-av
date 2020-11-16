@@ -5,6 +5,9 @@
 import click
 import importlib
 
+
+
+
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
 @click.option('--time-budget', required=True, type=int)
@@ -16,7 +19,8 @@ def generate(executor, time_budget, map_size, module_name, class_name):
         from executors import MockExecutor
         the_executor = MockExecutor(time_budget=time_budget, map_size=map_size)
     elif executor == "beamng":
-        raise NotImplementedError("BeamNG executor not yet available")
+        from beamng_executor import BeamngExecutor
+        the_executor = BeamngExecutor(time_budget=time_budget, map_size=map_size)
 
     # Dynamically load test generator
     # TODO Where the code should be placed? on the python path is enought?
