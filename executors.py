@@ -1,5 +1,7 @@
 # TODO Create an abstract class to host the logic for calling the validation and the timing
 # Use this class to output tests in predefined locations after execution
+import json
+
 
 from validation import TestValidator
 from abc import ABC, abstractmethod
@@ -56,21 +58,18 @@ class MockExecutor(AbstractTestExecutor):
 
         return test_outcome, description, execution_data
 
-class BeamngExecutor (AbstractTestExecutor):
-
-    def _execute(self, the_test):
-        # Ensure we do not execute anything longer than the time budget
-        super()._execute(the_test)
-
-        print("Executing the test")
-
-        test_outcome = "FAIL"
-        description = "Not implemented"
-        execution_data = []
-
-        return test_outcome, description, execution_data
-
 
 if __name__ == '__main__':
-    executor = BeamngExecutor()
-    executor.execute_test()
+    from beamng_executor import BeamngExecutor
+    executor = BeamngExecutor(time_budget=250000, map_size=250)
+    ROAD_PATH = r"data\seed0.json"
+    with open(ROAD_PATH, 'r') as f:
+        dict = json.loads(f.read())
+    sample_nodes = [tuple(t) for t in dict['sample_nodes']]
+
+    # nodes should be a list of (x,y) float coordinates
+    nodes = [sample[:2] for sample in sample_nodes]
+    nodes = [(node[0], node[1], -28.0, 8.0) for node in nodes]
+
+    tc = nodes
+    test_outcome, description, execution_data= executor.execute_test(tc)

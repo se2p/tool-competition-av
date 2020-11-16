@@ -54,10 +54,6 @@ class OutOfBoundsMonitor:
             intersection = car_bbox_polygon.intersection(self.road_polygon.left_polygon)
         else:
             intersection = car_bbox_polygon.intersection(self.road_polygon.polygon)
-        print(intersection.area)
-        print(intersection.area / car_bbox_polygon.area)
-        print(1 - intersection.area / car_bbox_polygon.area)
-        print("-------------")
         return 1 - intersection.area / car_bbox_polygon.area
 
     def is_oob_bb(self, tolerance=0.05, wrt="right") -> bool:

@@ -1,10 +1,9 @@
+from executors import AbstractTestExecutor
 import json
 import os
 import time
 import traceback
 from typing import Tuple
-import numpy as np
-import cv2
 
 from self_driving.beamng_brewer import BeamNGBrewer
 from self_driving.beamng_tig_maps import maps
@@ -37,27 +36,41 @@ class BeamNGCarCameras:
         self.cameras_array = [cam_center, cam_left, cam_right]
 
 
-class Executor():
-    def __init__(self):
+class BeamngExecutor(AbstractTestExecutor):
+
+    def __init__(self, time_budget=None, map_size=None):
+        super().__init__(time_budget, map_size)
         self.brewer: BeamNGBrewer = None
 
-    def evaluate(self, road_list):
-        for sample_nodes in road_list:
-            counter = 20
-            attempt = 0
-            condition = True
-            while condition:
-                attempt += 1
-                if attempt == counter:
-                    raise Exception('Exhausted attempts')
-                if attempt > 1:
-                    self._close()
-                if attempt > 2:
-                    time.sleep(5)
-                sim = self._run_simulation(sample_nodes)
-                if sim.info.success:
-                    condition = False
-                return(sim)
+
+    def _execute(self, the_test):
+        # Ensure we do not execute anything longer than the time budget
+        super()._execute(the_test)
+
+        print("Executing the test")
+
+        counter = 20
+        attempt = 0
+        condition = True
+        while condition:
+            attempt += 1
+            if attempt == counter:
+                test_outcome = "FAIL"
+                description = 'Exhausted attempts'
+            if attempt > 1:
+                self._close()
+            if attempt > 2:
+                time.sleep(5)
+            sim = self._run_simulation(the_test)
+            if sim.info.success:
+                test_outcome = "SUCCESS"
+                description = 'Successful test'
+                condition = False
+
+
+        execution_data = sim.states
+
+        return test_outcome, description, execution_data
 
     def _run_simulation(self, nodes) -> SimulationData:
         if not self.brewer:
@@ -150,23 +163,3 @@ class Executor():
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None
-
-
-if __name__ == '__main__':
-    ROAD_PATH = "data/member_seeds/population_HQ1/seed0.json"
-    ROAD_PATH =r"data\seed0.json"
-    MAX_SPEED = 25
-    MIN_SPEED = 10
-    inst = Executor()
-
-    with open(ROAD_PATH, 'r') as f:
-        dict = json.loads(f.read())
-    sample_nodes = [tuple(t) for t in dict['sample_nodes']]
-
-    # nodes should be a list of (x,y) float coordinates
-    nodes = [sample[:2] for sample in sample_nodes]
-    nodes = [(node[0],node[1],-28.0,8.0) for node in nodes]
-
-    sim = inst.evaluate([nodes])
-    #print(sim.states)
-
