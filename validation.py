@@ -20,7 +20,9 @@ class TestValidator:
         return max_x - min_x <= self.map_size and max_y - min_y <= self.map_size
 
     def is_right_type(self, the_test):
-        check = type(the_test) is list
+        check_list = type(the_test) is list
+        check_node_type = all(len(i) == 4 for i in the_test)
+        check = check_list and check_node_type
         return check
 
 
