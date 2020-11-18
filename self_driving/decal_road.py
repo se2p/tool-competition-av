@@ -25,16 +25,6 @@ class DecalRoad:
         self.nodes += [list(item) for item in nodes]
         return self
 
-    # unused
-    def add_2d_points(self, points2d: List[Tuple[float, float]], z=-28, width=8):
-        self._safe_add_nodes(points2d)
-        assert len(points2d) > 0, 'points2d should be a non empty list'
-        assert all(len(item) == 2 for item in points2d), 'points2d list should contain tuple of 2 elements'
-        assert all(all(isinstance(val, float) for val in item) for item in points2d), \
-            'points list can contain only float'
-        self.nodes += [(p[0], p[1], z, width) for p in points2d]
-        return self
-
     def to_dict(self):
         return {
             'name': self.name,
