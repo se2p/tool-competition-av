@@ -52,7 +52,6 @@ class RoadPoints:
 
         a = np.subtract(p2[0:2], origin)
 
-        #TODO: changed from 2 to 4
         # calculate the vector which length is half the road width
         v = (a / np.linalg.norm(a)) * p1[3] / 2
         # add normal vectors
@@ -69,7 +68,6 @@ class RoadPoints:
 
         p2v = np.subtract(p2[0:2], p1[0:2])
         v = (p2v / np.linalg.norm(p2v)) * meters_from_road_start
-        # TODO: test the amount
         origin = np.add(p1[0:2], p1r[0:2]) / 2
         deg = np.degrees(np.arctan2([-v[0]], [-v[1]]))
         res = BeamNGPose(pos=tuple(origin + v) + (p1[2],), rot=(0, 0, deg[0]))
