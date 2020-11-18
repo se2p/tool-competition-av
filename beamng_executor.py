@@ -38,6 +38,8 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, time_budget=None, map_size=None):
         super().__init__(time_budget, map_size)
+        self.test_time_budget = 250000
+        self.maxspeed = 7.0
         self.brewer: BeamNGBrewer = None
 
     def _execute(self, the_test):
@@ -55,6 +57,7 @@ class BeamngExecutor(AbstractTestExecutor):
             if attempt == counter:
                 test_outcome = "FAIL"
                 description = 'Exhausted attempts'
+                break
             if attempt > 1:
                 self._close()
             if attempt > 2:
@@ -97,8 +100,10 @@ class BeamngExecutor(AbstractTestExecutor):
 
         sim_data_collector.get_simulation_data().start()
         try:
+            import timeit
+            start = timeit.default_timer()
             brewer.bring_up()
-            iterations_count = int(self.time_budget/250)
+            iterations_count = int(self.test_time_budget/250)
             idx = 0
             while True:
                 idx += 1
@@ -107,7 +112,6 @@ class BeamngExecutor(AbstractTestExecutor):
                     raise Exception('Timeout simulation ', sim_data_collector.name)
 
                 sim_data_collector.collect_current_data(oob_bb=True)
-                #sim_data_collector.collect_current_data(oob_bb=False)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
 
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
@@ -116,21 +120,21 @@ class BeamngExecutor(AbstractTestExecutor):
                 if last_state.is_oob:
                     break
 
-                import timeit
-                start = timeit.default_timer()
-
                 beamng.step(steps)
 
                 #brewer.vehicle.ai_set_aggression(1)
-                brewer.vehicle.ai_set_speed(7.0, mode='limit')
+                brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
                 brewer.vehicle.ai_drive_in_lane(True)
                 brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
 
 
-                end = timeit.default_timer()
+
                 #print("Time: ", end - start)
 
             sim_data_collector.get_simulation_data().end(success=True)
+            end = timeit.default_timer()
+            run_elapsed_time = end - start
+            self.total_elapsed_time += run_elapsed_time
         except Exception as ex:
             sim_data_collector.get_simulation_data().end(success=False, exception=ex)
             traceback.print_exception(type(ex), ex, ex.__traceback__)
@@ -144,8 +148,6 @@ class BeamngExecutor(AbstractTestExecutor):
             self.end_iteration()
 
         return sim_data_collector.simulation_data
-
-
 
     def end_iteration(self):
         try:
