@@ -1,6 +1,4 @@
 from executors import AbstractTestExecutor
-import json
-import os
 import time
 import traceback
 from typing import Tuple
@@ -50,6 +48,7 @@ class BeamngExecutor(AbstractTestExecutor):
 
         counter = 20
         attempt = 0
+        sim = None
         condition = True
         while condition:
             attempt += 1
@@ -66,9 +65,9 @@ class BeamngExecutor(AbstractTestExecutor):
                 description = 'Successful test'
                 condition = False
 
-
         execution_data = sim.states
 
+        # TODO: report all test outcomes
         return test_outcome, description, execution_data
 
     def _run_simulation(self, nodes) -> SimulationData:
@@ -99,7 +98,7 @@ class BeamngExecutor(AbstractTestExecutor):
         sim_data_collector.get_simulation_data().start()
         try:
             brewer.bring_up()
-            iterations_count = 1000
+            iterations_count = int(self.time_budget/250)
             idx = 0
             while True:
                 idx += 1

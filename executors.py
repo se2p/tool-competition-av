@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 
 import time
 
+
 class AbstractTestExecutor(ABC):
 
     start_time = None
