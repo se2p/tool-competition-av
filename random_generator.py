@@ -14,6 +14,7 @@ class RandomTestGenerator():
             print("Starting test generation. Remaining time ", self.executor.get_remaining_time())
 
             # TODO Define a smarter random generation
+            # TODO test random generator
             test = []
             for i in range(1, 3):
                 test.append((randint(0, self.map_size), randint(0, self.map_size)))
