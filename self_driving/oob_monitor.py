@@ -98,20 +98,20 @@ class OutOfBoundsMonitor:
 
         # x coordinates of the bounding box of the car.
         boundary_x = [
-            car_bbox['near_bottom_left'][0],
-            car_bbox['near_bottom_right'][0],
-            car_bbox['far_bottom_right'][0],
-            car_bbox['far_bottom_left'][0],
-            car_bbox['near_bottom_left'][0],
+            car_bbox['rear_bottom_left'][0],
+            car_bbox['rear_bottom_right'][0],
+            car_bbox['front_bottom_right'][0],
+            car_bbox['front_bottom_left'][0],
+            car_bbox['rear_bottom_left'][0],
         ]
 
         # y coordinates of the bounding box of the car.
         boundary_y = [
-            car_bbox['near_bottom_left'][1],
-            car_bbox['near_bottom_right'][1],
-            car_bbox['far_bottom_right'][1],
-            car_bbox['far_bottom_left'][1],
-            car_bbox['near_bottom_left'][1],
+            car_bbox['rear_bottom_left'][1],
+            car_bbox['rear_bottom_right'][1],
+            car_bbox['front_bottom_right'][1],
+            car_bbox['front_bottom_left'][1],
+            car_bbox['rear_bottom_left'][1],
         ]
 
         return Polygon(zip(boundary_x, boundary_y))

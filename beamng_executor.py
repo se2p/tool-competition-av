@@ -10,29 +10,10 @@ from self_driving.simulation_data import SimulationDataRecord, SimulationData
 from self_driving.simulation_data_collector import SimulationDataCollector
 from self_driving.utils import get_node_coords, points_distance
 from self_driving.vehicle_state_reader import VehicleStateReader
-from beamngpy.sensors import Camera
 
 
 
 FloatDTuple = Tuple[float, float, float, float]
-IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
-
-class BeamNGCarCameras:
-    def __init__(self):
-        direction = (0, 1, 0)
-        fov = 120
-        resolution = (320, 160)
-        y, z = 1.7, 1.0
-
-        cam_center = 'cam_center', Camera((-0.3, y, z), direction, fov, resolution, colour=True, depth=True,
-                                          annotation=True)
-        cam_left = 'cam_left', Camera((-1.3, y, z), direction, fov, resolution, colour=True, depth=True,
-                                      annotation=True)
-        cam_right = 'cam_right', Camera((0.4, y, z), direction, fov, resolution, colour=True, depth=True,
-                                        annotation=True)
-
-        self.cameras_array = [cam_center, cam_left, cam_right]
-
 
 class BeamngExecutor(AbstractTestExecutor):
 
@@ -77,7 +58,6 @@ class BeamngExecutor(AbstractTestExecutor):
         if not self.brewer:
             self.brewer = BeamNGBrewer()
             self.vehicle = self.brewer.setup_vehicle()
-            self.camera = self.brewer.setup_scenario_camera()
 
         brewer = self.brewer
         brewer.setup_road_nodes(nodes)
@@ -86,8 +66,7 @@ class BeamngExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        cameras = BeamNGCarCameras()
-        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=cameras.cameras_array)
+        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=None)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
 
         steps = brewer.params.beamng_steps
@@ -95,7 +74,6 @@ class BeamngExecutor(AbstractTestExecutor):
         name = 'beamng_executor/sim_$(id)'.replace('$(id)', simulation_id)
         sim_data_collector = SimulationDataCollector(self.vehicle, beamng, brewer.decal_road, brewer.params,
                                                      vehicle_state_reader=vehicle_state_reader,
-                                                     camera=self.camera,
                                                      simulation_name=name)
 
         sim_data_collector.get_simulation_data().start()

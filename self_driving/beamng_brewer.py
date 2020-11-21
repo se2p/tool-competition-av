@@ -1,10 +1,15 @@
+import json
+
 from beamngpy import BeamNGpy, Scenario, Vehicle
 from beamngpy.sensors import Camera
 
+from self_driving.beamng_waypoint import BeamNGWaypoint
 from self_driving.decal_road import DecalRoad
 from self_driving.road_points import List4DTuple, RoadPoints
 from self_driving.simulation_data import SimulationParams
 from self_driving.beamng_pose import BeamNGPose
+from self_driving.utils import get_node_coords
+from self_driving.beamng_tig_maps import maps
 
 
 class BeamNGCamera:
