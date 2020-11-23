@@ -70,7 +70,14 @@ class AbstractTestExecutor(ABC):
         is_valid, validation_msg = self.validate_test(the_test_as_4tuple)
 
         if is_valid:
-            return self._execute(the_test_as_4tuple)
+            test_outcome, description, execution_data = self._execute(the_test_as_4tuple)
+            if test_outcome == "ERROR":
+                # This indicates a generic error during the execution, usually caused by a malformed test that the
+                # validation logic was not able to catch.
+                return "INVALID", description, []
+            else:
+                # Valid, either pass or fail
+                return test_outcome, description, execution_data
         else:
             return "INVALID", validation_msg, []
 

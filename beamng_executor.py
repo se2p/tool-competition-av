@@ -49,18 +49,25 @@ class BeamngExecutor(AbstractTestExecutor):
         while condition:
             attempt += 1
             if attempt == counter:
-                test_outcome = "FAIL"
+                test_outcome = "ERROR"
                 description = 'Exhausted attempts'
                 break
             if attempt > 1:
                 self._close()
             if attempt > 2:
                 time.sleep(5)
+
             sim = self._run_simulation(interpolated_test)
+
             if sim.info.success:
-                test_outcome = "SUCCESS"
-                description = 'Successful test'
+                if sim.exception_str:
+                    test_outcome = "FAIL"
+                    description = sim.exception_str
+                else:
+                    test_outcome = "SUCCESS"
+                    description = 'Successful test'
                 condition = False
+
 
         execution_data = sim.states
 
@@ -124,23 +131,19 @@ class BeamngExecutor(AbstractTestExecutor):
 
             while True:
                 idx += 1
-                if idx >= iterations_count:
-                    sim_data_collector.save()
-                    raise Exception('Timeout simulation ', sim_data_collector.name)
+
+                assert idx < iterations_count, "Timeout Simulation " + str(sim_data_collector.name)
 
                 sim_data_collector.collect_current_data(oob_bb=True)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
 
+                # Target point reached
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
 
-                if not self._is_the_car_moving(last_state):
-                    sim_data_collector.save()
-                    raise Exception('Car is not moving fast enough ', sim_data_collector.name)
+                assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(sim_data_collector.name)
 
-                if last_state.is_oob:
-                    sim_data_collector.save()
-                    raise Exception('Car drove out of the lane ', sim_data_collector.name)
+                assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
 
                 beamng.step(steps)
 
@@ -148,7 +151,13 @@ class BeamngExecutor(AbstractTestExecutor):
             end = timeit.default_timer()
             run_elapsed_time = end - start
             self.total_elapsed_time += run_elapsed_time
+        except AssertionError as aex:
+            sim_data_collector.save()
+            # An assertion that trigger is still a successfull test execution, otherwise it will count as ERROR
+            sim_data_collector.get_simulation_data().end(success=True, exception=aex)
+            traceback.print_exception(type(aex), aex, aex.__traceback__)
         except Exception as ex:
+            sim_data_collector.save()
             sim_data_collector.get_simulation_data().end(success=False, exception=ex)
             traceback.print_exception(type(ex), ex, ex.__traceback__)
         finally:
