@@ -13,12 +13,11 @@ class RandomTestGenerator():
         while self.executor.get_remaining_time() > 0:
             print("Starting test generation. Remaining time ", self.executor.get_remaining_time())
 
-            # TODO Define a smarter random generation
-            # TODO test random generator
             test = []
             for i in range(1, 3):
                 test.append((randint(0, self.map_size), randint(0, self.map_size)))
 
+            print("Generated test: ", test)
             test_outcome, description, execution_data = self.executor.execute_test(test)
 
             print("test_outcome ", test_outcome)
