@@ -135,12 +135,12 @@ class BeamngExecutor(AbstractTestExecutor):
                     break
 
                 if not self._is_the_car_moving(last_state):
-                    print("Car is not moving fast enough")
-                    break
+                    sim_data_collector.save()
+                    raise Exception('Car is not moving fast enough ', sim_data_collector.name)
 
                 if last_state.is_oob:
-                    print("Car drove out of the lane")
-                    break
+                    sim_data_collector.save()
+                    raise Exception('Car drove out of the lane ', sim_data_collector.name)
 
                 beamng.step(steps)
 
