@@ -1,17 +1,21 @@
 from self_driving.road_polygon import RoadPolygon
-
+from shapely.geometry import LineString
 
 class TestValidator:
 
-    def __init__(self, map_size):
+    def __init__(self, map_size, min_road_lenght = 20):
         self.map_size = map_size
+        self.min_road_lenght = min_road_lenght
+        # Not sure how to set this value... This might require to compute some sort of density: not points that are too
+        # close to each others
+        self.max_points = 500
+
+    def is_too_many_points(self, the_test):
+        return len(the_test) > self.max_points
 
     def is_not_self_intersecting(self, the_test):
         road_polygon = RoadPolygon.from_nodes(the_test)
         return road_polygon.is_valid()
-
-    def is_not_overlapping(self, the_test):
-        pass
 
     def is_inside_map(self, the_test):
         """ Take the extreme points and ensure that their distance is smaller than the map side"""
@@ -31,6 +35,9 @@ class TestValidator:
 
         return check
 
+    def is_minimum_length(self, the_test):
+        # This is approximated because at this point the_test is not yet interpolated
+        return LineString([(t[0], t[1]) for t in the_test]).length > self.min_road_lenght
 
     def validate_test(self, the_test):
         # TODO This requires 4-tuple so we need to transform the_test appropriately
@@ -38,6 +45,11 @@ class TestValidator:
 
         is_valid = True
         validation_msg = ""
+
+        if self.is_too_many_points(the_test_as_4tuple):
+            is_valid = False
+            validation_msg = "The road definition contains too many points"
+            return is_valid, validation_msg
 
         if not self.is_inside_map(the_test_as_4tuple):
             is_valid = False
@@ -50,5 +62,10 @@ class TestValidator:
         if not self.is_right_type(the_test_as_4tuple):
             is_valid = False
             validation_msg = "Wrong type"
+            return is_valid, validation_msg
+        if not self.is_minimum_length(the_test_as_4tuple):
+            is_valid = False
+            validation_msg = "The road is not long enough."
+            return is_valid, validation_msg
 
         return is_valid, validation_msg
