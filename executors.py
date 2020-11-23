@@ -23,13 +23,18 @@ class AbstractTestExecutor(ABC):
 
     # test_outcome, description, execution_data
     def execute_test(self, the_test):
-        is_valid, validation_msg = self.validate_test(the_test)
+        # TODO There is a mistmacth between the format of the_test and the format expected by the executors 4-tuple
+        the_test_as_4tuple = [(float(t[0]), float(t[1]), -28.0, 8.0) for t in the_test]
+
+        is_valid, validation_msg = self.validate_test(the_test_as_4tuple)
+
         if is_valid:
-            return self._execute(the_test)
+            return self._execute(the_test_as_4tuple)
         else:
             return "INVALID", validation_msg, []
 
     def validate_test(self, the_test):
+        print("Validating test")
         return self.test_validator.validate_test(the_test)
 
     def get_elapsed_time(self):

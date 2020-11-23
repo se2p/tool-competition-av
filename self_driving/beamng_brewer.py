@@ -31,12 +31,7 @@ class BeamNGCamera:
 
 class BeamNGBrewer:
     def __init__(self, beamng_home = None, road_nodes: List4DTuple = None):
-        if beamng_home:
-            # Explicitly select which BeamNG.exe to use. Useful for debugging and upgrading
-            self.beamng = BeamNGpy(beamng_home, 'localhost', 64256)
-        else:
-            # Assume that BeamNG.exe is on PATH
-            self.beamng = BeamNGpy('localhost', 64256)
+        self.beamng = BeamNGpy('localhost', 64256, home=beamng_home)
 
         self.vehicle: Vehicle = None
         self.camera: BeamNGCamera = None

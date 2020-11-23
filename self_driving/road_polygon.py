@@ -12,7 +12,7 @@ class RoadPolygon:
     (a polygon or a sequence of polygons)."""
 
     @classmethod
-    def from_nodes(cls, nodes: List[Tuple[float, float]]):
+    def from_nodes(cls, nodes: List[Tuple[float, float, float, float]]):
         return RoadPolygon(RoadPoints.from_nodes(nodes))
 
     def __init__(self, road_points: RoadPoints):
