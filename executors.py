@@ -6,6 +6,12 @@ import json
 from validation import TestValidator
 from abc import ABC, abstractmethod
 
+from scipy.interpolate import splev, splprep
+from numpy.ma import arange
+from numpy import repeat, linspace
+from shapely.geometry import LineString
+
+
 import time
 
 
@@ -19,9 +25,44 @@ class AbstractTestExecutor(ABC):
         self.start_time = time.monotonic()
         self.total_elapsed_time = 0
 
+        self.rounding_precision = 3
+        self.min_num_nodes = 20
+        # every 5 meters more or less we need to place a node
+        self.interpolation_distance = 5
+        self.line_width = 0.15
+        self.smoothness = 0
+
         super().__init__()
 
-    # test_outcome, description, execution_data
+    def _interpolate(self, the_test):
+        old_x_vals = [t[0] for t in the_test ]
+        old_y_vals = [t[1] for t in the_test]
+        old_width_vals = [8.0 for t in the_test]
+
+        # This is an approximation based on whatever input is given
+        test_road_lenght = LineString([(t[0], t[1]) for t in the_test]).length
+        num_nodes = int(test_road_lenght / self.interpolation_distance)
+        if num_nodes < self.min_num_nodes:
+            num_nodes = self.min_num_nodes
+
+        k = 1 if len(old_x_vals) <= 3 else 3
+        pos_tck, pos_u = splprep([old_x_vals, old_y_vals], s=self.smoothness, k=k)
+
+        # Made this proportional to the lenght of the road
+
+        step_size = 1 / num_nodes
+        unew = arange(0, 1 + step_size, step_size)
+
+        new_x_vals, new_y_vals = splev(unew, pos_tck)
+        width_tck, width_u = splprep([pos_u, old_width_vals], s=self.smoothness, k=k)
+        _, new_width_vals = splev(unew, width_tck)
+        # Reduce floating point rounding errors otherwise these may cause problems with calculating parallel_offset
+        # TODO Return the 4-tuple with standard z and width... this is bad but I cannot think of another solution
+        return list(zip([round(v, self.rounding_precision) for v in new_x_vals],
+                        [round(v, self.rounding_precision) for v in new_y_vals],
+                        [-28.0 for v in new_x_vals],
+                        [8.0 for v in new_x_vals]))
+
     def execute_test(self, the_test):
         # TODO There is a mistmacth between the format of the_test and the format expected by the executors 4-tuple
         the_test_as_4tuple = [(float(t[0]), float(t[1]), -28.0, 8.0) for t in the_test]

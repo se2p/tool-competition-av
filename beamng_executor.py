@@ -28,9 +28,15 @@ class BeamngExecutor(AbstractTestExecutor):
         # Ensure we do not execute anything longer than the time budget
         super()._execute(the_test)
 
+        # BeamNG requires the roads to be interpolated, as it cannot generate "squared" roads
+        # This returns 4-tuple
+        interpolated_test = self._interpolate(the_test)
+
         print("Executing the test")
 
-        counter = 20
+        # TODO Not sure why we need to repeat this 20 times...
+        counter = 2
+
         attempt = 0
         sim = None
         condition = True
@@ -44,7 +50,7 @@ class BeamngExecutor(AbstractTestExecutor):
                 self._close()
             if attempt > 2:
                 time.sleep(5)
-            sim = self._run_simulation(the_test)
+            sim = self._run_simulation(interpolated_test)
             if sim.info.success:
                 test_outcome = "SUCCESS"
                 description = 'Successful test'
