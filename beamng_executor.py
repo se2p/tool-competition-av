@@ -11,7 +11,7 @@ from self_driving.simulation_data_collector import SimulationDataCollector
 from self_driving.utils import get_node_coords, points_distance
 from self_driving.vehicle_state_reader import VehicleStateReader
 
-
+from shapely.geometry import Point
 
 FloatDTuple = Tuple[float, float, float, float]
 
@@ -25,6 +25,10 @@ class BeamngExecutor(AbstractTestExecutor):
         self.risk_value = 0.7
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
+        # Runtime Monitor about relative movement of the car
+        self.last_observation = None
+        # Not sure how to set this... How far can a car move in 250 ms at 5Km/h
+        self.min_delta_position = 1.0
 
     def _execute(self, the_test):
         # Ensure we do not execute anything longer than the time budget
@@ -63,6 +67,26 @@ class BeamngExecutor(AbstractTestExecutor):
         # TODO: report all test outcomes
         return test_outcome, description, execution_data
 
+
+    def _is_the_car_moving(self, last_state):
+        """ Check if the car moved in the past 10 seconds """
+
+        # Has the position changed
+        if self.last_observation == None:
+            self.last_observation = last_state
+            return True
+
+        # If the car moved since the last observation, we store the last state and move one
+        if Point(self.last_observation.pos[0],self.last_observation.pos[1]).distance(Point(last_state.pos[0], last_state.pos[1])) > self.min_delta_position:
+            self.last_observation = last_state
+            return True
+        else:
+            # How much time has passed since the last observation?
+            if last_state.timer - self.last_observation.timer > 10.0:
+                return False
+            else:
+                return True
+
     def _run_simulation(self, nodes) -> SimulationData:
         if not self.brewer:
             self.brewer = BeamNGBrewer(self.beamng_home)
@@ -93,7 +117,6 @@ class BeamngExecutor(AbstractTestExecutor):
             iterations_count = int(self.test_time_budget/250)
             idx = 0
 
-
             brewer.vehicle.ai_set_aggression(self.risk_value)
             brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
             brewer.vehicle.ai_drive_in_lane(True)
@@ -111,15 +134,15 @@ class BeamngExecutor(AbstractTestExecutor):
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
 
+                if not self._is_the_car_moving(last_state):
+                    print("Car is not moving fast enough")
+                    break
+
                 if last_state.is_oob:
+                    print("Car drove out of the lane")
                     break
 
                 beamng.step(steps)
-
-
-
-
-                #print("Time: ", end - start)
 
             sim_data_collector.get_simulation_data().end(success=True)
             end = timeit.default_timer()
