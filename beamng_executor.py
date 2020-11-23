@@ -17,11 +17,12 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, time_budget=None, map_size=None):
+    def __init__(self, beamng_home = None, time_budget=None, map_size=None):
         super().__init__(time_budget, map_size)
         self.test_time_budget = 250000
         self.maxspeed = 7.0
         self.brewer: BeamNGBrewer = None
+        self.beamng_home = beamng_home
 
     def _execute(self, the_test):
         # Ensure we do not execute anything longer than the time budget
@@ -56,7 +57,7 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def _run_simulation(self, nodes) -> SimulationData:
         if not self.brewer:
-            self.brewer = BeamNGBrewer()
+            self.brewer = BeamNGBrewer(self.beamng_home)
             self.vehicle = self.brewer.setup_vehicle()
 
         brewer = self.brewer
