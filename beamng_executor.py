@@ -20,7 +20,9 @@ class BeamngExecutor(AbstractTestExecutor):
     def __init__(self, beamng_home = None, time_budget=None, map_size=None):
         super().__init__(time_budget, map_size)
         self.test_time_budget = 250000
-        self.maxspeed = 7.0
+        # TODO Expose those as parameters
+        self.maxspeed = 70.0
+        self.risk_value = 0.7
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
 
@@ -90,6 +92,13 @@ class BeamngExecutor(AbstractTestExecutor):
             brewer.bring_up()
             iterations_count = int(self.test_time_budget/250)
             idx = 0
+
+
+            brewer.vehicle.ai_set_aggression(self.risk_value)
+            brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
+            brewer.vehicle.ai_drive_in_lane(True)
+            brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
+
             while True:
                 idx += 1
                 if idx >= iterations_count:
@@ -107,10 +116,6 @@ class BeamngExecutor(AbstractTestExecutor):
 
                 beamng.step(steps)
 
-                #brewer.vehicle.ai_set_aggression(1)
-                brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
-                brewer.vehicle.ai_drive_in_lane(True)
-                brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
 
 
 

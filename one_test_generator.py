@@ -24,6 +24,7 @@ class OneTestGenerator():
         print("Generated test: ", test)
         test_outcome, description, execution_data = self.executor.execute_test(test)
 
+        print(execution_data)
         # Check that data is timestamped
         pass
 
