@@ -12,7 +12,7 @@ import os
 @click.option('--time-budget', required=True, type=int)
 @click.option('--map-size', type=int, default=200)
 @click.option('--module-name', required=True, type=str)
-# Add type: File
+# TODO Add type: File
 @click.option('--module-path', required=True, type=str)
 @click.option('--class-name', required=True, type=str)
 def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name):
