@@ -27,8 +27,8 @@ class AbstractTestExecutor(ABC):
 
         self.rounding_precision = 3
         self.min_num_nodes = 20
-        # every 5 meters more or less we need to place a node
-        self.interpolation_distance = 5
+        # every 2 meters more or less we need to place a node
+        self.interpolation_distance = 2
         self.line_width = 0.15
         self.smoothness = 0
 
@@ -116,7 +116,7 @@ class MockExecutor(AbstractTestExecutor):
 
 if __name__ == '__main__':
     from beamng_executor import BeamngExecutor
-    executor = BeamngExecutor(time_budget=250000, map_size=250)
+    executor = BeamngExecutor(time_budget=250000, map_size=250, beamng_home=r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0")
     ROAD_PATH = r"data\seed0.json"
     with open(ROAD_PATH, 'r') as f:
         dict = json.loads(f.read())

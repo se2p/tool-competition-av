@@ -71,6 +71,7 @@ class SimulationData:
         self.road: DecalRoad = None
         self.states: SimulationDataRecord = None
         self.info: SimulationInfo = None
+        self.exception_str = None
 
         assert len(self.name) >= 3, 'the simulation name must be a string of at least 3 character'
 
@@ -147,3 +148,5 @@ class SimulationData:
         self.info.success = success
         if exception:
             self.exception_str = str(exception)
+        else:
+            self.exception_str = "No exception"
