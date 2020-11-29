@@ -17,7 +17,7 @@ class OutOfBoundsMonitor:
         self.last_max_oob_percentage = 0
 
     # Why tolerance is 1?
-    def get_oob_info(self, wrt="right", oob_bb=True, tolerance=0.8) -> Tuple[bool, int, float]:
+    def get_oob_info(self, wrt="right", oob_bb=True, tolerance=0.95) -> Tuple[bool, int, float]:
         if oob_bb:
             is_oob = self.is_oob_bb(tolerance=tolerance, wrt=wrt)
             self.update_oob_percentage(is_oob)

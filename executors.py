@@ -27,8 +27,8 @@ class AbstractTestExecutor(ABC):
 
         self.rounding_precision = 3
         self.min_num_nodes = 20
-        # every 2 meters more or less we need to place a node
-        self.interpolation_distance = 2
+        # every meter more or less we need to place a node
+        self.interpolation_distance = 1
         self.line_width = 0.15
         self.smoothness = 0
 
