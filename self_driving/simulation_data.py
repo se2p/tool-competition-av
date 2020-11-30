@@ -148,5 +148,3 @@ class SimulationData:
         self.info.success = success
         if exception:
             self.exception_str = str(exception)
-        else:
-            self.exception_str = "No exception"
