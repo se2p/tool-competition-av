@@ -259,14 +259,20 @@ class JanusGenerator():
         MAX_ANGLE = 40
         NUM_SPLINE_NODES = 20
         SEG_LENGTH = 25
-        test = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
-                             num_spline_nodes=NUM_SPLINE_NODES).generate()
+        test_outcome = None
+        count = 0
 
-        print("Generated test: ", test)
-        test_outcome, description, execution_data = self.executor.execute_test(test)
+        while(test_outcome != "FAIL"):
+            test = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
+                                 num_spline_nodes=NUM_SPLINE_NODES).generate()
 
-        print(test_outcome, description)
-        pass
+            print("Generated test: ", test)
+            test_outcome, description, execution_data = self.executor.execute_test(test)
+
+            print(test_outcome, description)
+            count += 1
+
+        print("Successful tests: "+str(count))
 
 
 if __name__ == "__main__":
