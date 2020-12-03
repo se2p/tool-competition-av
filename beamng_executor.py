@@ -68,18 +68,16 @@ class BeamngExecutor(AbstractTestExecutor):
                     description = 'Successful test'
                 condition = False
 
-
         execution_data = sim.states
 
         # TODO: report all test outcomes
         return test_outcome, description, execution_data
 
-
     def _is_the_car_moving(self, last_state):
         """ Check if the car moved in the past 10 seconds """
 
         # Has the position changed
-        if self.last_observation == None:
+        if self.last_observation is None:
             self.last_observation = last_state
             return True
 
