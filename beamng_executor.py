@@ -118,8 +118,6 @@ class BeamngExecutor(AbstractTestExecutor):
 
         sim_data_collector.get_simulation_data().start()
         try:
-            import timeit
-            start = timeit.default_timer()
             brewer.bring_up()
             iterations_count = int(self.test_time_budget/250)
             idx = 0
@@ -136,7 +134,6 @@ class BeamngExecutor(AbstractTestExecutor):
 
                 sim_data_collector.collect_current_data(oob_bb=True)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
-
                 # Target point reached
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
@@ -148,12 +145,11 @@ class BeamngExecutor(AbstractTestExecutor):
                 beamng.step(steps)
 
             sim_data_collector.get_simulation_data().end(success=True)
-            end = timeit.default_timer()
-            run_elapsed_time = end - start
+            run_elapsed_time = float(last_state.timer)
             self.total_elapsed_time += run_elapsed_time
         except AssertionError as aex:
             sim_data_collector.save()
-            # An assertion that trigger is still a successfull test execution, otherwise it will count as ERROR
+            # An assertion that trigger is still a successful test execution, otherwise it will count as ERROR
             sim_data_collector.get_simulation_data().end(success=True, exception=aex)
             traceback.print_exception(type(aex), aex, aex.__traceback__)
         except Exception as ex:

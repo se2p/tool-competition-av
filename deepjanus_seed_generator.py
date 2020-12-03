@@ -271,6 +271,7 @@ class JanusGenerator():
 
             print(test_outcome, description)
             count += 1
+            print("Remaining Time: "+str(self.executor.get_remaining_time()))
 
         print("Successful tests: "+str(count))
 
