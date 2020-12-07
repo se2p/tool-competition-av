@@ -35,6 +35,11 @@ class TestValidator:
 
         return check
 
+    def is_valid_polygon(self, the_test):
+        road_polygon = RoadPolygon.from_nodes(the_test)
+        check = road_polygon.is_valid()
+        return check
+
     def is_minimum_length(self, the_test):
         # This is approximated because at this point the_test is not yet interpolated
         return LineString([(t[0], t[1]) for t in the_test]).length > self.min_road_lenght
@@ -55,10 +60,18 @@ class TestValidator:
             is_valid = False
             validation_msg = "Not entirely inside the map boundaries"
             return is_valid, validation_msg
+
+        # TODO: consider whether remove it
         if not self.is_not_self_intersecting(the_test_as_4tuple):
            is_valid = False
            validation_msg = "The road is self-intersecting"
            return is_valid, validation_msg
+
+        if not self.is_valid_polygon(the_test):
+            is_valid = False
+            validation_msg = "The road is self-intersecting"
+            return is_valid, validation_msg
+
         if not self.is_right_type(the_test_as_4tuple):
             is_valid = False
             validation_msg = "Wrong type"
