@@ -9,7 +9,15 @@ It is developed in Python and runs on Windows machines.
 ### BeamNG simulator ###
 
 This tool needs the BeamNG simulator to be installed on the machine where it is running. 
-A free version of the BeamNG simulator for research purposes can be obtained by registering at https://register.beamng.tech and following the instructions provided by BeamNG. 
+A free version of the BeamNG simulator for research purposes can be obtained by registering at [https://register.beamng.tech](https://register.beamng.tech) and following the instructions provided by BeamNG. Please fill the "Application Text" field of the registration form with the following text:
+
+```
+I would like to participate to the "Testing Self-Driving Car Software
+Contest" of the SBST Tool Competition 2021 and for that I need to a
+copy of BeamNG.research
+```
+
+> **Note**: as stated on the BeamNG registration page, **please use your university email address**. If you do not own a university email address, please contact the organizers of the tool competition. 
 
 ### Python ###
 
