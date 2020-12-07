@@ -3,22 +3,31 @@
 ## Scenario/Road Generation
 
 ### Introduction
-This task is about generation of virtual roads to test lane keeping assist function of the test subject(s). A scenario consists of an ego-car equipped with a test lane keeping assist system, a road, a driving task and the environment definition. 
-The driving task is to drive from road start to road end without going astray
-
-Roads' geometry can change but the layout is always: one left lane, one right lane (where the car drives). Each lane is 4m wide. Lane markings are solid yellow and solid white (TODO: clarify this point, add a figure)
-
+This task is about generation of virtual roads to test lane keeping assist function of the test subject(s). A scenario consists of an ego-car equipped with a test lane keeping assist system, a road, a driving task and the environment definition.  The driving task is to drive from road start to road end without going astray
 
 ### Goal
 Force the test subject to drive of the lane, without creating invalid roads (See below)
 
 
 ### Road structure
-Roads are defined by a (ordered) sequence of coordinates in a two-dimensional space, i.e., (x, y). Each point corresponds the central line of the road, a.k.a., *the central spine*. 
+Roads are defined by a (ordered) sequence of coordinates in a two-dimensional space, i.e., (x, y). Each point corresponds the central line of the road, a.k.a., *road spine*. 
 
-The first point in the sequence defines the starting location the last one the target location (TODO: initial placement of the car defined how? Target location defined how?)
+The first point in the sequence defines the starting location the last one the target location.
 
-So test generators must generate sequences of points to define the overall geometry of the roads. Road material, road slope, road layout, background, weather, time-of-day, are all fixed and predefined in this challenge (daylight, no rain, clear-sky, green grass, no curbs, cement/asphalt/concrete).
+> **NOTE**: the initial placement and rotation of the ego-vehicle is automatically defined.
+
+Test generators must generate sequences of coordinates, i.e., *road points*, that define the overall geometry of the roads. The road points are automatically interpolated using cubic splines to obtain the final road geometry.
+
+The following image illustrates how a road is rendered from the following *road points*: 
+`[(10,20), (30, 20), (40, 30), (50, 40), (150, 100), (30, 180)]`
+
+![Sample Road caption="test"](./figures/road_sample.pdf "Sample Road")
+
+In the figure, the inner square identifies the boundary of the map (200x200), the white dots are the *road points*, the yellow solid line is the *road spine* that interpolates them, and, finally, the gray area is the road.
+
+As the figure illustrates, the road layout consist of one left lane and one right lane (where the car drives). Each lane is 4 meter wide and the lane markings are defined according to the US standard (solid yellow line in the middle and solid white lines on the side).
+
+> **Note**: road material, slope, layout, and environmental factors such as weather and time-of-day are fixed and predefined  (daylight, no rain, clear-sky, green grass, no curbs, cement/asphalt/concrete). 
 
 
 ### Validity checks
