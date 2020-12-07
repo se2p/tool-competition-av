@@ -6,7 +6,8 @@
 from random import randint
 from typing import List, Tuple
 
-from shapely.geometry import Point, box, LineString, Polygon
+from shapely.geometry import Point
+from bbox import RoadBoundingBox
 
 import math
 import numpy as np
@@ -82,45 +83,6 @@ def catmull_rom(points: List[tuple], num_spline_points=20) -> List[tuple]:
     z0 = points[0][2]
     width = points[0][3]
     return [(p[0], p[1], z0, width) for p in np_point_array]
-
-
-class RoadBoundingBox:
-    """A class representing the bounding box that contains the road."""
-
-    def __init__(self, bbox_size: Tuple[float, float, float, float]):
-        assert len(bbox_size) == 4
-        self.bbox = box(*bbox_size)
-
-    def intersects_sides(self, point: Point) -> bool:
-        for side in self.get_sides():
-            if side.intersects(point):
-                return True
-        return False
-
-    def intersects_vertices(self, point: Point) -> bool:
-        for vertex in self.get_vertices():
-            if vertex.intersects(point):
-                return True
-        return False
-
-    def intersects_boundary(self, other: Polygon) -> bool:
-        return other.intersects(self.bbox.boundary)
-
-    def contains(self, other: RoadPolygon) -> bool:
-        return self.bbox.contains(other.polyline)
-
-    def get_sides(self) -> List[LineString]:
-        sides = []
-        xs, ys = self.bbox.exterior.coords.xy
-        xys = list(zip(xs, ys))
-        for p1, p2 in zip(xys[:-1], xys[1:]):
-            sides.append(LineString([p1, p2]))
-        return sides
-
-    def get_vertices(self) -> List[Point]:
-        xs, ys = self.bbox.exterior.coords.xy
-        xys = list(zip(xs, ys))
-        return [Point(xy) for xy in xys]
 
 
 class RoadGenerator:
