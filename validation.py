@@ -1,11 +1,14 @@
+from bbox import RoadBoundingBox
 from self_driving.road_polygon import RoadPolygon
 from shapely.geometry import LineString
 
 class TestValidator:
 
-    def __init__(self, map_size, min_road_lenght = 20):
+    def __init__(self, map_size, min_road_length = 20):
         self.map_size = map_size
-        self.min_road_lenght = min_road_lenght
+        self.box = (-map_size, 0, map_size, 2*map_size)
+        self.road_bbox = RoadBoundingBox(self.box)
+        self.min_road_length = min_road_length
         # Not sure how to set this value... This might require to compute some sort of density: not points that are too
         # close to each others
         self.max_points = 500
@@ -40,9 +43,14 @@ class TestValidator:
         check = road_polygon.is_valid()
         return check
 
+    def intersects_boundary(self, the_test):
+        road_polygon = RoadPolygon.from_nodes(the_test)
+        check = self.road_bbox.intersects_boundary(road_polygon.polygon)
+        return check
+
     def is_minimum_length(self, the_test):
         # This is approximated because at this point the_test is not yet interpolated
-        return LineString([(t[0], t[1]) for t in the_test]).length > self.min_road_lenght
+        return LineString([(t[0], t[1]) for t in the_test]).length > self.min_road_length
 
     def validate_test(self, the_test):
         # TODO This requires 4-tuple so we need to transform the_test appropriately
@@ -56,12 +64,18 @@ class TestValidator:
             validation_msg = "The road definition contains too many points"
             return is_valid, validation_msg
 
+        # TODO: consider whether to remove it
         if not self.is_inside_map(the_test_as_4tuple):
             is_valid = False
             validation_msg = "Not entirely inside the map boundaries"
             return is_valid, validation_msg
 
-        # TODO: consider whether remove it
+        if not self.intersects_boundary(the_test):
+            is_valid = False
+            validation_msg = "Not entirely inside the map boundaries"
+            return is_valid, validation_msg
+
+        # TODO: consider whether to remove it
         if not self.is_not_self_intersecting(the_test_as_4tuple):
            is_valid = False
            validation_msg = "The road is self-intersecting"
