@@ -65,21 +65,21 @@ class TestValidator:
             return is_valid, validation_msg
 
         # TODO: consider whether to remove it
-        if not self.is_inside_map(the_test_as_4tuple):
+        # if not self.is_inside_map(the_test_as_4tuple):
+        #     is_valid = False
+        #     validation_msg = "Not entirely inside the map boundaries"
+        #     return is_valid, validation_msg
+
+        if self.intersects_boundary(the_test):
             is_valid = False
             validation_msg = "Not entirely inside the map boundaries"
             return is_valid, validation_msg
 
-        if not self.intersects_boundary(the_test):
-            is_valid = False
-            validation_msg = "Not entirely inside the map boundaries"
-            return is_valid, validation_msg
-
-        # TODO: consider whether to remove it
-        if not self.is_not_self_intersecting(the_test_as_4tuple):
-           is_valid = False
-           validation_msg = "The road is self-intersecting"
-           return is_valid, validation_msg
+        # # TODO: consider whether to remove it
+        # if not self.is_not_self_intersecting(the_test_as_4tuple):
+        #    is_valid = False
+        #    validation_msg = "The road is self-intersecting"
+        #    return is_valid, validation_msg
 
         if not self.is_valid_polygon(the_test):
             is_valid = False
