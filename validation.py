@@ -6,7 +6,7 @@ class TestValidator:
 
     def __init__(self, map_size, min_road_length = 20):
         self.map_size = map_size
-        self.box = (-map_size, 0, map_size, 2*map_size)
+        self.box = (0, 0, map_size, map_size)
         self.road_bbox = RoadBoundingBox(self.box)
         self.min_road_length = min_road_length
         # Not sure how to set this value... This might require to compute some sort of density: not points that are too
