@@ -25,7 +25,7 @@ This code has been tested with Python 3.6
 
 ### Other Libraries ###
 
-To easily install the other dependencies with rely on `pip`, we suggest to create a dedicated virtual environment (we tested `vent`), activate it, and run the following command:
+To easily install the other dependencies with rely on `pip`, we suggest to create a dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.6/library/venv.html)), activate it, and run the following command:
 
 ```
 pip install -r requirements-36.txt
