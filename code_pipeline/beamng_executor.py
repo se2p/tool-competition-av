@@ -1,4 +1,4 @@
-from executors import AbstractTestExecutor
+from code_pipeline.executors import AbstractTestExecutor
 import time
 import traceback
 from typing import Tuple

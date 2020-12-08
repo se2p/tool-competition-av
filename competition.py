@@ -4,7 +4,7 @@
 #
 import click
 import importlib
-import os
+
 
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
@@ -17,10 +17,10 @@ import os
 @click.option('--class-name', required=True, type=str)
 def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name):
     if executor == "mock":
-        from executors import MockExecutor
+        from code_pipeline.executors import MockExecutor
         the_executor = MockExecutor(time_budget=time_budget, map_size=map_size)
     elif executor == "beamng":
-        from beamng_executor import BeamngExecutor
+        from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget, map_size=map_size)
 
     # Dynamically load test generator

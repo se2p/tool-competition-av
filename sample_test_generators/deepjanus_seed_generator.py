@@ -243,7 +243,7 @@ if __name__ == "__main__":
     map_size = 250
     beamng_home = r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0"
 
-    from beamng_executor import BeamngExecutor
+    from code_pipeline.beamng_executor import BeamngExecutor
     executor = BeamngExecutor(time_budget=time_budget, map_size=map_size, beamng_home=beamng_home)
 
     roadgen = JanusGenerator(time_budget, executor, map_size)

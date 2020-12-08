@@ -1,5 +1,5 @@
 import unittest
-from validation import TestValidator
+from code_pipeline.validation import TestValidator
 import inspect
 
 class ValidationTest(unittest.TestCase):

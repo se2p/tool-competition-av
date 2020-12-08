@@ -3,7 +3,7 @@
 import json
 
 
-from validation import TestValidator
+from code_pipeline.validation import TestValidator
 from abc import ABC, abstractmethod
 
 from scipy.interpolate import splev, splprep
@@ -203,7 +203,7 @@ class MockExecutor(AbstractTestExecutor):
 
 
 if __name__ == '__main__':
-    from beamng_executor import BeamngExecutor
+    from code_pipeline.beamng_executor import BeamngExecutor
     executor = BeamngExecutor(time_budget=250000, map_size=250, beamng_home=r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0")
     ROAD_PATH = r"data\seed0.json"
     with open(ROAD_PATH, 'r') as f:
