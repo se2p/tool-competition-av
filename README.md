@@ -1,4 +1,6 @@
-# Testing Self-Driving Car Software Contest
+# Cyber-Physical Systems Testing Competition
+
+Starting this year, SBST offers a challenge for software testers who want to work with self-driving cars.
 
 ## Scenario/Road Generation
 
