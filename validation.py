@@ -21,14 +21,19 @@ class TestValidator:
         return road_polygon.is_valid()
 
     def is_inside_map(self, the_test):
-        """ Take the extreme points and ensure that their distance is smaller than the map side"""
+        """
+            Take the extreme points and ensure that their distance is smaller than the map side
+        """
         xs = [t[0] for t in the_test]
         ys = [t[1] for t in the_test]
 
         min_x, max_x = min(xs), max(xs)
         min_y, max_y = min(ys), max(ys)
 
-        return max_x - min_x <= self.map_size and max_y - min_y <= self.map_size
+        return 0 < min_x or min_x > self.map_size and \
+               0 < max_x or max_x > self.map_size and \
+               0 < min_y or min_y > self.map_size and \
+               0 < max_y or max_y > self.map_size
 
     def is_right_type(self, the_test):
         check_list = type(the_test) is list
@@ -64,11 +69,10 @@ class TestValidator:
             validation_msg = "The road definition contains too many points"
             return is_valid, validation_msg
 
-        # TODO: consider whether to remove it
-        # if not self.is_inside_map(the_test_as_4tuple):
-        #     is_valid = False
-        #     validation_msg = "Not entirely inside the map boundaries"
-        #     return is_valid, validation_msg
+        if not self.is_inside_map(the_test_as_4tuple):
+            is_valid = False
+            validation_msg = "Not entirely inside the map boundaries"
+            return is_valid, validation_msg
 
         if self.intersects_boundary(the_test):
             is_valid = False
