@@ -7,7 +7,7 @@ from random import randint
 from typing import List, Tuple
 
 from shapely.geometry import Point
-from bbox import RoadBoundingBox
+from self_driving.bbox import RoadBoundingBox
 
 import math
 import numpy as np

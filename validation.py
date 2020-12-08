@@ -1,4 +1,4 @@
-from bbox import RoadBoundingBox
+from self_driving.bbox import RoadBoundingBox
 from self_driving.road_polygon import RoadPolygon
 from shapely.geometry import LineString
 
