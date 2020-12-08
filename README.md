@@ -65,7 +65,7 @@ The evaluation will be conducted using the same simulation, BeamNG.tech, and set
 The submission package comes with an implementation of a random test generator. This serves the dual purpose of providing an example on how to use the library, and a baseline for the evolution.
 
 # Installation
-Check the [Installation Guide](INSTALL.md)
+Check the [Installation Guide](documentation/INSTALL.md)
 
 # Technical considerations
 contest - 
