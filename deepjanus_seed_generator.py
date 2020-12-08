@@ -92,8 +92,8 @@ class RoadGenerator:
     NUM_UNDO_ATTEMPTS = 20
 
     def __init__(self, num_control_nodes=15, max_angle=None, seg_length=None,
-                 num_spline_nodes=None, initial_node=(0.0, 0.0, -28.0, 8.0),
-                 bbox_size=(-250, 0, 250, 500)):
+                 num_spline_nodes=None, initial_node=(125.0, 0.0, -28.0, 8.0),
+                 bbox_size=(0, 0, 250, 250)):
         assert num_control_nodes > 1 and num_spline_nodes > 0
         assert 0 <= max_angle <= 360
         assert seg_length > 0
@@ -105,7 +105,7 @@ class RoadGenerator:
         self.seg_length = seg_length
         self.road_bbox = RoadBoundingBox(bbox_size)
         assert not self.road_bbox.intersects_vertices(self._get_initial_point())
-        assert self.road_bbox.intersects_sides(self._get_initial_point())
+        #assert self.road_bbox.intersects_sides(self._get_initial_point())
 
     def generate_control_nodes(self, attempts=NUM_UNDO_ATTEMPTS) -> List[Tuple4F]:
         condition = True
@@ -169,12 +169,12 @@ class RoadGenerator:
         condition = True
         while condition:
             control_nodes = self.generate_control_nodes()
+            control_nodes = control_nodes[1:]
             sample_nodes = catmull_rom(control_nodes, self.num_spline_nodes)
             if self.is_valid(control_nodes, sample_nodes, self.num_spline_nodes):
                 condition = False
 
         road = [(node[0], node[1]) for node in sample_nodes]
-
         return road
 
     def _get_initial_point(self) -> Point:
