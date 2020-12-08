@@ -13,7 +13,7 @@ import os
 @click.option('--map-size', type=int, default=200)
 @click.option('--module-name', required=True, type=str)
 # TODO Add type: File
-@click.option('--module-path', required=True, type=str)
+@click.option('--module-path', required=False, type=str)
 @click.option('--class-name', required=True, type=str)
 def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name):
     if executor == "mock":
@@ -28,8 +28,15 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     class_ = getattr(module, class_name)
     test_generator = class_(time_budget=time_budget, executor=the_executor, map_size=map_size)
 
-    # Start the generation
-    test_generator.start()
+    try:
+        # Start the generation
+        test_generator.start()
+    except Exception as ex:
+        print("An error occurred during test generation", ex)
+    finally:
+        # When the generation ends. Print the stats collected
+        print("Test Generation Statistics:")
+        print(the_executor.get_stats())
 
 
 if __name__ == '__main__':
