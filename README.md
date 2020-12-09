@@ -20,7 +20,7 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Self driving car testing library](/self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator
 
-[Scenario template]: basic scenario used in this competition
+[Scenario template](/levels_template/tig): basic scenario used in this competition
 
 [Documentation](/documentation): contains the installation guide and the detailed rules of the competition
 
