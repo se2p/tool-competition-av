@@ -4,7 +4,7 @@ The classes in this folder allow the integration of the test input generators, o
 
 ## License ##
 
-This software has been developed by Vincenzo Riccio and Paolo Tonella in the DeepJanus project. It is distributed under MIT license. See the LICENSE.md file.
+This software has been developed by Vincenzo Riccio and Paolo Tonella in the DeepJanus project. It is distributed under MIT license. See the [LICENSE.md](/LICENSE.md) file.
 
 ## References ##
 
