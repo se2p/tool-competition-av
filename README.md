@@ -24,6 +24,9 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Requirements](/requirements-36.txt): file containing the list of the required packages
 
+## License ##
+The software we developed is distributed under GNU GPL license. See the [LICENSE.md](/LICENSE.md) file.
+
 ## Contacts ##
 
 Alessio Gambi  - Passau University, Germany - 
