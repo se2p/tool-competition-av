@@ -28,7 +28,7 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 Alessio Gambi  - Passau University, Germany
 
-Vincenzo Riccio  - University of Lugano, Switzerland
+Vincenzo Riccio  - Software Institute - USI, Lugano, Switzerland
 
 Fiorella Zampetti  - University of Sannio, Italy
 
