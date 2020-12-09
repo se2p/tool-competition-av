@@ -18,6 +18,8 @@ More information can be found on the SBST tool competition website: [https://sbs
 ## Repository Structure ##
 [Code pipeline](/code_pipeline): code that integrates your test generator with the simulator
 
+[Self driving car testing library](/self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator
+
 [Documentation](/documentation): contains the installation guide and the detailed rules of the competition
 
 [Sample test generators](/sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
