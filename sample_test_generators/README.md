@@ -18,7 +18,7 @@ This test generators heavily rely on interpolation to generate the roads, it is 
 
 
 ### DeepJanus Generator
-This test generator (`deepjanus_seed_generator.py`) generates roads starting from the control points of Catmull-Rom cubic splines as proposed in [1]. 
+This test generator (`deepjanus_seed_generator.py`) generates roads starting from the control points of Catmull-Rom cubic splines as proposed in the DeepJanus tool [1]. 
 
 A road is defined by 10 control points in which the initial point is always at a fixed position whereas the others are placed at a random position 25 meters away from the previous one. The points of the road to be rendered in the simulator are calculated by exploiting the recursive algorithm for the evaluation of Catmull-Rom cubic splines proposed by Barry and Goldman [2] and the functionality offered by the Shapely library for manipulation and analysis of planar geometric objects.
 
