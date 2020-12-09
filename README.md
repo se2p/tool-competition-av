@@ -24,3 +24,12 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Requirements](/requirements-36.txt): file containing the list of the required packages
 
+## Contacts ##
+
+Alessio Gambi  - Passau University, Germany
+
+Vincenzo Riccio  - University of Lugano, Switzerland
+
+Fiorella Zampetti  - University of Sannio, Italy
+
+Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland
