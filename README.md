@@ -33,10 +33,10 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 
 ## Contacts ##
 
-Alessio Gambi  - Passau University, Germany - 
+Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
 
 Vincenzo Riccio  - Software Institute @ USI, Lugano, Switzerland - vincenzo.riccio@usi.ch
 
-Fiorella Zampetti  - University of Sannio, Italy
+Fiorella Zampetti  - University of Sannio, Italy - fiorella.zampetti@unisannio.it
 
-Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland
+Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland - panc@zhaw.ch
