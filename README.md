@@ -10,33 +10,33 @@ The generated roads are evaluated in a driving simulator. We partnered with Beam
 [![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
 
 ## Implement Your Test Generator ##
-We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](/sample_test_generators) to show how to use our code pipeline.
+We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](sample_test_generators/README.md) to show how to use our code pipeline.
 
 ## Information About the Competition ##
 More information can be found on the SBST tool competition website: [https://sbst21.github.io/tools/](https://sbst21.github.io/tools/)
 
 ## Repository Structure ##
-[Code pipeline](/code_pipeline): code that integrates your test generator with the simulator
+[Code pipeline](code_pipeline): code that integrates your test generator with the simulator
 
-[Self driving car testing library](/self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator
+[Self driving car testing library](self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator
 
-[Scenario template](/levels_template/tig): basic scenario used in this competition
+[Scenario template](levels_template/tig): basic scenario used in this competition
 
-[Documentation](/documentation): contains the installation guide and the detailed rules of the competition
+[Documentation](documentation): contains the installation guide and the detailed rules of the competition
 
-[Sample test generators](/sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
+[Sample test generators/README.md](sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
 
-[Requirements](/requirements-36.txt): file containing the list of the required packages
+[Requirements](requirements-36.txt): file containing the list of the required packages
 
 ## License ##
-The software we developed is distributed under GNU GPL license. See the [LICENSE.md](/LICENSE.md) file.
+The software we developed is distributed under GNU GPL license. See the [LICENSE.md](LICENSE.md) file.
 
 ## Contacts ##
 
-Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
+Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
 
-Vincenzo Riccio  - Software Institute @ USI, Lugano, Switzerland - vincenzo.riccio@usi.ch
+Dr. Vincenzo Riccio  - Software Institute @ USI, Lugano, Switzerland - vincenzo.riccio@usi.ch
 
-Fiorella Zampetti  - University of Sannio, Italy - fiorella.zampetti@unisannio.it
+Dr. Fiorella Zampetti  - University of Sannio, Italy - fiorella.zampetti@unisannio.it
 
-Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland - panc@zhaw.ch
+Dr. Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland - panc@zhaw.ch
