@@ -7,7 +7,7 @@ The competitors should generate virtual roads to test a lane keeping assist syst
 
 The generated roads are evaluated in a driving simulator. We partnered with BeamNG GmbH which offers a version of their simulators for researchers, named [BeamNG.research](https://beamng.gmbh/research/). This simulator is ideal for researchers due to its state-of-the-art soft-body physics simulation, ease of access to sensory data, and a Python API to control the simulation.
 
-[![IMAGE ALT TEXT HERE](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)]
+[![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
 
 ## Implement Your Test Generator ##
 We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](/sample_test_generators) to show how to use our code pipeline.
