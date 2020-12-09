@@ -30,5 +30,5 @@ The following figure shows that the shape of the splines is determined by the co
 
 [1] Vincenzo Riccio and Paolo Tonella. 2020. Model-based exploration of the frontier of behaviours for deep learning system testing. In Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2020). Association for Computing Machinery, New York, NY, USA, 876–888. DOI:https://doi.org/10.1145/3368089.3409730
 
-[2] Phillip J.Barry and Ronald N.Goldman. 1988. A Recursive Evaluation Algorithm for a Class of Catmull-Rom Splines. SIGGRAPH Comput. Graph. 22, 4 (June 1988), 199–204. https://doi.org/10.1145/378456.378511
+[2] Phillip J. Barry and Ronald N. Goldman. 1988. A Recursive Evaluation Algorithm for a Class of Catmull-Rom Splines. SIGGRAPH Comput. Graph. 22, 4 (June 1988), 199–204. DOI:https://doi.org/10.1145/378456.378511
 
