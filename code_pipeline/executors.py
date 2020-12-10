@@ -62,6 +62,8 @@ class AbstractTestExecutor(ABC):
             else:
                 self.stats.test_failed += 1
                 # Valid, either pass or fail
+                if description.startswith("Car drove out of the lane "):
+                    self.stats.obes += 1
                 return test_outcome, description, execution_data
         else:
             self.stats.test_invalid += 1

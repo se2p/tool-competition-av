@@ -74,6 +74,7 @@ class TestGenerationStatistic:
         self.test_passed = 0
         self.test_failed = 0
         self.test_in_error = 0
+        self.obes = 0
 
         self.test_execution_real_times = []
         self.test_execution_simulation_times = []
