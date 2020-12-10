@@ -63,7 +63,7 @@ class BeamngExecutor(AbstractTestExecutor):
                     test_outcome = "FAIL"
                     description = sim.exception_str
                 else:
-                    test_outcome = "SUCCESS"
+                    test_outcome = "PASS"
                     description = 'Successful test'
                 condition = False
 
