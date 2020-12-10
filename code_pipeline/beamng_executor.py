@@ -1,4 +1,6 @@
 from code_pipeline.executors import AbstractTestExecutor
+from code_pipeline.tests_generation import RoadTest
+
 import time
 import traceback
 from typing import Tuple
@@ -19,6 +21,7 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, beamng_home = None, time_budget=None, map_size=None):
         super().__init__(time_budget, map_size)
+        # TODO Is this still valid?
         self.test_time_budget = 250000
         # TODO Expose those as parameters
         self.maxspeed = 70.0
@@ -34,13 +37,9 @@ class BeamngExecutor(AbstractTestExecutor):
         # Ensure we do not execute anything longer than the time budget
         super()._execute(the_test)
 
-        # BeamNG requires the roads to be interpolated, as it cannot generate "squared" roads
-        # This returns 4-tuple
-        interpolated_test = self._interpolate(the_test)
-
         print("Executing the test")
 
-        # TODO Not sure why we need to repeat this 20 times...
+        # TODO Not sure why we need to repeat this 2 times...
         counter = 2
 
         attempt = 0
@@ -57,7 +56,7 @@ class BeamngExecutor(AbstractTestExecutor):
             if attempt > 2:
                 time.sleep(5)
 
-            sim = self._run_simulation(interpolated_test)
+            sim = self._run_simulation(the_test)
 
             if sim.info.success:
                 if sim.exception_str:
@@ -92,10 +91,14 @@ class BeamngExecutor(AbstractTestExecutor):
             else:
                 return True
 
-    def _run_simulation(self, nodes) -> SimulationData:
+    def _run_simulation(self, the_test: RoadTest) -> SimulationData:
         if not self.brewer:
             self.brewer = BeamNGBrewer(self.beamng_home)
             self.vehicle = self.brewer.setup_vehicle()
+
+        # For the execution we need the interpolated points
+        nodes = the_test.interpolated_points
+
 
         brewer = self.brewer
         brewer.setup_road_nodes(nodes)

@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from code_pipeline.tests_generation import RoadTest
 
 
 class OneTestGenerator():
@@ -16,7 +17,7 @@ class OneTestGenerator():
     def start(self):
         print("Starting test generation")
 
-        test = []
+        road_points = []
 
         # Create a vertical segment starting close to the left edge of the map
         x = 10.0
@@ -24,7 +25,7 @@ class OneTestGenerator():
         length = 100.0
         interpolation_points = int(length / 10.0)
         for y in np.linspace(y, y + length, num=interpolation_points):
-            test.append((x, y))
+            road_points.append((x, y))
 
         # Create the 90-deg right turn
         radius = 20.0
@@ -38,22 +39,24 @@ class OneTestGenerator():
         for angle_in_rads in [ math.radians(a) for a in angles_in_deg]:
             x = math.sin(angle_in_rads) * radius + center_x
             y = math.cos(angle_in_rads) * radius + center_y
-            test.append((x, y))
+            road_points.append((x, y))
 
         # Create an horizontal segment, make sure the points line up with previous segment
         x += radius / 2.0
         length = 30.0
         interpolation_points = int(length / 10.0)
         for x in np.linspace(x, x + length, num=interpolation_points):
-            test.append((x, y))
+            road_points.append((x, y))
 
         # Now we add a final road point "below" the last one just to illustrate how the interpolation works
         y -= 50.0
-        test.append((x, y, -28.0, 8.0))
+        road_points.append((x, y))
+
+        # Creating the RoadTest from the points
+        the_test = RoadTest(road_points)
 
         # Send the test for execution
-        test_outcome, description, execution_data = self.executor.execute_test(test)
+        test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
         # Print test outcome
         print(test_outcome, description)
-

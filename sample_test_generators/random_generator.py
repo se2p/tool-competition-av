@@ -1,5 +1,5 @@
 from random import randint
-
+from code_pipeline.tests_generation import RoadTest
 
 class RandomTestGenerator():
     """
@@ -20,15 +20,16 @@ class RandomTestGenerator():
             print("Starting test generation. Remaining time ", self.executor.get_remaining_time())
 
             # Pick up random points from the map. They will be interpolated anyway to generate the road
-            test = []
+            road_points = []
             for i in range(0, 3):
-                test.append((randint(0, self.map_size), randint(0, self.map_size)))
+                road_points.append((randint(0, self.map_size), randint(0, self.map_size)))
 
             # Some more debugging
-            print("Generated test: ", test)
+            print("Generated test using: ", road_points)
+            the_test = RoadTest(road_points)
 
             # Try to execute the test
-            test_outcome, description, execution_data = self.executor.execute_test(test)
+            test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
             # Print the result from the test and continue
             print("test_outcome ", test_outcome)
