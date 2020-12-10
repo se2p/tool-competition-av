@@ -24,7 +24,7 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Documentation](documentation): contains the installation guide and the detailed rules of the competition
 
-[Sample test generators/README.md](sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
+[Sample test generators](sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
 
 [Requirements](requirements-36.txt): file containing the list of the required packages
 
