@@ -8,6 +8,7 @@ from typing import List, Tuple
 
 from shapely.geometry import Point
 from self_driving.bbox import RoadBoundingBox
+from code_pipeline.tests_generation import RoadTest
 
 import math
 import numpy as np
@@ -225,11 +226,13 @@ class JanusGenerator():
         count = 0
 
         while(test_outcome != "FAIL"):
-            test = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
+            road_points = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
                                  num_spline_nodes=NUM_SPLINE_NODES).generate()
 
-            print("Generated test: ", test)
-            test_outcome, description, execution_data = self.executor.execute_test(test)
+            print("Generated test from road points ", road_points)
+            the_test = RoadTest(road_points)
+
+            test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
             print(test_outcome, description)
             count += 1
@@ -237,7 +240,7 @@ class JanusGenerator():
 
         print("Successful tests: "+str(count))
 
-
+# TODO Clean up the code and remove hardcoded logic from the sample generators
 if __name__ == "__main__":
     time_budget = 250000
     map_size = 250

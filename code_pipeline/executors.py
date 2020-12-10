@@ -6,51 +6,12 @@ import json
 from code_pipeline.validation import TestValidator
 from abc import ABC, abstractmethod
 
-from scipy.interpolate import splev, splprep
-from numpy.ma import arange
-from shapely.geometry import LineString
-
 from self_driving.simulation_data import SimulationDataRecord
 
 import random
-
 import time
 
-
-class TestGenerationStatistic:
-    """
-        Store statistics about test generation
-        TODO: Refactor using a RoadTest and RoadTestExecution
-    """
-
-    def __init__(self):
-        self.test_generated = 0
-        self.test_valid = 0
-        self.test_invalid = 0
-        self.test_passed = 0
-        self.test_failed = 0
-        self.test_in_error = 0
-
-        self.test_execution_real_times = []
-        self.test_execution_simulation_times = []
-
-        # TODO Capturing this is not that easy. We might approximate it as the time between consecutive
-        #  calls to execute_test, but then we need to factor out how long it took to execute them... also
-        #  it does not account for invalid tests...
-        # self.last_generation_time = time.monotonic()
-        # self.test_generation_times = []
-
-    def __str__(self):
-        msg = ""
-        msg += "test generated: " + str(self.test_generated) + "\n"
-        msg += "test valid: " + str(self.test_valid) + "\n"
-        msg += "test invalid: " + str(self.test_invalid) + "\n"
-        msg += "test passed: " + str(self.test_passed) + "\n"
-        msg += "test failed: " + str(self.test_failed) + "\n"
-        msg += "test in_error: " + str(self.test_in_error) + "\n"
-        msg += "(real) time spent in execution :" + str(sum(self.test_execution_real_times)) + "\n"
-        # self.test_execution_simulation_times = []
-        return msg
+from code_pipeline.tests_generation import TestGenerationStatistic, RoadTest
 
 
 class AbstractTestExecutor(ABC):
@@ -66,61 +27,23 @@ class AbstractTestExecutor(ABC):
         self.start_time = time.monotonic()
         self.total_elapsed_time = 0
 
-        self.rounding_precision = 3
-        self.min_num_nodes = 20
         # every meter more or less we need to place a node
-        self.interpolation_distance = 1
         self.line_width = 0.15
-        self.smoothness = 0
+
 
         super().__init__()
 
-    # TODO Move this into RoadTest Class
-    def _interpolate(self, the_test):
-        old_x_vals = [t[0] for t in the_test ]
-        old_y_vals = [t[1] for t in the_test]
-        old_width_vals = [8.0 for t in the_test]
-
-        # This is an approximation based on whatever input is given
-        test_road_lenght = LineString([(t[0], t[1]) for t in the_test]).length
-        num_nodes = int(test_road_lenght / self.interpolation_distance)
-        if num_nodes < self.min_num_nodes:
-            num_nodes = self.min_num_nodes
-
-        k = 1 if len(old_x_vals) <= 3 else 3
-        pos_tck, pos_u = splprep([old_x_vals, old_y_vals], s=self.smoothness, k=k)
-
-        # Made this proportional to the lenght of the road
-
-        step_size = 1 / num_nodes
-        unew = arange(0, 1 + step_size, step_size)
-
-        new_x_vals, new_y_vals = splev(unew, pos_tck)
-        width_tck, width_u = splprep([pos_u, old_width_vals], s=self.smoothness, k=k)
-        _, new_width_vals = splev(unew, width_tck)
-        # Reduce floating point rounding errors otherwise these may cause problems with calculating parallel_offset
-        # TODO Return the 4-tuple with standard z and width... this is bad but I cannot think of another solution
-        return list(zip([round(v, self.rounding_precision) for v in new_x_vals],
-                        [round(v, self.rounding_precision) for v in new_y_vals],
-                        [-28.0 for v in new_x_vals],
-                        [8.0 for v in new_x_vals]))
-
-    # TODO Add type hint to the_test
-    def execute_test(self, the_test):
+    def execute_test(self, the_test: RoadTest):
 
         self.stats.test_generated += 1
 
-        # TODO There is a mistmacth between the format of the_test and the format expected by the executors 4-tuple
-        # This should be solved when we introduce RoadTest
-        the_test_as_4tuple = [(float(t[0]), float(t[1]), -28.0, 8.0) for t in the_test]
-
-        is_valid, validation_msg = self.validate_test(the_test_as_4tuple)
+        is_valid, validation_msg = self.validate_test(the_test)
 
         if is_valid:
             self.stats.test_valid += 1
             start_execution_real_time = time.monotonic()
 
-            test_outcome, description, execution_data = self._execute(the_test_as_4tuple)
+            test_outcome, description, execution_data = self._execute(the_test)
 
             end_execution_real_time = time.monotonic()
             self.stats.test_execution_real_times.append(end_execution_real_time - start_execution_real_time)
@@ -158,7 +81,7 @@ class AbstractTestExecutor(ABC):
         return self.stats
 
     @abstractmethod
-    def _execute(self, the_test):
+    def _execute(self, the_test: RoadTest):
         if self.get_remaining_time() <= 0:
             raise TimeoutError("Time budget is over, cannot run more tests")
         pass

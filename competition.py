@@ -4,6 +4,7 @@
 #
 import click
 import importlib
+import traceback
 
 
 @click.command()
@@ -23,7 +24,7 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget, map_size=map_size)
 
-    # Dynamically load test generator
+    # Dynamically load the test generator
     module = importlib.import_module(module_name, module_path)
     class_ = getattr(module, class_name)
     test_generator = class_(time_budget=time_budget, executor=the_executor, map_size=map_size)
@@ -32,7 +33,9 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         # Start the generation
         test_generator.start()
     except Exception as ex:
-        print("An error occurred during test generation", ex)
+        print("An error occurred during test generation")
+        traceback.print_exc()
+
     finally:
         # When the generation ends. Print the stats collected
         print("Test Generation Statistics:")
