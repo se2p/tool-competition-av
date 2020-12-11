@@ -1,5 +1,5 @@
 from random import randint
-from code_pipeline.tests_generation import RoadTest
+from code_pipeline.tests_generation import RoadTestFactory
 from time import  sleep
 class RandomTestGenerator():
     """
@@ -26,7 +26,7 @@ class RandomTestGenerator():
 
             # Some more debugging
             print("Generated test using: ", road_points)
-            the_test = RoadTest(road_points)
+            the_test = RoadTestFactory.create_road_test(road_points)
 
             # Try to execute the test
             test_outcome, description, execution_data = self.executor.execute_test(the_test)

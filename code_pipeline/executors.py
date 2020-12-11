@@ -11,7 +11,7 @@ from self_driving.simulation_data import SimulationDataRecord
 import random
 import time
 
-from code_pipeline.tests_generation import TestGenerationStatistic, RoadTest
+from code_pipeline.tests_generation import TestGenerationStatistic
 
 
 class AbstractTestExecutor(ABC):
@@ -31,7 +31,7 @@ class AbstractTestExecutor(ABC):
 
         super().__init__()
 
-    def execute_test(self, the_test: RoadTest):
+    def execute_test(self, the_test):
 
         self.stats.test_generated += 1
 
@@ -88,7 +88,7 @@ class AbstractTestExecutor(ABC):
         return self.stats
 
     @abstractmethod
-    def _execute(self, the_test: RoadTest):
+    def _execute(self, the_test):
         if self.get_remaining_time() <= 0:
             raise TimeoutError("Time budget is over, cannot run more tests")
         pass

@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from code_pipeline.tests_generation import RoadTest
+from code_pipeline.tests_generation import RoadTestFactory
 
 
 class OneTestGenerator():
@@ -49,11 +49,13 @@ class OneTestGenerator():
             road_points.append((x, y))
 
         # Now we add a final road point "below" the last one just to illustrate how the interpolation works
-        y -= 50.0
+        # But make sure the resulting turn is not too sharp...
+        y -= 100.0
+        x += 20.0
         road_points.append((x, y))
 
         # Creating the RoadTest from the points
-        the_test = RoadTest(road_points)
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         # Send the test for execution
         test_outcome, description, execution_data = self.executor.execute_test(the_test)

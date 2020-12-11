@@ -3,7 +3,8 @@ from math import sqrt
 from self_driving.bbox import RoadBoundingBox
 import numpy as np
 
-from code_pipeline.tests_generation import RoadTest
+# from code_pipeline.tests_generation import RoadTest
+from code_pipeline.tests_generation import RoadTestFactory
 
 
 def find_circle(p1, p2, p3):
@@ -89,7 +90,7 @@ class TestValidator:
         """
             The type of the_test must be RoadTest
         """
-        check = type(the_test) is RoadTest
+        check = type(the_test) is RoadTestFactory.RoadTest
         return check
 
     def is_valid_polygon(self, the_test):

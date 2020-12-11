@@ -3,14 +3,11 @@ import matplotlib.patches as patches
 from shapely.geometry import LineString
 from descartes import PolygonPatch
 
-from code_pipeline.tests_generation import RoadTest
-
 # https://stackoverflow.com/questions/34764535/why-cant-matplotlib-plot-in-a-different-thread
 class RoadTestVisualizer:
     """
         Visualize and Plot RoadTests
     """
-
 
     def __init__(self, map_size):
         self.map_size = map_size
@@ -32,7 +29,7 @@ class RoadTestVisualizer:
         plt.gca().set_aspect('equal', 'box')
         plt.gca().set(xlim=(-30, self.map_size + 30), ylim=(-30, self.map_size + 30))
 
-    def visualize_road_test(self, the_test: RoadTest):
+    def visualize_road_test(self, the_test):
 
         self._setup_figure()
 
@@ -70,7 +67,7 @@ class RoadTestVisualizer:
         # Add information about the test validity
         title_string = ""
         if the_test.is_valid is not None:
-            title_string = title_string + "Test is " + ("valid" if the_test.is_valid else "invalid")
+            title_string = " ".join([title_string, "Test", str(the_test.id), "is" , ("valid" if the_test.is_valid else "invalid")])
             if not the_test.is_valid:
                 title_string = title_string + ":" + the_test.validation_message
 
