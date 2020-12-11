@@ -78,7 +78,7 @@ class ValidationTest(unittest.TestCase):
         validator = TestValidator(map_size=200)
         is_valid, validation_msg = validator.validate_test(the_test)
 
-        self.assertTrue(is_valid)
+        self.assertTrue(is_valid, validation_msg)
 
     def test_road_side_partially_outside(self):
         """
