@@ -19,7 +19,7 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, beamng_home = None, time_budget=None, map_size=None):
+    def __init__(self, beamng_home = None, time_budget=None, map_size=None, road_visualizer=None):
         super().__init__(time_budget, map_size)
         # TODO Is this still valid?
         self.test_time_budget = 250000
@@ -32,6 +32,7 @@ class BeamngExecutor(AbstractTestExecutor):
         self.last_observation = None
         # Not sure how to set this... How far can a car move in 250 ms at 5Km/h
         self.min_delta_position = 1.0
+        self.road_visualizer = road_visualizer
 
     def _execute(self, the_test):
         # Ensure we do not execute anything longer than the time budget

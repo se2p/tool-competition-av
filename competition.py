@@ -18,7 +18,7 @@ from code_pipeline.visualization import RoadTestVisualizer
 @click.option('--module-path', required=False, type=str)
 @click.option('--class-name', required=True, type=str)
 # Visual Debugging
-@click.option('--visualize-tests', is_flag=True, help="Visualize the last generated test.")
+@click.option('--visualize-tests', required=False, is_flag=True, default=False, help="Visualize the last generated test.")
 def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name, visualize_tests):
     road_visualizer = None
     road_plotter = None
@@ -33,7 +33,8 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         the_executor = MockExecutor(time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
+                                      map_size=map_size, road_visualizer=road_visualizer)
 
     # Dynamically load the test generator
     module = importlib.import_module(module_name, module_path)
