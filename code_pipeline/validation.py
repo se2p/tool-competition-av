@@ -15,6 +15,9 @@ class TestValidator:
         # close to each others
         self.max_points = 500
 
+    def is_enough_road_points(self, the_test):
+        return len(the_test.road_points) > 1
+
     def is_too_many_points(self, the_test):
         return len(the_test.road_points) > self.max_points
 
@@ -66,6 +69,11 @@ class TestValidator:
         if not self.is_right_type(the_test):
             is_valid = False
             validation_msg = "Wrong type"
+            return is_valid, validation_msg
+
+        if not self.is_enough_road_points(the_test):
+            is_valid = False
+            validation_msg = "Not enough road points."
             return is_valid, validation_msg
 
         if self.is_too_many_points(the_test):
