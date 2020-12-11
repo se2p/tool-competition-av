@@ -60,3 +60,6 @@ class OneTestGenerator():
 
         # Print test outcome
         print(test_outcome, description)
+
+        import time
+        time.sleep(10)

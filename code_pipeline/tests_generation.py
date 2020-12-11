@@ -24,7 +24,19 @@ def _interpolate(the_test):
     if num_nodes < min_num_nodes:
         num_nodes = min_num_nodes
 
-    k = 1 if len(old_x_vals) <= 3 else 3
+    assert len(old_x_vals) >= 2, "You need at leas two road points to define a road"
+    assert len(old_y_vals) >= 2, "You need at leas two road points to define a road"
+
+    if len(old_x_vals) == 2:
+        # With two points the only option is a straight segment
+        k = 1
+    elif len(old_x_vals) == 3:
+        # With three points we use an arc, using linear interpolation will result in invalid road tests
+        k = 2
+    else:
+        # Otheriwse, use cubic splines
+        k = 3
+
     pos_tck, pos_u = splprep([old_x_vals, old_y_vals], s= smoothness, k=k)
 
     step_size = 1 / num_nodes
@@ -54,11 +66,19 @@ class RoadTest:
         # The rendered road
         self.road_polygon = RoadPolygon.from_nodes(self.interpolated_points)
 
+        # At the beginning we do not know whether the test is valid or not
+        self.is_valid = None
+        self.validation_message = None
+
     def get_road_polygon(self):
         return self.road_polygon
 
     def get_road_length(self):
         return LineString([(t[0], t[1]) for t in self.interpolated_points]).length
+
+    def set_validity(self, is_valid, validation_message):
+        self.is_valid = is_valid
+        self.validation_message = validation_message
 
 
 class TestGenerationStatistic:
