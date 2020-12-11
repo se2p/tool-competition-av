@@ -1,5 +1,6 @@
 import unittest
 from code_pipeline.validation import TestValidator
+from code_pipeline.tests_generation import RoadTestFactory
 import inspect
 
 class ValidationTest(unittest.TestCase):
@@ -12,12 +13,14 @@ class ValidationTest(unittest.TestCase):
         """
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((-10, -10, -28.0, 8.0))
-        the_road.append((50, 50, -28.0, 8.0))
+        road_points = []
+        road_points.append((-10, -10))
+        road_points.append((50, 50))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
@@ -28,12 +31,14 @@ class ValidationTest(unittest.TestCase):
         """
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((50, 50, -28.0, 8.0))
-        the_road.append((-10, -10, -28.0, 8.0))
+        road_points = []
+        road_points.append((50, 50))
+        road_points.append((-10, -10))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
@@ -45,12 +50,14 @@ class ValidationTest(unittest.TestCase):
 
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((-50, -50, -28.0, 8.0))
-        the_road.append((-10, -10, -28.0, 8.0))
+        road_points = []
+        road_points.append((-50, -50))
+        road_points.append((-10, -10))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
@@ -62,12 +69,14 @@ class ValidationTest(unittest.TestCase):
 
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((50, 50, -28.0, 8.0))
-        the_road.append((10, 10, -28.0, 8.0))
+        road_points = []
+        road_points.append((50, 50))
+        road_points.append((10, 10))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertTrue(is_valid)
 
@@ -79,12 +88,14 @@ class ValidationTest(unittest.TestCase):
 
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((1, 10, -28.0, 8.0))
-        the_road.append((1, 50, -28.0, 8.0))
+        road_points = []
+        road_points.append((1, 10))
+        road_points.append((1, 50))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
@@ -96,14 +107,17 @@ class ValidationTest(unittest.TestCase):
 
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((10, 10, -28.0, 8.0))
-        the_road.append((20, 20, -28.0, 8.0))
-        the_road.append((10, 20, -28.0, 8.0))
-        the_road.append((20, 10, -28.0, 8.0))
+        road_points = []
+        road_points.append((10, 10))
+        road_points.append((20, 20))
+        road_points.append((10, 20))
+        road_points.append((20, 10))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
@@ -115,15 +129,17 @@ class ValidationTest(unittest.TestCase):
 
         print("Running test", inspect.stack()[0][3])
 
-        the_road = []
-        the_road.append((10, 70, -28.0, 8.0))
-        the_road.append((10, 80, -28.0, 8.0))
-        the_road.append((15, 95, -28.0, 8.0))
-        the_road.append((15, 80, -28.0, 8.0))
-        the_road.append((15, 70, -28.0, 8.0))
+        road_points = []
+        road_points.append((10, 70))
+        road_points.append((10, 80))
+        road_points.append((15, 95))
+        road_points.append((15, 80))
+        road_points.append((15, 70))
+
+        the_test = RoadTestFactory.create_road_test(road_points)
 
         validator = TestValidator(map_size=200)
-        is_valid, validation_msg = validator.validate_test(the_road)
+        is_valid, validation_msg = validator.validate_test(the_test)
 
         self.assertFalse(is_valid)
 
