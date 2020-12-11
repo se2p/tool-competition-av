@@ -1,5 +1,4 @@
 from code_pipeline.executors import AbstractTestExecutor
-from code_pipeline.tests_generation import RoadTest
 
 import time
 import traceback
@@ -92,7 +91,7 @@ class BeamngExecutor(AbstractTestExecutor):
             else:
                 return True
 
-    def _run_simulation(self, the_test: RoadTest) -> SimulationData:
+    def _run_simulation(self, the_test) -> SimulationData:
         if not self.brewer:
             self.brewer = BeamNGBrewer(self.beamng_home)
             self.vehicle = self.brewer.setup_vehicle()
