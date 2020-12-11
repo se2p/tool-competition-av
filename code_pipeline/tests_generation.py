@@ -66,11 +66,19 @@ class RoadTest:
         # The rendered road
         self.road_polygon = RoadPolygon.from_nodes(self.interpolated_points)
 
+        # At the beginning we do not know whether the test is valid or not
+        self.is_valid = None
+        self.validation_message = None
+
     def get_road_polygon(self):
         return self.road_polygon
 
     def get_road_length(self):
         return LineString([(t[0], t[1]) for t in self.interpolated_points]).length
+
+    def set_validity(self, is_valid, validation_message):
+        self.is_valid = is_valid
+        self.validation_message = validation_message
 
 
 class TestGenerationStatistic:
