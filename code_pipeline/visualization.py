@@ -42,7 +42,7 @@ class RoadTestVisualizer:
         plt.draw()
         plt.pause(0.001)
 
-        # Road Geometry. TODO Maybe we can get this from the RoadPolygon instead?
+        # Road Geometry.
         road_poly = LineString([(t[0], t[1]) for t in the_test.interpolated_points]).buffer(8.0, cap_style=2, join_style=2)
         road_patch = PolygonPatch(road_poly, fc='gray', ec='dimgray')  # ec='#555555', alpha=0.5, zorder=4)
         plt.gca().add_patch(road_patch )

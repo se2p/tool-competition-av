@@ -23,7 +23,7 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     road_visualizer = None
     road_plotter = None
 
-    # Setup visualization and plotting. We use the same class to do both
+    # Setup visualization
     if visualize_tests:
         road_visualizer = RoadTestVisualizer(map_size=map_size)
         pass
