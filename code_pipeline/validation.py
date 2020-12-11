@@ -1,8 +1,46 @@
-from self_driving.bbox import RoadBoundingBox
+from math import sqrt
 
-from shapely.geometry import LineString
+from self_driving.bbox import RoadBoundingBox
+import numpy as np
 
 from code_pipeline.tests_generation import RoadTest
+
+
+def find_circle(p1, p2, p3):
+    """
+    Returns the center and radius of the circle passing the given 3 points.
+    In case the 3 points form a line, returns (None, infinity).
+    """
+    temp = p2[0] * p2[0] + p2[1] * p2[1]
+    bc = (p1[0] * p1[0] + p1[1] * p1[1] - temp) / 2
+    cd = (temp - p3[0] * p3[0] - p3[1] * p3[1]) / 2
+    det = (p1[0] - p2[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p2[1])
+
+    if abs(det) < 1.0e-6:
+        return np.inf
+
+    # Center of circle
+    cx = (bc*(p2[1] - p3[1]) - cd*(p1[1] - p2[1])) / det
+    cy = ((p1[0] - p2[0]) * cd - (p2[0] - p3[0]) * bc) / det
+
+    radius = np.sqrt((cx - p1[0])**2 + (cy - p1[1])**2)
+    return radius
+
+
+def min_radius(x, w=5):
+    mr = np.inf
+    nodes = x
+    for i in range(len(nodes) - w):
+        p1 = nodes[i]
+        p2 = nodes[i + int((w-1)/2)]
+        p3 = nodes[i + (w-1)]
+        radius = find_circle(p1, p2, p3)
+        if radius < mr:
+            mr = radius
+    if mr == np.inf:
+        mr = 0
+
+    return mr * 3.280839895#, mincurv
 
 class TestValidator:
 
@@ -21,6 +59,13 @@ class TestValidator:
     def is_not_self_intersecting(self, the_test):
         road_polygon = the_test.get_road_polygon()
         return road_polygon.is_valid()
+
+    def is_too_sharp(self, the_test, TSHD_RADIUS=47):
+        if min_radius(the_test.interpolated_points) < TSHD_RADIUS:
+            check = True
+        else:
+            check = False
+        return check
 
     def is_inside_map(self, the_test):
         """
@@ -91,6 +136,11 @@ class TestValidator:
         if not self.is_minimum_length(the_test):
             is_valid = False
             validation_msg = "The road is not long enough."
+            return is_valid, validation_msg
+
+        if self.is_too_sharp(the_test):
+            is_valid = False
+            validation_msg = "The road is too sharp"
             return is_valid, validation_msg
 
         return is_valid, validation_msg
