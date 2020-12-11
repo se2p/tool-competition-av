@@ -51,34 +51,54 @@ def _interpolate(the_test):
                     [8.0 for v in new_x_vals]))
 
 
-class RoadTest:
-    """
-        This class represent a test, i.e., the road that the driving agent should follow
-    """
+def _incremental_id_generator():
+    test_id = 1
+    while True:
+        yield test_id
+        test_id += 1
 
-    def __init__(self, road_points):
-        assert type(road_points) is list, "You must provide a list of road points to create a RoadTest"
-        assert all(len(i) == 2 for i in road_points), "Malformed list of road points"
-        # The original input
-        self.road_points = road_points[:]
-        # The interpolated input
-        self.interpolated_points = _interpolate(self.road_points)
-        # The rendered road
-        self.road_polygon = RoadPolygon.from_nodes(self.interpolated_points)
 
-        # At the beginning we do not know whether the test is valid or not
-        self.is_valid = None
-        self.validation_message = None
+class RoadTestFactory:
 
-    def get_road_polygon(self):
-        return self.road_polygon
+    # Static variable
+    test_id_generator = _incremental_id_generator()
 
-    def get_road_length(self):
-        return LineString([(t[0], t[1]) for t in self.interpolated_points]).length
+    class RoadTest:
+        """
+            This class represent a test, i.e., the road that the driving agent should follow.
+            Note that this class is nested in the RoadTestFactory to avoid direct creation
+        """
 
-    def set_validity(self, is_valid, validation_message):
-        self.is_valid = is_valid
-        self.validation_message = validation_message
+        def __init__(self, road_points):
+            assert type(road_points) is list, "You must provide a list of road points to create a RoadTest"
+            assert all(len(i) == 2 for i in road_points), "Malformed list of road points"
+            # The original input
+            self.road_points = road_points[:]
+            # The interpolated input
+            self.interpolated_points = _interpolate(self.road_points)
+            # The rendered road
+            self.road_polygon = RoadPolygon.from_nodes(self.interpolated_points)
+
+            # At the beginning we do not know whether the test is valid or not
+            self.is_valid = None
+            self.validation_message = None
+
+        def get_road_polygon(self):
+            return self.road_polygon
+
+        def get_road_length(self):
+            return LineString([(t[0], t[1]) for t in self.interpolated_points]).length
+
+        def set_validity(self, is_valid, validation_message):
+            self.is_valid = is_valid
+            self.validation_message = validation_message
+
+    @staticmethod
+    def create_road_test(road_points):
+        road_test = RoadTestFactory.RoadTest(road_points)
+        # Generate the new id. Call next otherwise we return the generator
+        setattr(road_test, 'id', next(RoadTestFactory.test_id_generator))
+        return road_test
 
 
 class TestGenerationStatistic:

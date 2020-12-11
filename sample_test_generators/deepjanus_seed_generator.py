@@ -8,7 +8,7 @@ from typing import List, Tuple
 
 from shapely.geometry import Point
 from self_driving.bbox import RoadBoundingBox
-from code_pipeline.tests_generation import RoadTest
+from code_pipeline.tests_generation import RoadTestFactory
 
 import math
 import numpy as np
@@ -230,7 +230,7 @@ class JanusGenerator():
                                  num_spline_nodes=NUM_SPLINE_NODES).generate()
 
             print("Generated test from road points ", road_points)
-            the_test = RoadTest(road_points)
+            the_test = RoadTestFactory.create_road_test(road_points)
 
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
