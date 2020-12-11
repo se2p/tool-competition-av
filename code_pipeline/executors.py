@@ -18,7 +18,7 @@ class AbstractTestExecutor(ABC):
 
     start_time = None
 
-    def __init__(self, time_budget=None, map_size=None):
+    def __init__(self, time_budget=None, map_size=None, road_visualizer=None):
 
         self.stats = TestGenerationStatistic()
 
@@ -27,15 +27,17 @@ class AbstractTestExecutor(ABC):
         self.start_time = time.monotonic()
         self.total_elapsed_time = 0
 
-        # every meter more or less we need to place a node
-        self.line_width = 0.15
-
+        self.road_visualizer = road_visualizer
 
         super().__init__()
 
     def execute_test(self, the_test: RoadTest):
 
         self.stats.test_generated += 1
+
+        # Visualize the road if a road visualizer is defined
+        if self.road_visualizer:
+            self.road_visualizer.visualize_road_test(the_test)
 
         is_valid, validation_msg = self.validate_test(the_test)
 

@@ -1,6 +1,6 @@
 from random import randint
 from code_pipeline.tests_generation import RoadTest
-
+from time import  sleep
 class RandomTestGenerator():
     """
         This simple (naive) test generator creates roads using 4 points randomly placed on the map.
@@ -35,3 +35,5 @@ class RandomTestGenerator():
             print("test_outcome ", test_outcome)
             print("description ", description)
 
+            if self.executor.road_visualizer:
+                sleep(5)
