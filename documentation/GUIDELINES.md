@@ -50,7 +50,7 @@ We perform the following validity checks before executing a test:
 
 
 ## Competition ##
-The contest's organizers provide a [code pipeline](../../code_pipeline/) to check the validity of the tests, to execute them, and to keep track of the time budget. The submission should integrate with it.
+The contest's organizers provide a [code pipeline](https://github.com/se2p/tool-competition-av/tree/main/code_pipeline) to check the validity of the tests, to execute them, and to keep track of the time budget. The submission should integrate with it.
 
 Execution can be mocked or simulated. 
 
@@ -78,7 +78,7 @@ The evaluation will be conducted using the same simulation, BeamNG.tech. The tes
 
 
 ## Sample Test Generators ##
-The submission package comes with an implementation of [sample test generators](./sample_test_generators). This serves the dual purpose of providing an example on how to use our code pipeline, and a baseline for the evolution.
+The submission package comes with an implementation of [sample test generators](https://github.com/se2p/tool-competition-av/tree/main/sample_test_generators). This serves the dual purpose of providing an example on how to use our code pipeline, and a baseline for the evolution.
 
 ## Installation ##
 Check the [Installation Guide](INSTALL.md)
