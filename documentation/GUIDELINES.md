@@ -1,82 +1,115 @@
-# Scenario/Road Generation
+# Competition Guidelines #
 
-## Introduction
-This task is about generation of virtual roads to test lane keeping assist function of the test subject(s). A scenario consists of an ego-car equipped with a test lane keeping assist system, a road, a driving task and the environment definition.  The driving task is to drive from road start to road end without going astray
+## Goal ##
 
-## Goal
-Force the test subject to drive of the lane, without creating invalid roads (See below)
+The tool should generate test inputs to test a Lane Keeping Assist System (LKAS). The competitors should generate roads that force the ego-car, i.e., the test subject, to drive off its lane without creating invalid roads.
 
+## Tests as Driving Tasks ##
 
-## Road structure
-Roads are defined by a (ordered) sequence of coordinates in a two-dimensional space, i.e., (x, y). Each point corresponds the central line of the road, a.k.a., *road spine*. 
+In the competition,  tests are driving tasks that the ego-car, i.e., a car equipped with the lane-keeping assist system under test, must complete. These driving tasks are defined in terms of a road that the ego-car must follow. 
 
-The first point in the sequence defines the starting location the last one the target location.
+### What is a test input for the current competition? ###
 
-> **NOTE**: the initial placement and rotation of the ego-vehicle is automatically defined.
+For simplicity, we consider driving scenarios on single, flat roads surrounded by green grass. The ego-car must drive along the roads keeping the right lane. The environmental conditions and the road layout are fixed and predefined. In particular, the roads consist of two fixed-width lanes, which are divided by a solid yellow line. Two additional white lines define the exterior boundaries of the lanes.
 
-Test generators must generate sequences of coordinates, i.e., *road points*, that define the overall geometry of the roads. The road points are automatically interpolated using cubic splines to obtain the final road geometry.
+### What makes a test input? ###
 
-The following image illustrates how a road is rendered from the following *road points*: 
-`[(10,20), (30, 20), (40, 30), (50, 40), (150, 100), (30, 180)]`
+The competitor tools should generate roads as sequences of points, i.e., _road points_, defined in a two-dimensional squared map with predefined size (e.g., 200-by-200 meter). 
+The sequence of _road points_ defines the _road spine_, i.e., the road's center line.
+
+The **first point** in the sequence of _road points_ defines the starting location of the ego-car by convention, while the **last point** defines the target location. The road points are automatically interpolated using cubic splines to obtain the final road geometry.
+
+> **NOTE**: the road's geometry automatically defines the initial placement and rotation of the ego-vehicle.
+
+The following image illustrates how a road is defined from the following _road points_ over a map of size 200-by-200 meters: 
+
+```
+[
+    (10.0, 20.0), (30.0, 20.0), (40.0, 30.0), 
+    (50.0, 40.0), (150.0, 100.0), (30.0, 180.0)
+]
+```
 
 ![Sample Road caption="test"](./figures/road_sample.pdf "Sample Road")
 
-In the figure, the inner square identifies the boundary of the map (200x200), the white dots are the *road points*, the yellow solid line is the *road spine* that interpolates them, and, finally, the gray area is the road.
+In the figure, the inner square identifies the map's boundary (200x200), the white dots correspond to the _road points_, the solid yellow line corresponds to the _road spine_ that interpolates them, and, finally, the gray area is the road.
 
-As the figure illustrates, the road layout consist of one left lane and one right lane (where the car drives). Each lane is 4 meter wide and the lane markings are defined according to the US standard (solid yellow line in the middle and solid white lines on the side).
-
-> **Note**: road material, slope, layout, and environmental factors such as weather and time-of-day are fixed and predefined  (daylight, no rain, clear-sky, green grass, no curbs, cement/asphalt/concrete). 
+As the figure illustrates, the road layout consists of one left lane and one right lane (where the car drives). Each lane is four meters wide, and the lane markings are defined similarly to the US standards: solid yellow line in the middle and solid white lines on the side (not drawn in the figure).
 
 
-## Validity checks
-Roads must be valid, and we perform a series of validity check before executing a test. An invalid input results in an invalid (not failed) test.
+### Valid Roads ###
 
-To keep things simple we do no allow intersections (geometry check already implemented) or overlapping. Turns must have a geometry that allows car to drive on them, so "too" sharp edges are disallowed (limit on curvature). To limit the length of road, roads must be completely within a predefined squared map, so we enforce a map limit (box of given size, the road should not cross the limits), and have a maximum length. Also to avoid trivial tests, roads have a minimum length. (TODO Are we sure about those? What are those limits? Min must ensure the car fits there, but max?)
+We perform the following validity checks on the roads before using them in the driving tasks:
 
-To avoid overly complex roads we also limit the points that can be used to define them (500/1000 points). Notably, the points defining the roads are interpolate using cad-mul splines. For the same reason, we might enforce a minimum distance between consecutive points.
+* Roads must be made of at least 2 _road points_.
+* Roads must never intersect or overlap.
+* Turns must have a geometry that allows the ego-car to completely fit in the lane while driving on them; so, "too" sharp edges, i.e., turns with small radius, are disallowed.
+* Roads must completely fit the given squared map boundaries; implicitly, this limits the roads' maximum length. 
+* To avoid overly complex roads and limit the issues with spline interpolation, we also limit the number of _road points_ that can be used to define roads (500/1000 points).
 
+Invalid roads are reported as such (hence not executed), so they do not count as a *failed* test. 
 
-## Competition
-The contest's organizers provide a library to check the validity of the tests, to execute them, and to keep track of the time budget. Execution can be mocked or simulated. Simulation requires  registering and installing the simulation software, BeamNG.tech which runs only under windows (see simulation).
+## Competition ##
+The contest's organizers provide a [code pipeline](https://github.com/se2p/tool-competition-av/tree/main/code_pipeline) to check the tests' validity, execute them, and keep track of the time budget. The submission should integrate with it.
 
-To ease the integration of various components, the organizers provide a python 3.7 library and submission should integrate with them. Hence, we expect python submissions. (TODO how can we integrate other technologies? Do we want that?)
+At the moment, execution can be mocked or simulated. Mocked execution generates random data and is meant **only** to support development. Simulation instead requires executing the BeamNG.research simulation (see the [Installation Guide](INSTALL.md) for details about registering and installing the simulation software).
 
-Competitors must create roads to test lane keeping assist function of the test subject(s) and submit them in the agreed format. The generation will continue until a given time budget is reached. The time budget includes time for generating and simulating tests.
+There's no limit on the number of tests that can be generated and executed. However, there's a limit on the execution time: The generation can continue until the given time budget is reached. The time budget includes time for generating and simulating tests.
 
-During development contestant can either use BeamNG.tech to simulate executions or mock them. If the mock is used, an approximation of the simulation time will be computed. There's no limit on the number of test that can be generated and executed. The time budget will be up to one hour.
+To participate, competitors must submit the code of their test generator and instructions about installing it before the official deadline.
 
+## How To Submit ##
 
-## Results
-To evaluate submissions we will follow those guidelines:
-- count how many valid/invalid tests have been executed
-- how many tests passed/failed. A test fail if the test subject does not reach the end of the road within a timeout (computed over the length of the road) or drives off the lane/road
-- input diversity and feature coverage (measures only on the roads)
-- output diversity and feature coverage (measures on the test subject)
+Submitting a tool to this competition entails requires you to share your code with us, so the easiest way is to forking the master branch of this repo and send us a pull request with your code in it. Alternatively, you can send the address of a repo where we can download the code or a "tar-ball" with your code in it. 
 
-TODO: define coverage and metrics in broad terms, do not release the code to compute them, or not? Why yes/no?
+We will come back to you if we need support to install and run your code.
 
-The test subjects used for the evaluation will be not released before the submission deadline to avoid biasing the solution towards it. Mock test subjects are provided with the package (simulation and mock execution).
+## Results ##
 
-The evaluation will be conducted using the same simulation, BeamNG.tech, and setup provided to the contestants.
+The test generators' evaluation will be conducted using the same simulation and code-pipeline used for the development. Still, we will not release the test subjects used for the evaluation before the submission deadline to avoid biasing the solution towards it.
 
-## Random Generation
-The submission package comes with an implementation of a random test generator. This serves the dual purpose of providing an example on how to use the library, and a baseline for the evolution.
+For the evaluation we will consider (at least) the following metrics:
 
-# Installation
-Check the [Installation Guide](documentation/INSTALL.md)
+- count how many tests have been generated
+- count how many tests are valid and invalid
+- count how many tests passed, failed, or generated an error. 
 
-# Technical considerations
-contest - 
-    command line interface based on CLI to get time budget, map size
-    configure the executor (validity checks)
-    load dynamically the test generator (predefined name, check plugin style)
-    instantiate the generator with the executor and start it
-    
->> How to stop it?
+> **Note**: tests fail for different reasons. For example, a test fail if the ego-car does not move, or does not reach the end of the road within a timeout (computed over the length of the road), or drives off the lane.
 
-test generator 
-    - constructor, executor + additional parameters
-    - start
+## Sample Test Generators ##
+The submission package comes with an implementation of [sample test generators](../sample_test_generators/README.md). This serves the dual purpose of providing an example on how to use our code pipeline, and a baseline for the evaluation.
 
-executor
-    - execute tests [test] -> [time, simulation data, status (pass/fail)
+## Installation ##
+Check the [Installation Guide](INSTALL.md)
+
+## Technical considerations ##
+The competition code can be run by executing `competition.py` from the main folder of this repo.
+
+Usage(from command line): 
+
+```
+competition.py [OPTIONS]
+
+Options:
+  --executor [mock|beamng]
+  --time-budget INTEGER     [required - time budget in seconds]
+  --map-size INTEGER        [default 200, as 200x200]
+  --module-name TEXT        [required - name of your test generation module]
+  --module-path TEXT        [path to your test generation module]
+  --class-name TEXT         [required - name of the class implementing your generator]
+  --visualize-tests         [visualize the last generated test].
+  --beamng-home TEXT        [considered only if beamng executor is selected]
+  --help                    Show this message and exit.
+```
+
+For example, to execute the `one-test-generator.py`, activate your virtual environment (if you have one... and you should), then `cd` to the root of this repository and run:
+
+``` 
+python competition.py \
+        --visualize-tests \
+        --time-budget 10 \
+        --executor mock \
+        --map-size 200 \
+        --module-name sample_test_generators.one_test_generator \
+        --class-name OneTestGenerator
+```
