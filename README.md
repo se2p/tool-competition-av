@@ -23,9 +23,9 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Scenario template](levels_template/tig): basic scenario used in this competition
 
-[Documentation](documentation): contains the installation guide and the detailed rules of the competition
+[Documentation](documentation/README.md): contains the installation guide and the detailed rules of the competition
 
-[Sample test generators](sample_test_generators): sample test generators already integrated with the code pipeline for illustrative purposes 
+[Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes 
 
 [Requirements](requirements-36.txt): file containing the list of the required packages
 
