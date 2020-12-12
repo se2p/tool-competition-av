@@ -30,7 +30,7 @@ The following image illustrates how a road is defined from the following _road p
 ]
 ```
 
-![Sample Road caption="test"](./figures/road_sample.pdf "Sample Road")
+![Sample Road caption="test"](./figures/sample_road.PNG "Sample Road")
 
 In the figure, the inner square identifies the map's boundary (200x200), the white dots correspond to the _road points_, the solid yellow line corresponds to the _road spine_ that interpolates them, and, finally, the gray area is the road.
 
