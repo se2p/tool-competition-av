@@ -50,11 +50,11 @@ We perform the following validity checks before executing a test:
 
 
 ## Competition ##
-The contest's organizers provide a [code pipeline](./code_pipeline) to check the validity of the tests, to execute them, and to keep track of the time budget. The submission should integrate with it.
+The contest's organizers provide a [code pipeline](../../code_pipeline/) to check the validity of the tests, to execute them, and to keep track of the time budget. The submission should integrate with it.
 
 Execution can be mocked or simulated. 
 
-Simulation requires registering and installing the simulation software from BeamNG GmbH (see the [Installation Guide](documentation/INSTALL.md)). Otherwise, if the mock is used, an approximation of the simulation time will be computed. 
+Simulation requires registering and installing the simulation software from BeamNG GmbH (see the [Installation Guide](INSTALL.md)). Otherwise, if the mock is used, an approximation of the simulation time will be computed. 
 
 There's no limit on the number of test that can be generated and executed. The time budget will be up to one hour. The generation will continue until a given time budget is reached. The time budget includes time for generating and simulating tests.
 
@@ -81,7 +81,7 @@ The evaluation will be conducted using the same simulation, BeamNG.tech. The tes
 The submission package comes with an implementation of [sample test generators](./sample_test_generators). This serves the dual purpose of providing an example on how to use our code pipeline, and a baseline for the evolution.
 
 ## Installation ##
-Check the [Installation Guide](documentation/INSTALL.md)
+Check the [Installation Guide](INSTALL.md)
 
 ## Technical considerations ##
 The competiton code can be run by launching competition.py in the main folder.
