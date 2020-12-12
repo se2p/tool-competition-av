@@ -1,13 +1,19 @@
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Polygon
+from shapely.affinity import translate, rotate
 from descartes import PolygonPatch
+from math import atan2, pi, degrees
+
 
 # https://stackoverflow.com/questions/34764535/why-cant-matplotlib-plot-in-a-different-thread
 class RoadTestVisualizer:
     """
         Visualize and Plot RoadTests
     """
+
+    little_triangle = Polygon([(10, 0), (0, -5), (0, 5), (10, 0)])
+    square = Polygon([(5, 5), (5, -5), (-5, -5), (-5, 5), (5,5)])
 
     def __init__(self, map_size):
         self.map_size = map_size
@@ -63,6 +69,29 @@ class RoadTestVisualizer:
         x = [t[0] for t in the_test.road_points]
         y = [t[1] for t in the_test.road_points]
         plt.plot(x, y, 'wo')
+
+        # Plot the little triangle indicating the starting position of the ego-vehicle
+        delta_x = sx[1] - sx[0]
+        delta_y = sy[1] - sy[0]
+
+        current_angle = atan2(delta_y, delta_x)
+
+        rotation_angle = degrees(current_angle)
+        transformed_fov = rotate(self.little_triangle, origin=(0, 0), angle=rotation_angle)
+        transformed_fov = translate(transformed_fov, xoff=sx[0], yoff=sy[0])
+        plt.plot(*transformed_fov.exterior.xy, color='black')
+
+        # Plot the little square indicating the ending position of the ego-vehicle
+        delta_x = sx[-1] - sx[-2]
+        delta_y = sy[-1] - sy[-2]
+
+        current_angle = atan2(delta_y, delta_x)
+
+        rotation_angle = degrees(current_angle)
+        transformed_fov = rotate(self.square, origin=(0, 0), angle=rotation_angle)
+        transformed_fov = translate(transformed_fov, xoff=sx[-1], yoff=sy[-1])
+        plt.plot(*transformed_fov.exterior.xy, color='black')
+
 
         # Add information about the test validity
         title_string = ""
