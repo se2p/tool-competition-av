@@ -65,7 +65,7 @@ class TestValidator:
         return road_polygon.is_valid()
 
     def is_too_sharp(self, the_test, TSHD_RADIUS=47):
-        if min_radius(the_test.interpolated_points) < TSHD_RADIUS:
+        if TSHD_RADIUS > min_radius(the_test.interpolated_points) > 0.0:
             check = True
         else:
             check = False
