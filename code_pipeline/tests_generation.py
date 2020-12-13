@@ -105,6 +105,7 @@ class TestGenerationStatistic:
     """
         Store statistics about test generation
         TODO: Refactor using a RoadTest and RoadTestExecution
+        TODO Move to road_statistics package
     """
 
     def __init__(self):
