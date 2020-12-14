@@ -10,6 +10,7 @@ from self_driving.simulation_data import SimulationDataRecord
 
 import random
 import time
+import sys
 
 from code_pipeline.tests_generation import TestGenerationStatistic
 
@@ -29,9 +30,21 @@ class AbstractTestExecutor(ABC):
 
         self.road_visualizer = road_visualizer
 
+        self.timeout_forced = False
+
         super().__init__()
 
+    def is_force_timeout(self):
+        return self.timeout_forced == True
+
     def execute_test(self, the_test):
+
+        # Maybe we can solve this using decorators, but we need the reference to the instance, not sure how to handle
+        # that cleanly
+        if self.get_remaining_time() <= 0:
+            self.timeout_forced = True
+            print("Time budget is over, cannot run more tests. FORCE EXIT")
+            sys.exit(123)
 
         self.stats.test_generated += 1
 
@@ -89,10 +102,11 @@ class AbstractTestExecutor(ABC):
 
     @abstractmethod
     def _execute(self, the_test):
+        # This should not be necessary, but better safe than sorry...
         if self.get_remaining_time() <= 0:
-            raise TimeoutError("Time budget is over, cannot run more tests")
-        pass
-
+            self.timeout_forced = True
+            print("Time budget is over, cannot run more tests. FORCE EXIT")
+            sys.exit(123)
 
 class MockExecutor(AbstractTestExecutor):
 

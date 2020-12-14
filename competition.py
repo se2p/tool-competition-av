@@ -7,6 +7,34 @@ import importlib
 import traceback
 from code_pipeline.visualization import RoadTestVisualizer
 
+from code_pipeline.test_generation_utils import register_exit_fun
+
+
+OUTPUT_RESULTS_TO = 'results'
+
+
+def validate_map_size(ctx, param, value):
+    if value < 100 or value > 1000:
+        raise click.UsageError('The provived value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
+    else:
+        return value
+
+
+def post_process(the_executor):
+    print("Test Generation Statistics:")
+    print(the_executor.get_stats())
+
+
+def create_post_processing_hook(executor):
+
+    def _f():
+        if executor.is_force_timeout():
+            # The process killed itself because a timeout, so we need to ensure the post_process function
+            # is called
+            post_process(executor)
+
+    return _f
+
 
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
@@ -43,6 +71,10 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     # Instantiate the test generator
     test_generator = class_(time_budget=time_budget, executor=the_executor, map_size=map_size)
 
+    # Register shutdown hook to run the data analysis, but only if the internal timeout triggers. We do not want
+    #   this to trigger if the use crtl+D his/her process, e.g., during development or debugging
+    register_exit_fun(create_post_processing_hook(the_executor))
+
     try:
         # Start the generation
         test_generator.start()
@@ -50,10 +82,8 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         print("An error occurred during test generation")
         traceback.print_exc()
 
-    finally:
-        # When the generation ends. Print the stats collected
-        print("Test Generation Statistics:")
-        print(the_executor.get_stats())
+    # We still need this here for the regular flow
+    post_process(the_executor)
 
 
 if __name__ == '__main__':
