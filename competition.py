@@ -5,11 +5,14 @@
 import click
 import importlib
 import traceback
-from code_pipeline.visualization import RoadTestVisualizer
 import time
 import os
 import sys
 import errno
+
+from code_pipeline.visualization import RoadTestVisualizer
+from code_pipeline.tests_generation import TestGenerationStatistic
+
 
 OUTPUT_RESULTS_TO = 'results'
 
@@ -29,6 +32,15 @@ def validate_time_budget(ctx, param, value):
         raise click.UsageError('The provived value for ' + str(param) + ' is invalid. Choose a positive integer')
     else:
         return value
+
+
+def create_summary(result_folder, raw_data):
+    if type(raw_data) is TestGenerationStatistic:
+        summary_file = os.path.join(result_folder, "generation_stats.csv")
+        csv_content = raw_data.as_csv()
+        with open(summary_file, 'w') as output_file:
+            output_file.write( csv_content )
+    pass
 
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
@@ -54,15 +66,6 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     if visualize_tests:
         road_visualizer = RoadTestVisualizer(map_size=map_size)
 
-    # Setup executor
-    if executor == "mock":
-        from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
-    elif executor == "beamng":
-        from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
-                                      map_size=map_size, road_visualizer=road_visualizer)
-
     # Setup folder structure
 
     # Ensure base folder is there.
@@ -85,9 +88,18 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     except OSError as e:
         raise
 
+    # TODO Use a logger
     print("Outputting results to " + result_folder)
 
-
+    # Setup executor
+    if executor == "mock":
+        from code_pipeline.executors import MockExecutor
+        the_executor = MockExecutor(time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
+    elif executor == "beamng":
+        # TODO Make sure this executor outputs the files in the results folder
+        from code_pipeline.beamng_executor import BeamngExecutor
+        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
+                                      map_size=map_size, road_visualizer=road_visualizer)
 
     try:
         # Instantiate the test generator
@@ -100,15 +112,22 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         traceback.print_exc()
 
     finally:
-        # When the generation ends. Print the stats collected
+        # TODO Use a logger
+        # When the generation ends. Print generic stats, more details will be provided in the summary
         print("Test Generation Statistics:")
         print(the_executor.get_stats())
 
-    # Run the analysis
+    # Run the analysis and generate the summary
     # TODO Consider configuring this via command line arguments or moving it to a different (sub-)command
+    # Analyses can be implemented as plugins, but how can we pass data to from them? Default constructor?
+    # Here I would go with:
+    # for analysise in configured_analyses:
+    #   analysise.analyze(all_execution_data?)
+    #   analysise.create_summary(result_folder)
+    # TODO Consider encapsulating this into a class
+    create_summary(result_folder, the_executor.get_stats())
 
 
-    # Generate a summary
 
 if __name__ == '__main__':
     generate()
