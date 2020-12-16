@@ -136,3 +136,12 @@ class TestGenerationStatistic:
         msg += "(real) time spent in execution :" + str(sum(self.test_execution_real_times)) + "\n"
         # self.test_execution_simulation_times = []
         return msg
+
+    def as_csv(self):
+        # TODO There's definitively a more python way to do this
+        header = ",".join(["test_generated","test_valid","test_invalid","test_passed","test_failed",
+                           "test_in_error","total_execution_time"   ])
+        values = ",".join([str(self.test_generated), str(self.test_valid), str(self.test_invalid),
+                           str(self.test_passed), str(self.test_failed), str(self.test_in_error),
+                           str(sum(self.test_execution_real_times))])
+        return '\n'.join([header, values])
