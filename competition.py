@@ -49,8 +49,8 @@ def post_process(result_folder, the_executor):
         This will be invoked after the generation is over. Whatever results is produced will be copied inside
         the result_folder
     """
-    print("Test Generation Statistics:")
-    print(the_executor.get_stats())
+    log.info("Test Generation Statistics:")
+    log.info(the_executor.get_stats())
     create_summary(result_folder, the_executor.get_stats())
 
 
@@ -91,7 +91,6 @@ def setup_logging(log_to, debug):
     # See: https://stackoverflow.com/questions/56618739/matplotlib-throws-warning-message-because-of-findfont-python
     log.getLogger('matplotlib.font_manager').disabled = True
 
-
     term_handler = log.StreamHandler()
     log_handlers = [term_handler]
     start_msg = "Started test generation"
@@ -130,22 +129,16 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     setup_logging(log_to, debug)
 
 
-    # Setup test generator
-    # TODO Probably we should validate this somehow?
-    # Dynamically load the test generator
+    # Setup test generator by dynamically loading it
     module = importlib.import_module(module_name, module_path)
     the_class = getattr(module, class_name)
 
-    # Pre Execution Setup
     road_visualizer = None
-
     # Setup visualization
     if visualize_tests:
         road_visualizer = RoadTestVisualizer(map_size=map_size)
 
-    # Setup folder structure
-
-    # Ensure base folder is there. For the moment we HARDCODED the location of the output folder
+    # Setup folder structure by ensuring that the basic folder structure is there.
     default_output_folder = os.path.join(get_script_path(), OUTPUT_RESULTS_TO)
     try:
         os.makedirs(default_output_folder)
@@ -156,18 +149,16 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     # Create the unique folder that will host the results of this execution using the test generator data and
     # a timestamp as id
     timestamp_id = time.time_ns() // 1000000
-
     result_folder = os.path.join(default_output_folder, "_".join([str(module_name), str(class_name), str(timestamp_id)]))
 
     try:
         os.makedirs(result_folder)
-    except OSError as e:
-        print("An error occurred during test generation")
+    except OSError:
+        log.fatal("An error occurred during test generation")
         traceback.print_exc()
         sys.exit(2)
 
-    # TODO Use a logger
-    print("Outputting results to " + result_folder)
+    log.info("Outputting results to " + result_folder)
 
     # Setup executor
     if executor == "mock":
@@ -179,10 +170,6 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
                                       map_size=map_size, road_visualizer=road_visualizer)
 
-    # Dynamically load the test generator
-    module = importlib.import_module(module_name, module_path)
-    class_ = getattr(module, class_name)
-
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(result_folder, the_executor))
 
@@ -191,10 +178,9 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         test_generator = the_class(time_budget=time_budget, executor=the_executor, map_size=map_size)
         # Start the generation
         test_generator.start()
-    except Exception as ex:
-        print("An error occurred during test generation")
+    except Exception:
+        log.fatal("An error occurred during test generation")
         traceback.print_exc()
-        # TODO Shall we attempt to post process data at this point?
         sys.exit(2)
 
     # We still need this here to post process the results if the execution takes the regular flow

@@ -14,6 +14,8 @@ from self_driving.vehicle_state_reader import VehicleStateReader
 
 from shapely.geometry import Point
 
+import logging as log
+
 FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
@@ -37,7 +39,8 @@ class BeamngExecutor(AbstractTestExecutor):
         # Ensure we do not execute anything longer than the time budget
         super()._execute(the_test)
 
-        print("Executing the test")
+        # TODO Show name of the test?
+        log.info("Executing the test")
 
         # TODO Not sure why we need to repeat this 2 times...
         counter = 2

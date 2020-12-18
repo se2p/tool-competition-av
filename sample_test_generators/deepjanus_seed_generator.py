@@ -12,6 +12,7 @@ from code_pipeline.tests_generation import RoadTestFactory
 
 import math
 import numpy as np
+import logging as log
 
 from self_driving.road_polygon import RoadPolygon
 
@@ -214,7 +215,7 @@ class JanusGenerator():
         self.map_size = map_size
 
     def start(self):
-        print("Starting test generation")
+        log.info("Starting test generation")
         # Generate a single test.
 
         #TODO: return points
@@ -229,19 +230,20 @@ class JanusGenerator():
             road_points = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
                                  num_spline_nodes=NUM_SPLINE_NODES).generate()
 
-            print("Generated test from road points ", road_points)
+            log.info("Generated test from road points %s", road_points)
             the_test = RoadTestFactory.create_road_test(road_points)
 
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
-            print(test_outcome, description)
+            log.info(test_outcome, description)
             count += 1
-            print("Remaining Time: "+str(self.executor.get_remaining_time()))
+            log.info("Remaining Time: %s", str(self.executor.get_remaining_time()))
 
-        print("Successful tests: "+str(count))
+            log.info("Successful tests: %s", str(count))
 
-# TODO Clean up the code and remove hardcoded logic from the sample generators
+
 if __name__ == "__main__":
+    # TODO Clean up the code and remove hardcoded logic from the sample generators. Create a unit tests instead
     time_budget = 250000
     map_size = 250
     beamng_home = r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0"

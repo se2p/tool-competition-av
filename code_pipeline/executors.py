@@ -1,18 +1,17 @@
 # TODO Create an abstract class to host the logic for calling the validation and the timing
 # Use this class to output tests in predefined locations after execution
 import json
-
-
-from code_pipeline.validation import TestValidator
-from abc import ABC, abstractmethod
-
-from self_driving.simulation_data import SimulationDataRecord
-
+import logging as log
 import random
 import time
 import sys
 
+from abc import ABC, abstractmethod
+
+from code_pipeline.validation import TestValidator
 from code_pipeline.tests_generation import TestGenerationStatistic
+
+from self_driving.simulation_data import SimulationDataRecord
 
 
 class AbstractTestExecutor(ABC):
@@ -43,7 +42,7 @@ class AbstractTestExecutor(ABC):
         # that cleanly
         if self.get_remaining_time() <= 0:
             self.timeout_forced = True
-            print("Time budget is over, cannot run more tests. FORCE EXIT")
+            log.warning("Time budget is over, cannot run more tests. FORCE EXIT")
             sys.exit(123)
 
         self.stats.test_generated += 1
@@ -88,7 +87,7 @@ class AbstractTestExecutor(ABC):
             return "INVALID", validation_msg, []
 
     def validate_test(self, the_test):
-        print("Validating test")
+        log.debug("Validating test")
         return self.test_validator.validate_test(the_test)
 
     def get_elapsed_time(self):
@@ -105,7 +104,7 @@ class AbstractTestExecutor(ABC):
         # This should not be necessary, but better safe than sorry...
         if self.get_remaining_time() <= 0:
             self.timeout_forced = True
-            print("Time budget is over, cannot run more tests. FORCE EXIT")
+            log.warning("Time budget is over, cannot run more tests. FORCE EXIT")
             sys.exit(123)
 
 class MockExecutor(AbstractTestExecutor):
@@ -139,7 +138,7 @@ class MockExecutor(AbstractTestExecutor):
 
         execution_data = [sim_state]
 
-        print("Pretend test is executing")
+        log.info("Pretend test is executing")
         time.sleep(5)
         self.total_elapsed_time += 5
 
@@ -147,6 +146,7 @@ class MockExecutor(AbstractTestExecutor):
 
 
 if __name__ == '__main__':
+    # TODO Remove this code and create an unit test instead
     from code_pipeline.beamng_executor import BeamngExecutor
     executor = BeamngExecutor(time_budget=250000, map_size=250, beamng_home=r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0")
     ROAD_PATH = r"data\seed0.json"
