@@ -9,6 +9,7 @@ import time
 import os
 import sys
 import errno
+import logging as log
 
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
@@ -81,6 +82,35 @@ def create_summary(result_folder, raw_data):
     pass
 
 
+def log_exception(extype, value, trace):
+    log.exception('Uncaught exception:', exc_info=(extype, value, trace))
+
+
+def setup_logging(log_to, debug):
+    # Disable annoyng messages from matplot lib.
+    # See: https://stackoverflow.com/questions/56618739/matplotlib-throws-warning-message-because-of-findfont-python
+    log.getLogger('matplotlib.font_manager').disabled = True
+
+
+    term_handler = log.StreamHandler()
+    log_handlers = [term_handler]
+    start_msg = "Started test generation"
+
+    if log_to is not None:
+        file_handler = log.FileHandler(log_to, 'a', 'utf-8')
+        log_handlers.append( file_handler )
+        start_msg += " ".join(["writing to file: ", str(log_to)])
+
+    log_level = log.DEBUG if debug else log.INFO
+
+    log.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=log_level, handlers=log_handlers)
+
+    sys.excepthook = log_exception
+
+    log.info(start_msg)
+
+
+
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
 @click.option('--beamng-home', required=False, type=click.Path(exists=True))
@@ -90,8 +120,16 @@ def create_summary(result_folder, raw_data):
 @click.option('--module-path', required=False, type=click.Path(exists=True))
 @click.option('--class-name', required=True, type=str)
 # Visual Debugging
-@click.option('--visualize-tests', required=False, is_flag=True, default=False, help="Visualize the last generated test.")
-def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name, visualize_tests):
+@click.option('--visualize-tests', required=False, is_flag=True, default=False, help = "Visualize the last generated test.")
+# Logging options
+@click.option('--log-to', required=False, type=click.Path(exists=False), help = "File to Log to. If not specified logs will show on the console")
+@click.option('--debug', required=False, is_flag=True, default=False, help = "Activate debugging (more logging)")
+
+def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
+    # Setup logging
+    setup_logging(log_to, debug)
+
+
     # Setup test generator
     # TODO Probably we should validate this somehow?
     # Dynamically load the test generator
