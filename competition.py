@@ -160,14 +160,13 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
 
     log.info("Outputting results to " + result_folder)
 
-    # Setup executor
+    # Setup executor. All the executor must output the execution data into the result_folder
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = MockExecutor(result_folder, time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
     elif executor == "beamng":
-        # TODO Make sure this executor outputs the files in the results folder
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
+        the_executor = BeamngExecutor(result_folder, beamng_home=beamng_home, time_budget=time_budget,
                                       map_size=map_size, road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results
