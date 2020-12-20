@@ -9,7 +9,8 @@ from math import sqrt
 
 from itertools import islice
 import functools
-
+import os
+import json
 
 BEFORE_THRESHOLD = 60.0
 AFTER_THRESHOLD = 20.0
@@ -311,6 +312,16 @@ def _identify_segments(nodes):
     return segments
 
 
+def _test_failed_with_oob(json_file):
+    """
+        Load the test from the json file and check the relevant attributes. The test must be valid, and FAILED because
+        of OOB
+    """
+    with open(json_file, 'r') as test_json:
+        data = json.load(test_json)
+    return data["is_valid"] and data["test_outcome"] == "FAILED" and data["description"].startswith("Car drove out of the lane")
+
+
 class RoadTestEvaluator:
 
     def __init__(self, road_length_before_oob = BEFORE_THRESHOLD, road_lengrth_after_oob = AFTER_THRESHOLD):
@@ -394,3 +405,34 @@ class RoadTestEvaluator:
 
         # Return them
         return interesting_road_segments
+
+
+class UniqueOOBAnalysis:
+
+    def __init__(self, result_folder):
+        self.result_folder = result_folder
+
+    def _measure_distance_between(self, oob1, oob2):
+        # TODO Implement this
+        pass
+
+    def analyse(self):
+        """
+            Iterate over the result_folder, identify the OOB and measure their relative distance, and ... TODO
+        """
+        file_names = [os.path.join(self.result_folder, fn) for fn in os.listdir(self.result_folder)
+                      if fn.startswith('test.') and fn.endswith('json')]
+
+        # Filter tests that have oob
+
+        file_names = filter(_test_failed_with_oob, file_names)
+
+        for file_name in file_names:
+            print(file_name)
+
+
+        pass
+
+    def create_summary(self):
+        """ TODO Create whatever summary we need from this """
+        pass

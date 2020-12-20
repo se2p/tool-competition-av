@@ -41,7 +41,7 @@ def create_summary(result_folder, raw_data):
         summary_file = os.path.join(result_folder, "generation_stats.csv")
         csv_content = raw_data.as_csv()
         with open(summary_file, 'w') as output_file:
-            output_file.write( csv_content )
+            output_file.write( csv_content)
 
 
 def post_process(result_folder, the_executor):
@@ -49,6 +49,8 @@ def post_process(result_folder, the_executor):
         This will be invoked after the generation is over. Whatever results is produced will be copied inside
         the result_folder
     """
+    # TODO Test generation statistic is a bit hardcoded in the executors code, so we might leave it as it is for the
+    #  moment.
     log.info("Test Generation Statistics:")
     log.info(the_executor.get_stats())
     create_summary(result_folder, the_executor.get_stats())

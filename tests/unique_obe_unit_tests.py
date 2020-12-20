@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from code_pipeline.tests_evaluation import RoadTestEvaluator
+from code_pipeline.tests_evaluation import RoadTestEvaluator, UniqueOOBAnalysis
 
 from numpy import linspace
 
@@ -84,6 +84,18 @@ def _plot_nodes(sample_nodes, style, markersize, fig = None, title=None):
 
 class UniqueOBETest(unittest.TestCase):
 
+
+    def test_run_analysis(self):
+        """
+            Load test data and run the analysis
+        """
+        uob = UniqueOOBAnalysis('./sample_test_generators_data')
+        uob.analyse()
+
+
+
+class RoadTestEvaluatorTest(unittest.TestCase):
+
     def _load_execution_data(self, execution_data_file):
         # Load the execution data
         with open(execution_data_file) as input_file:
@@ -150,3 +162,6 @@ class UniqueOBETest(unittest.TestCase):
         # plt.gca().set(xlim=(-30, map_size + 30), ylim=(-30, map_size + 30))
         #
         # plt.show()
+
+if __name__ == '__main__':
+    unittest.main()

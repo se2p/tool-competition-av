@@ -40,7 +40,7 @@ class AbstractTestExecutor(ABC):
 
     def store_test(self, the_test):
         # TODO Pad zeros to id
-        output_file_name = os.path.join(self.result_folder, ".".join(["test", str(the_test.id), "json"]))
+        output_file_name = os.path.join(self.result_folder, ".".join(["test", str(the_test.id).zfill(4), "json"]))
         with open(output_file_name, 'w') as test_file:
             test_file.write(the_test.to_json())
 
