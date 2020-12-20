@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import logging as log
+
 from code_pipeline.tests_generation import RoadTestFactory
 
 
@@ -15,7 +17,7 @@ class OneTestGenerator():
         self.map_size = map_size
 
     def start(self):
-        print("Starting test generation")
+        log.info("Starting test generation")
 
         road_points = []
 
@@ -61,7 +63,8 @@ class OneTestGenerator():
         test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
         # Print test outcome
-        print(test_outcome, description)
+        log.info("test_outcome %s", test_outcome)
+        log.info("description %s", description)
 
         import time
         time.sleep(10)
