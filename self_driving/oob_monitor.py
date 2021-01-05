@@ -27,7 +27,7 @@ class OutOfBoundsMonitor:
         self.update_oob_counter(is_oob)
 
         last_max_oob_percentage = self.last_max_oob_percentage if oob_bb else float("nan")
-        oob_distance = float("nan") if oob_bb else self.oob_distance( wrt=wrt)
+        oob_distance = self.oob_distance(wrt=wrt)
 
         return is_oob, self.oob_counter, last_max_oob_percentage, oob_distance
 
@@ -64,7 +64,7 @@ class OutOfBoundsMonitor:
 
     def oob_distance(self,  wrt="right") -> float:
         """Returns the difference between the width of a lane and
-        the distance between the car and the center of the road."""
+        the distance between the car and the center of the lane."""
         car_point = Point(self.vehicle_state_reader.get_state().pos)
         divisor = 4.0
         if wrt == "right":
