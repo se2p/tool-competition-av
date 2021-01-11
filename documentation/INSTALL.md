@@ -21,17 +21,17 @@ copy of BeamNG.research
 
 ### Python ###
 
-This code has been tested with Python 3.6
+This code has been tested with **Python 3.7**. 
 
 ### Other Libraries ###
 
-To easily install the other dependencies with rely on `pip`, we suggest to create a dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.6/library/venv.html)), activate it, and run the following command:
+To easily install the other dependencies with rely on `pip`, we suggest to create a dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.7/library/venv.html)), activate it, and run the following command:
 
 ```
-pip install -r requirements-36.txt
+pip install -r requirements-37.txt
 ```
 
-Otherwise, you can manually install each required library listed in the ```requirements-36.txt``` file.
+Otherwise, you can manually install each required library listed in the ```requirements-37.txt``` file.
 
 > **Note**: the version of Shapely should match your system (see below).
 
@@ -43,7 +43,7 @@ To create such a file you can run the following command from within your active 
 pip freeze > additional-requirements.txt
 ```
 
-Otherwise, you can manually list the additional libraries your test generator need in the `additional-requirements.txt`.
+Otherwise, you can manually list the additional libraries your test generator need in the `additional-requirements.txt` file.
 
 > **Note**: the format of this file must follow the usual convention where the library name is followed by the target version number
 
@@ -52,13 +52,13 @@ Otherwise, you can manually list the additional libraries your test generator ne
 
 You can obtain Shapely from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely). 
 
-You should download the wheel file matching you Python version, i.e. download the file with cp36 in the name if you use Python 3.6. The wheel file should also match the architecture of your machine, i.e., you should install the file with either win32 or win_amd64 in the name.
+You should download the wheel file matching you Python version, i.e. download the file with cp37 in the name if you use Python 3.7. The wheel file should also match the architecture of your machine, i.e., you should install the file with either `win32` or `win_amd64` in the name.
 
-*Example:* if you have a 64 bit machine equipped with Python 3.6, you should download the wheel file named *Shapely‑1.7.1‑cp36‑cp36m‑win_amd64.whl*
+After downloading the wheel file, you can install Shapely by running (in an active virtual environment) the following command:
 
-To install Shapely, you should run:
-
-```pip install [path of the shapely file]```
+```
+pip install [path to the shapely file]
+```
 
 ## Recommended Requirements ##
 
