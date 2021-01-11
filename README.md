@@ -23,13 +23,12 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Scenario template](levels_template/tig): basic scenario used in this competition
 
-[Documentation](documentation/README.md): contains the installation guide and the detailed rules of the competition
+[Documentation](documentation/README.md): contains the installation guide, detailed rules of the competition, and the frequently asked questions
 
 [Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes 
 
 [Requirements](requirements-37.txt): contains the list of the required packages.
 
-[FAQ](FAQ.md): a list of some frequently asked questions
 
 ## License ##
 The software we developed is distributed under GNU GPL license. See the [LICENSE.md](LICENSE.md) file.
