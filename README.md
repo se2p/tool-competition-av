@@ -27,7 +27,9 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes 
 
-[Requirements](requirements-36.txt): file containing the list of the required packages
+[Requirements](requirements-37.txt): contains the list of the required packages.
+
+[FAQ](FAQ.md): a list of some frequently asked questions
 
 ## License ##
 The software we developed is distributed under GNU GPL license. See the [LICENSE.md](LICENSE.md) file.
