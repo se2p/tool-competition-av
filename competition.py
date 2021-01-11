@@ -113,6 +113,7 @@ def setup_logging(log_to, debug):
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
 @click.option('--beamng-home', required=False, type=click.Path(exists=True))
+@click.option('--beamng-user', required=False, type=click.Path(exists=True))
 @click.option('--time-budget', required=True, type=int, callback=validate_time_budget)
 @click.option('--map-size', type=int, default=200, callback=validate_map_size)
 @click.option('--module-name', required=True, type=str)
@@ -123,11 +124,9 @@ def setup_logging(log_to, debug):
 # Logging options
 @click.option('--log-to', required=False, type=click.Path(exists=False), help = "File to Log to. If not specified logs will show on the console")
 @click.option('--debug', required=False, is_flag=True, default=False, help = "Activate debugging (more logging)")
-
-def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
+def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
     # Setup logging
     setup_logging(log_to, debug)
-
 
     # Setup test generator by dynamically loading it
     module = importlib.import_module(module_name, module_path)
@@ -167,7 +166,7 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
     elif executor == "beamng":
         # TODO Make sure this executor outputs the files in the results folder
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, time_budget=time_budget,
+        the_executor = BeamngExecutor(beamng_home=beamng_home, beamng_user=beamng_user, time_budget=time_budget,
                                       map_size=map_size, road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results

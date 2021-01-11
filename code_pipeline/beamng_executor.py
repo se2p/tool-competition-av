@@ -5,7 +5,8 @@ import traceback
 from typing import Tuple
 
 from self_driving.beamng_brewer import BeamNGBrewer
-from self_driving.beamng_tig_maps import maps
+# maps is a global variable in the module, which is initialized to Maps()
+from self_driving.beamng_tig_maps import maps, LevelsFolder
 from self_driving.beamng_waypoint import BeamNGWaypoint
 from self_driving.simulation_data import SimulationDataRecord, SimulationData
 from self_driving.simulation_data_collector import SimulationDataCollector
@@ -15,12 +16,12 @@ from self_driving.vehicle_state_reader import VehicleStateReader
 from shapely.geometry import Point
 
 import logging as log
-
+import os.path
 FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, beamng_home = None, time_budget=None, map_size=None, road_visualizer=None):
+    def __init__(self, beamng_home=None, beamng_user=None, time_budget=None, map_size=None, road_visualizer=None):
         super().__init__(time_budget, map_size)
         # TODO Is this still valid?
         self.test_time_budget = 250000
@@ -29,6 +30,13 @@ class BeamngExecutor(AbstractTestExecutor):
         self.risk_value = 0.7
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
+        self.beamng_user = beamng_user
+
+        # TODO Add checks with default setup. This requires a call to BeamNGpy resolve  (~/Documents/BeamNG.research)
+        if not os.path.exists(os.path.join(self.beamng_user, "research.key")):
+            log.warning("%s is missing but is required to use BeamNG.research", )
+
+
         # Runtime Monitor about relative movement of the car
         self.last_observation = None
         # Not sure how to set this... How far can a car move in 250 ms at 5Km/h
@@ -96,7 +104,7 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def _run_simulation(self, the_test) -> SimulationData:
         if not self.brewer:
-            self.brewer = BeamNGBrewer(self.beamng_home)
+            self.brewer = BeamNGBrewer(beamng_home=self.beamng_home, beamng_user=self.beamng_user)
             self.vehicle = self.brewer.setup_vehicle()
 
         # For the execution we need the interpolated points
@@ -107,6 +115,14 @@ class BeamngExecutor(AbstractTestExecutor):
         brewer.setup_road_nodes(nodes)
         beamng = brewer.beamng
         waypoint_goal = BeamNGWaypoint('waypoint_goal', get_node_coords(nodes[-1]))
+
+        # TODO Make sure that maps points to the right folder !
+        if self.beamng_user is not None:
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
+            maps.beamng_levels = beamng_levels
+            maps.beamng_map = maps.beamng_levels.get_map('tig')
+            maps.print_paths()
+
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
