@@ -37,7 +37,6 @@ class AbstractTestExecutor(ABC):
         return self.timeout_forced == True
 
     def execute_test(self, the_test):
-
         # Maybe we can solve this using decorators, but we need the reference to the instance, not sure how to handle
         # that cleanly
         if self.get_remaining_time() <= 0:
@@ -99,6 +98,15 @@ class AbstractTestExecutor(ABC):
     def get_stats(self):
         return self.stats
 
+    def close(self):
+        log.info("CLOSING EXECUTOR")
+        self._close()
+
+    @abstractmethod
+    def _close(self):
+        if self.get_remaining_time() > 0:
+            log.warning("Despite the time budget is not over executor is exiting!")
+
     @abstractmethod
     def _execute(self, the_test):
         # This should not be necessary, but better safe than sorry...
@@ -144,6 +152,9 @@ class MockExecutor(AbstractTestExecutor):
 
         return test_outcome, description, execution_data
 
+    def _close(self):
+        super()._close()
+        print("Closing Mock Executor")
 
 if __name__ == '__main__':
     # TODO Remove this code and create an unit test instead

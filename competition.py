@@ -49,6 +49,9 @@ def post_process(result_folder, the_executor):
         This will be invoked after the generation is over. Whatever results is produced will be copied inside
         the result_folder
     """
+    # Ensure the executor is stopped
+    the_executor.close()
+
     log.info("Test Generation Statistics:")
     log.info(the_executor.get_stats())
     create_summary(result_folder, the_executor.get_stats())

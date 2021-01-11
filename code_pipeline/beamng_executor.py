@@ -121,7 +121,7 @@ class BeamngExecutor(AbstractTestExecutor):
             beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
-            maps.print_paths()
+            # maps.print_paths()
 
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
@@ -139,8 +139,8 @@ class BeamngExecutor(AbstractTestExecutor):
         sim_data_collector.get_simulation_data().start()
         try:
             brewer.bring_up()
-            iterations_count = int(self.test_time_budget/250)
-            idx = 0
+            # iterations_count = int(self.test_time_budget/250)
+            # idx = 0
 
             brewer.vehicle.ai_set_aggression(self.risk_value)
             brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
@@ -148,9 +148,8 @@ class BeamngExecutor(AbstractTestExecutor):
             brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
 
             while True:
-                idx += 1
-
-                assert idx < iterations_count, "Timeout Simulation " + str(sim_data_collector.name)
+                # idx += 1
+                # assert idx < iterations_count, "Timeout Simulation " + str(sim_data_collector.name)
 
                 sim_data_collector.collect_current_data(oob_bb=True)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
