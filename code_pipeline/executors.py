@@ -24,7 +24,7 @@ class AbstractTestExecutor(ABC):
 
         self.time_budget = time_budget
         self.test_validator = TestValidator(map_size)
-        self.start_time = time.monotonic()
+        self.start_time = time.time()
         self.total_elapsed_time = 0
 
         self.road_visualizer = road_visualizer
@@ -90,6 +90,8 @@ class AbstractTestExecutor(ABC):
         return self.test_validator.validate_test(the_test)
 
     def get_elapsed_time(self):
+        now = time.time()
+        self.total_elapsed_time = now - self.start_time
         return self.total_elapsed_time
 
     def get_remaining_time(self):
