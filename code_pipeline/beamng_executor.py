@@ -33,7 +33,7 @@ class BeamngExecutor(AbstractTestExecutor):
         self.beamng_user = beamng_user
 
         # TODO Add checks with default setup. This requires a call to BeamNGpy resolve  (~/Documents/BeamNG.research)
-        if not os.path.exists(os.path.join(self.beamng_user, "research.key")):
+        if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
             log.warning("%s is missing but is required to use BeamNG.research", )
 
 

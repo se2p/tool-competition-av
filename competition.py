@@ -115,8 +115,8 @@ def setup_logging(log_to, debug):
 
 @click.command()
 @click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
-@click.option('--beamng-home', required=False, type=click.Path(exists=True))
-@click.option('--beamng-user', required=False, type=click.Path(exists=True))
+@click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True))
+@click.option('--beamng-user', required=False, default=None, type=click.Path(exists=True))
 @click.option('--time-budget', required=True, type=int, callback=validate_time_budget)
 @click.option('--map-size', type=int, default=200, callback=validate_map_size)
 @click.option('--module-name', required=True, type=str)
