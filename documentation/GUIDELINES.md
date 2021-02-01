@@ -138,7 +138,7 @@ Options:
 
 ## Example
 
-As an example, you can "pretend to" execute the `one-test-generator.py` as show below, Remember to activate your virtual environment (if you have one... and you should!), then `cd` to the root of this repository and run:
+As an example, you can use the mock to "pretend to" execute the `one-test-generator.py` as shown below. We suggest you to activate a virtual environment. `cd` to the root of this repository and run:
 
 ``` 
 python competition.py \
@@ -151,13 +151,14 @@ python competition.py \
 ```
 
 
-If you have installed BeamNG at `<BEAMNG_HOME>` you can execute the tests for real using the following command
+If you have installed BeamNG at `<BEAMNG_HOME>` you can actually execute the tests using the simulator through the following command
 
 ``` 
 python competition.py \
         --visualize-tests \
         --time-budget 10 \
         --executor beamng --beamng-home <BEAMNG_HOME> \
+        --beamng-user <BEAMNG_USER> \
         --map-size 200 \
         --module-name sample_test_generators.one_test_generator \
         --class-name OneTestGenerator
