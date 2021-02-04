@@ -60,7 +60,7 @@ To participate, competitors must submit the code of their test generator and ins
 
 ## How To Submit ##
 
-Submitting a tool to this competition entails requires you to share your code with us, so the easiest way is to forking the master branch of this repo and send us a pull request with your code in it. Alternatively, you can send the address of a repo where we can download the code or a "tar-ball" with your code in it. 
+Submitting a tool to this competition requires participants to share their code with us. So, the easiest way is to fork the master branch of this repo and send us a pull request with your code in it. Alternatively, you can send the URL of a repo where we can download the code or even a "tar-ball" with your code in it. 
 
 We will come back to you if we need support to install and run your code.
 
