@@ -26,7 +26,7 @@ class AbstractTestExecutor(ABC):
 
         self.time_budget = time_budget
         self.test_validator = TestValidator(map_size)
-        self.start_time = time.monotonic()
+        self.start_time = time.time()
         self.total_elapsed_time = 0
 
         self.road_visualizer = road_visualizer
@@ -45,7 +45,6 @@ class AbstractTestExecutor(ABC):
             test_file.write(the_test.to_json())
 
     def execute_test(self, the_test):
-
         # Maybe we can solve this using decorators, but we need the reference to the instance, not sure how to handle
         # that cleanly
         if self.get_remaining_time() <= 0:
@@ -110,6 +109,8 @@ class AbstractTestExecutor(ABC):
         return self.test_validator.validate_test(the_test)
 
     def get_elapsed_time(self):
+        now = time.time()
+        self.total_elapsed_time = now - self.start_time
         return self.total_elapsed_time
 
     def get_remaining_time(self):
@@ -117,6 +118,15 @@ class AbstractTestExecutor(ABC):
 
     def get_stats(self):
         return self.stats
+
+    def close(self):
+        log.info("CLOSING EXECUTOR")
+        self._close()
+
+    @abstractmethod
+    def _close(self):
+        if self.get_remaining_time() > 0:
+            log.warning("Despite the time budget is not over executor is exiting!")
 
     @abstractmethod
     def _execute(self, the_test):
@@ -162,3 +172,7 @@ class MockExecutor(AbstractTestExecutor):
         self.total_elapsed_time += 5
 
         return test_outcome, description, execution_data
+
+    def _close(self):
+        super()._close()
+        print("Closing Mock Executor")

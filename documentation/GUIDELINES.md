@@ -60,7 +60,7 @@ To participate, competitors must submit the code of their test generator and ins
 
 ## How To Submit ##
 
-Submitting a tool to this competition entails requires you to share your code with us, so the easiest way is to forking the master branch of this repo and send us a pull request with your code in it. Alternatively, you can send the address of a repo where we can download the code or a "tar-ball" with your code in it. 
+Submitting a tool to this competition requires participants to share their code with us. So, the easiest way is to fork the master branch of this repo and send us a pull request with your code in it. Alternatively, you can send the URL of a repo where we can download the code or even a "tar-ball" with your code in it. 
 
 We will come back to you if we need support to install and run your code.
 
@@ -85,30 +85,80 @@ Check the [Installation Guide](INSTALL.md)
 ## Technical considerations ##
 The competition code can be run by executing `competition.py` from the main folder of this repo.
 
-Usage(from command line): 
+Usage (from command line): 
 
 ```
-competition.py [OPTIONS]
+
+Usage: competition.py [OPTIONS]
 
 Options:
-  --executor [mock|beamng]
-  --time-budget INTEGER     [required - time budget in seconds]
-  --map-size INTEGER        [default 200, as 200x200]
-  --module-name TEXT        [required - name of your test generation module]
-  --module-path TEXT        [path to your test generation module]
-  --class-name TEXT         [required - name of the class implementing your generator]
-  --visualize-tests         [visualize the last generated test].
-  --beamng-home TEXT        [considered only if beamng executor is selected]
+  --executor [mock|beamng]  The name of the executor to use. Currently we have
+                            'mock' or 'beamng'.  [default: (Mock Executor
+                            (meant for debugging))]
+
+  --beamng-home PATH        Customize BeamNG executor by specifying the home
+                            of the simulator.
+
+  --beamng-user PATH        Customize BeamNG executor by specifying the
+                            location of the folder where levels, props, and
+                            other BeamNG-related data will be copied.** Use
+                            this to avoid spaces in URL/PATHS! **
+
+  --time-budget INTEGER     Overall budget for the generation and execution.
+                            Expressed in 'real-time'seconds.  [required]
+
+  --map-size INTEGER        The lenght of the size of the squared map where
+                            the road must fit.Expressed in meters.  [default:
+                            (200m, which leads to a 200x200m^2 squared map)]
+
+  --module-name TEXT        Name of the module where your test generator is
+                            located.  [required]
+
+  --module-path PATH        Path of the module where your test generator is
+                            located.
+
+  --class-name TEXT         Name of the (main) class implementing your test
+                            generator.  [required]
+
+  --visualize-tests         Visualize the last generated test, i.e., the test
+                            sent for the execution. Invalid tests are also
+                            visualized.  [default: (Disabled)]
+
+  --log-to PATH             Location of the log file. If not specified logs
+                            appear on the console
+
+  --debug                   Activate debugging (results in more logging)
+                            [default: (Disabled)]
+
   --help                    Show this message and exit.
+
 ```
 
-For example, to execute the `one-test-generator.py`, activate your virtual environment (if you have one... and you should), then `cd` to the root of this repository and run:
+> NOTE: We have to introduce the `--beamng-user` option because currently BeamNGpy does not support folders that contain "spaces" in them. By specify this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
+
+## Example
+
+As an example, you can use the mock to "pretend to" execute the `one-test-generator.py` as shown below. We suggest you to activate a virtual environment. `cd` to the root of this repository and run:
 
 ``` 
 python competition.py \
         --visualize-tests \
         --time-budget 10 \
         --executor mock \
+        --map-size 200 \
+        --module-name sample_test_generators.one_test_generator \
+        --class-name OneTestGenerator
+```
+
+
+If you have installed BeamNG at `<BEAMNG_HOME>` you can actually execute the tests using the simulator through the following command
+
+``` 
+python competition.py \
+        --visualize-tests \
+        --time-budget 10 \
+        --executor beamng --beamng-home <BEAMNG_HOME> \
+        --beamng-user <BEAMNG_USER> \
         --map-size 200 \
         --module-name sample_test_generators.one_test_generator \
         --class-name OneTestGenerator

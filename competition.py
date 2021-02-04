@@ -49,8 +49,9 @@ def post_process(result_folder, the_executor):
         This will be invoked after the generation is over. Whatever results is produced will be copied inside
         the result_folder
     """
-    # TODO Test generation statistic is a bit hardcoded in the executors code, so we might leave it as it is for the
-    #  moment.
+    # Ensure the executor is stopped
+    the_executor.close()
+
     log.info("Test Generation Statistics:")
     log.info(the_executor.get_stats())
     create_summary(result_folder, the_executor.get_stats())
@@ -113,23 +114,44 @@ def setup_logging(log_to, debug):
 
 
 @click.command()
-@click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock")
-@click.option('--beamng-home', required=False, type=click.Path(exists=True))
-@click.option('--time-budget', required=True, type=int, callback=validate_time_budget)
-@click.option('--map-size', type=int, default=200, callback=validate_map_size)
-@click.option('--module-name', required=True, type=str)
-@click.option('--module-path', required=False, type=click.Path(exists=True))
-@click.option('--class-name', required=True, type=str)
+@click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock",
+              show_default='Mock Executor (meant for debugging)',
+              help="The name of the executor to use. Currently we have 'mock' or 'beamng'.")
+@click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True),
+              show_default='None',
+              help="Customize BeamNG executor by specifying the home of the simulator.")
+@click.option('--beamng-user', required=False, default=None, type=click.Path(exists=True),
+              show_default='Currently Active User (~/BeamNG.research/)',
+              help="Customize BeamNG executor by specifying the location of the folder "
+                   "where levels, props, and other BeamNG-related data will be copied."
+                   "** Use this to avoid spaces in URL/PATHS! **")
+@click.option('--time-budget', required=True, type=int, callback=validate_time_budget,
+              help="Overall budget for the generation and execution. Expressed in 'real-time'"
+                   "seconds.")
+@click.option('--map-size', type=int, default=200, callback=validate_map_size,
+              show_default='200m, which leads to a 200x200m^2 squared map',
+              help="The lenght of the size of the squared map where the road must fit."
+                   "Expressed in meters.")
+@click.option('--module-name', required=True, type=str,
+              help="Name of the module where your test generator is located.")
+@click.option('--module-path', required=False, type=click.Path(exists=True),
+              help="Path of the module where your test generator is located.")
+@click.option('--class-name', required=True, type=str,
+              help="Name of the (main) class implementing your test generator.")
 # Visual Debugging
-@click.option('--visualize-tests', required=False, is_flag=True, default=False, help = "Visualize the last generated test.")
+@click.option('--visualize-tests', required=False, is_flag=True, default=False,
+              show_default='Disabled',
+              help="Visualize the last generated test, i.e., the test sent for the execution. "
+                   "Invalid tests are also visualized.")
 # Logging options
-@click.option('--log-to', required=False, type=click.Path(exists=False), help = "File to Log to. If not specified logs will show on the console")
-@click.option('--debug', required=False, is_flag=True, default=False, help = "Activate debugging (more logging)")
-
-def generate(executor, beamng_home, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
+@click.option('--log-to', required=False, type=click.Path(exists=False),
+              help="Location of the log file. If not specified logs appear on the console")
+@click.option('--debug', required=False, is_flag=True, default=False,
+              show_default='Disabled',
+              help="Activate debugging (results in more logging)")
+def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
     # Setup logging
     setup_logging(log_to, debug)
-
 
     # Setup test generator by dynamically loading it
     module = importlib.import_module(module_name, module_path)
@@ -168,7 +190,7 @@ def generate(executor, beamng_home, time_budget, map_size, module_name, module_p
         the_executor = MockExecutor(result_folder, time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(result_folder, beamng_home=beamng_home, time_budget=time_budget,
+        the_executor = BeamngExecutor(beamng_home=beamng_home, beamng_user=beamng_user, time_budget=time_budget,
                                       map_size=map_size, road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results

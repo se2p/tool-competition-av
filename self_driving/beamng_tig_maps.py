@@ -83,7 +83,7 @@ class Maps:
     def install_map_if_needed(self):
         if self.never_logged_path:
             self.never_logged_path = False
-            print(f'BeamNG userpath levels is [{self.beamng_levels.path}]')
+            # print(f'BeamNG userpath levels is [{self.beamng_levels.path}]')
 
         self.beamng_levels.ensure_folder_exists()
 
