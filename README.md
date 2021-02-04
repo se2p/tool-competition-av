@@ -1,7 +1,11 @@
 # Cyber-Physical Systems Testing Competition #
 
-Starting this year, the [SBST Workshop](https://sbst21.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context
-of the usual [tool competition](https://sbst21.github.io/tools/).
+Starting this year, the [SBST Workshop](https://sbst21.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst21.github.io/tools/).
+
+## Important Dates
+The deadline to submit your tool is: **February 12**
+
+The results of the evaluation will be communicated to participants on: **March 2**
 
 ## Goal ##
 The competitors should generate virtual roads to test a lane keeping assist system. 
