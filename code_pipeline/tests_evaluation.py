@@ -324,7 +324,7 @@ def _test_failed_with_oob(json_file):
 
 class RoadTestEvaluator:
 
-    def __init__(self, road_length_before_oob = BEFORE_THRESHOLD, road_lengrth_after_oob = AFTER_THRESHOLD):
+    def __init__(self, road_length_before_oob=BEFORE_THRESHOLD, road_lengrth_after_oob=AFTER_THRESHOLD):
         self.road_length_before_oob = road_length_before_oob
         self.road_lengrth_after_oob = road_lengrth_after_oob
 
@@ -344,14 +344,23 @@ class RoadTestEvaluator:
             positions.append(Point(record["pos"][0], record["pos"][1]))
             if record["is_oob"]:
                 oob_pos = Point(record["pos"][0], record["pos"][1])
+                break
 
         if oob_pos == None:
-            # No oob, no interesting segments
-            return []
+            # No oob, no interesting segments and we cannot tell whether the OOB was left/rigth
+            return None, None, None, None
 
         # Find the point in the interpolated points that is closes to the OOB position
         # https://stackoverflow.com/questions/24415806/coordinates-of-the-closest-points-of-two-geometries-in-shapely
         np = nearest_points(road_line, oob_pos)[0]
+        # Assuming that the road is made by one lane per traffic direction and position are collected frequently,
+        # if the distance between oob and the center of the road is greater than 2.0 (half of lane) then the oob is
+        # on the right side, otherwise on the left side
+        #
+        if oob_pos.distance(road_line) < 2.0:
+            oob_side = "LEFT"
+        else:
+            oob_side = "RIGHT"
 
         # https://gis.stackexchange.com/questions/84512/get-the-vertices-on-a-linestring-either-side-of-a-point
         before = None
@@ -359,7 +368,7 @@ class RoadTestEvaluator:
 
         road_coords = list(road_line.coords)
         for i, p in enumerate(road_coords):
-            if Point(p).distance(np) < 0.5:  # Since we interpolate at every meter, whatever is closer than half od if
+            if Point(p).distance(np) < 0.5:  # Since we interpolate at every meter, whatever is closer than half of if
                 before = road_coords[0:i]
                 before.append(np.coords[0])
 
@@ -399,12 +408,9 @@ class RoadTestEvaluator:
         segment_after = LineString(temp)
 
         # Identify the road segments from ALL the "interesting part of the road"
-        interesting_road_segments = _identify_segments(list(segment_before.coords) + list(segment_after.coords))
-
-        # TODO Mark the road segment that contains the OOB?
-
-        # Return them
-        return interesting_road_segments
+        # TODO Why do we need "segments" can't we simply return the (interpolated) road points?
+        # interesting_road_segments = _identify_segments(list(segment_before.coords) + list(segment_after.coords))
+        return oob_pos, segment_before, segment_after, oob_side
 
 
 class UniqueOOBAnalysis:

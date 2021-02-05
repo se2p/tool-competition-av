@@ -102,66 +102,62 @@ class RoadTestEvaluatorTest(unittest.TestCase):
             execution_data = json.load(input_file)
         return execution_data
 
-    def test_obe(self):
-        execution_data_1 = self._load_execution_data("./obes/execution_1/simulation.full.json")
-        execution_data_2 = self._load_execution_data("./obes/execution_2/simulation.full.json")
+    def _plot_execution_data(self, execution_data):
+        for record in execution_data["records"]:
+            if record["is_oob"] == True:
+                plt.plot(record["pos"][0], record["pos"][1], 'ro')
+            else:
+                plt.plot(record["pos"][0], record["pos"][1], 'go')
 
-        # Measure Similarity
-        road_test_evaluation = RoadTestEvaluator()
+    def _plot_oob(self, oob_pos, segment_before, segment_after ):
+        road_poly = segment_before.buffer(4.0, cap_style=2, join_style=2)
+        patch = PolygonPatch(road_poly, fc='gray', ec='dimgray')  # ec='#555555', alpha=0.5, zorder=4)
+        plt.gca().add_patch(patch)
+        #
+        road_poly = segment_after.buffer(4.0, cap_style=2, join_style=2)
+        patch = PolygonPatch(road_poly, fc='gray', ec='dimgray')  # ec='#555555', alpha=0.5, zorder=4)
+        plt.gca().add_patch(patch)
 
-        interesting_road_segments_oob_1 = road_test_evaluation.identify_interesting_road_segments(execution_data_1)
-        interesting_road_segments_oob_2 = road_test_evaluation.identify_interesting_road_segments(execution_data_2)
-
-        print(interesting_road_segments_oob_1)
-        print(interesting_road_segments_oob_2)
-
-        # TODO Given the interesting road segments for each OOB we should be able to compute "Uniqueness"
-        # This can be done per competitor or for all the competitors
-
-        # #####
-        #
-        # _plot_road_segments(interesting_road_segments )
-        #
-        # # New figure
-        # plt.figure()
-        # # Extract features from the MN road
-        #
-        # map_size = 200
-        #
-        # # plot the map
-        # map_boundary = patches.Rectangle((0, 0), map_size, map_size, linewidth=1, edgecolor='black', facecolor='none')
-        # plt.gca().add_patch(map_boundary)
-        #
-        # # plot the actual road as buffer
-        # road_poly = road_line.buffer(8.0, cap_style=2,join_style=2)
-        # patch = PolygonPatch(road_poly, fc='gray', ec='dimgray')  # ec='#555555', alpha=0.5, zorder=4)
-        # plt.gca().add_patch(patch)
-        #
-        # road_poly_before = segment_before.buffer(8.0, cap_style=2, join_style=2)
-        # patch_before = PolygonPatch(road_poly_before , fc='gray', ec='red', alpha=0.5)  # ec='#555555', alpha=0.5, zorder=4)
-        # plt.gca().add_patch(patch_before)
-        #
-        # road_poly_after = segment_after.buffer(8.0, cap_style=2, join_style=2)
-        # patch_after = PolygonPatch(road_poly_after, fc='gray', ec='green', alpha=0.5)  # ec='#555555', alpha=0.5, zorder=4)
-        # plt.gca().add_patch(patch_after)
-        #
-        # # plot the interpolated road spine
-        # # https://github.com/Toblerity/Shapely/blob/master/docs/code/linestring.py
-        # x, y = road_line.xy
-        # plt.plot(x, y, 'yellow')
-        #
-        #
-        # x = [p.x for p in positions]
+        plt.plot(oob_pos.x, oob_pos.y, 'xr')
+        #https://github.com/Toblerity/Shapely/blob/master/docs/code/linestring.py
+        x, y = segment_before.xy
+        plt.plot(x, y, 'ob')
+        x, y = segment_after.xy
+        plt.plot(x, y, 'ob')
+        # x = [p.x for p in segment_before]
         # y = [p.y for p in positions]
         #
         # plt.plot(x, y, "b*")
         # plt.plot(oob_pos.x, oob_pos.y, "ro")
         # plt.plot(np.x, np.y, "gs")
         #
-        # plt.gca().set_aspect('equal', 'box')
+        plt.gca().set_aspect('equal', 'box')
         # plt.gca().set(xlim=(-30, map_size + 30), ylim=(-30, map_size + 30))
-        #
-        # plt.show()
+
+    def test_obe(self):
+        execution_data_1 = self._load_execution_data("./obes/execution_1/simulation.full.json")
+        execution_data_2 = self._load_execution_data("./obes/execution_2/simulation.full.json")
+
+        # Extract the "Interesting" road segment. This returns the interpolated data to ease computing
+        # the distances
+        meters_before_oob = 60.0
+        meters_after_oob = 20.0
+        road_test_evaluation = RoadTestEvaluator(road_length_before_oob=meters_before_oob,
+                                                 road_lengrth_after_oob=meters_after_oob)
+
+        oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(execution_data_1)
+        plt.figure()
+
+        self._plot_execution_data(execution_data_1)
+        self._plot_oob(oob_pos, segment_before, segment_after)
+        plt.show()
+
+        oob_pos, segment_before, segment_after = road_test_evaluation.identify_interesting_road_segments(execution_data_2)
+
+        plt.figure()
+        self._plot_execution_data(execution_data_2)
+        self._plot_oob(oob_pos, segment_before, segment_after)
+        plt.show()
 
 if __name__ == '__main__':
     unittest.main()
