@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from code_pipeline.tests_evaluation import RoadTestEvaluator, UniqueOOBAnalysis
+from code_pipeline.tests_evaluation import RoadTestEvaluator, OOBAnalyzer
 
 from numpy import linspace
 
@@ -84,13 +84,19 @@ def _plot_nodes(sample_nodes, style, markersize, fig = None, title=None):
 
 class UniqueOBETest(unittest.TestCase):
 
-
     def test_run_analysis(self):
         """
             Load test data and run the analysis
         """
-        uob = UniqueOOBAnalysis('./sample_test_generators_data')
-        uob.analyse()
+        uob = OOBAnalyzer('./no-oobs')
+        csv_content = uob.create_summary()
+        print(csv_content, "\n")
+
+        uob = OOBAnalyzer('./some-oobs')
+        csv_content = uob.create_summary()
+        print(csv_content, "\n")
+
+
 
 from self_driving.simulation_data import SimulationDataRecord
 

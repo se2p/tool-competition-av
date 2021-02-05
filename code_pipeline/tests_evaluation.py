@@ -1,7 +1,17 @@
+import logging
+
 from shapely.geometry import Point, LineString
 from shapely.ops import nearest_points
 
+from code_pipeline.edit_distance_polyline import iterative_levenshtein
+
+from self_driving.simulation_data import SimulationDataRecord
+
 from scipy.interpolate import splev, splprep
+
+import numpy as np
+
+from itertools import combinations
 
 from numpy.ma import arange
 
@@ -15,6 +25,7 @@ import json
 BEFORE_THRESHOLD = 60.0
 AFTER_THRESHOLD = 20.0
 
+# The following utility methods might not even be used. TODO Clean up if possible
 
 def _interpolate_and_resample_splines(sample_nodes, nodes_per_meter = 1, smoothness=0, k=3, rounding_precision=4):
     """ Interpolate a list of points as a spline (quadratic by default) and resample it with num_nodes"""
@@ -322,7 +333,13 @@ def _test_failed_with_oob(json_file):
     return data["is_valid"] and data["test_outcome"] == "FAILED" and data["description"].startswith("Car drove out of the lane")
 
 
+
 class RoadTestEvaluator:
+    """
+    This class identify the interesting segment for an OOB. The interesting segment is defined by that
+    part of the road before and after an OOB defined by the values road_length_before_oob and
+    roal_length_after_oob
+    """
 
     def __init__(self, road_length_before_oob=BEFORE_THRESHOLD, road_lengrth_after_oob=AFTER_THRESHOLD):
         self.road_length_before_oob = road_length_before_oob
@@ -414,32 +431,129 @@ class RoadTestEvaluator:
         return oob_pos, segment_before, segment_after, oob_side
 
 
-class UniqueOOBAnalysis:
-
+class OOBAnalyzer:
+    """
+        This class implements some analyses on the OOB discovered by a test generator. For the moment,
+        we compute similarity of the OOBS using Levenstein distance over the "Interesting" segments
+    """
     def __init__(self, result_folder):
-        self.result_folder = result_folder
+        self.logger = logging.getLogger('OOBAnalyzer')
+        self.oobs = self._load_oobs_from(result_folder)
 
-    def _measure_distance_between(self, oob1, oob2):
-        # TODO Implement this
-        pass
+    def _load_oobs_from(self, result_folder):
 
-    def analyse(self):
+        # Go over all the files in the result folder and extract the interesing road segments for each OOB
+        road_test_evaluation = RoadTestEvaluator(road_length_before_oob=30, road_lengrth_after_oob=30)
+
+        oobs = []
+        for subdir, dirs, files in os.walk(result_folder, followlinks=False):
+            # Consider only the files that match the pattern
+            for sample_file in sorted(
+                    [os.path.join(subdir, f) for f in files if f.startswith("test.") and f.endswith(".json")]):
+
+                self.logger.debug("Processing test file %s", sample_file)
+
+                test_id, is_valid, test_outcome, road_data, execution_data = self._load_test_data(sample_file)
+
+                # If the test is not valid or passed we skip it the analysis
+                if not is_valid or not test_outcome == "FAIL":
+                    continue
+
+                # Extract data about OOB, if any
+                oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
+                    road_data, execution_data)
+
+                # A test might fail also without OOB
+                if oob_pos is None:
+                    continue
+
+                oobs.append(
+                    {
+                        'test id': test_id,
+                        'simulation file': sample_file,
+                        # Point
+                        'oob point': oob_pos,
+                        # LEFT/RIGHT
+                        'oob side': oob_side,
+                        # LineStrings representing the center of the road, interpolated points
+                        'road segment before oob': segment_before,
+                        'road segment after oob': segment_after,
+                        # This is the list of points, so we need to extract from LineString objects
+                        'interesting segment': list(segment_before.coords) + list(segment_after.coords)
+                    }
+                )
+
+        self.logger.info("Collected data about %d oobs", len(oobs))
+        return oobs
+
+    def _load_test_data(self, execution_data_file):
+        # Load the execution data
+        with open(execution_data_file) as input_file:
+            json_data = json.load(input_file)
+            test_id = json_data["id"]
+            road_data = json_data["road_points"]
+            is_valid = json_data["is_valid"]
+            test_outcome = json_data["test_outcome"]
+            execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]] \
+                if is_valid else []
+        return test_id, is_valid, test_outcome, road_data, execution_data
+
+    def _compute_sparseness(self):
+        # Compute distance among the OOB and take the avg of their maximum distance
+        max_distances_starting_from = {}
+
+        for (oob1, oob2) in combinations(self.oobs, 2):
+            # Compute distance between cells
+            distance = iterative_levenshtein(oob1['interesting segment'], oob2['interesting segment'])
+            self.logger.debug("Distance of OOB %s from OOB %s is %.3f", oob1["test id"], oob2["test id"], distance)
+
+            # Update the max values
+            if oob1['test id'] in max_distances_starting_from.keys():
+                max_distances_starting_from[oob1['test id']] = max(
+                    max_distances_starting_from[oob1['test id']], distance)
+            else:
+                max_distances_starting_from[oob1['test id']] = distance
+
+        mean_distance = np.mean([list(max_distances_starting_from.values())]) if len(
+            max_distances_starting_from) > 0 else np.NaN
+        std_dev = np.std([list(max_distances_starting_from.values())]) if len(
+            max_distances_starting_from) > 0 else np.NaN
+
+        self.logger.debug("Sparseness: Mean: %.3f, StdDev: %3f", mean_distance, std_dev)
+
+        return mean_distance, std_dev
+
+    def _compute_oob_side_stats(self):
+        n_left = 0
+        n_right = 0
+
+        for oob in self.oobs:
+            if oob['oob side'] == "LEFT":
+                n_left += 1
+            else:
+                n_right += 1
+
+        self.logger.debug("Left: %d - Right: %d", n_left, n_right)
+        return n_left, n_right
+
+    def _analyse(self):
         """
             Iterate over the result_folder, identify the OOB and measure their relative distance, and ... TODO
         """
-        file_names = [os.path.join(self.result_folder, fn) for fn in os.listdir(self.result_folder)
-                      if fn.startswith('test.') and fn.endswith('json')]
+        mean_sparseness, stdev_sparseness = self._compute_sparseness()
+        n_oobs_on_the_left, n_oobs_on_the_right = self._compute_oob_side_stats()
 
-        # Filter tests that have oob
+        report_data = {}
 
-        file_names = filter(_test_failed_with_oob, file_names)
+        report_data["sparseness"] = (mean_sparseness, stdev_sparseness)
+        report_data["oob_side"] = (n_oobs_on_the_left, n_oobs_on_the_right)
 
-        for file_name in file_names:
-            print(file_name)
-
-
-        pass
+        return report_data
 
     def create_summary(self):
-        """ TODO Create whatever summary we need from this """
-        pass
+
+        report_data = self._analyse()
+        csv_header = "total_oob,left_oob,right_oob,avg_sparseness,stdev_sparseness"
+        csv_body = "%d,%d,%d,%.3f,%3.f" % (len(self.oobs), *report_data["oob_side"],*report_data["sparseness"])
+
+        return "\n".join([csv_header, csv_body])

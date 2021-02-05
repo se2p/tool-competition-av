@@ -10,18 +10,12 @@ import os
 import sys
 import errno
 import logging as log
-import json
-import numpy as np
-
-from itertools import combinations
-
-from self_driving.simulation_data import SimulationDataRecords
 
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
-from code_pipeline.tests_evaluation import RoadTestEvaluator
-from code_pipeline.edit_distance_polyline import iterative_levenshtein
+
+from code_pipeline.tests_evaluation import OOBAnalyzer
 
 OUTPUT_RESULTS_TO = 'results'
 
@@ -46,19 +40,11 @@ def validate_time_budget(ctx, param, value):
 # TODO Refactor and move away
 from self_driving.simulation_data import SimulationDataRecord
 
-def _load_test_data(execution_data_file):
-    # Load the execution data
-    with open(execution_data_file) as input_file:
-        # TODO What if the test is not valid?
-        json_data = json.load(input_file)
-        road_data = json_data["road_points"]
-        execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]] \
-            if "execution_data" in json_data else []
-    return road_data, execution_data
 
 def create_summary(result_folder, raw_data):
     log.info("Creating Reports")
 
+    # Refactor this
     if type(raw_data) is TestGenerationStatistic:
         log.info("Creating Test Statistics Report:")
         summary_file = os.path.join(result_folder, "generation_stats.csv")
@@ -67,85 +53,12 @@ def create_summary(result_folder, raw_data):
             output_file.write( csv_content)
         log.info("Test Statistics Report available: %s", summary_file)
 
-    # TODO Refactor and move away
     log.info("Creating OOB Report")
-
-    # Go over all the files in the result folder and extract the interesing road segments for each OOB
-    road_test_evaluation = RoadTestEvaluator(road_length_before_oob=30,
-                                             road_lengrth_after_oob=30)
-
-    oobs = []
-    for subdir, dirs, files in os.walk(result_folder, followlinks=False):
-        # Consider only the files that match the pattern
-        for sample_file in sorted([os.path.join(subdir, f) for f in files if f.startswith("test.") and f.endswith(".json")]):
-
-            log.debug("Processing test file %s", sample_file)
-
-            road_data, execution_data = _load_test_data(sample_file)
-
-            # If the test was not valid skip the analysis
-            if len(execution_data) == 0:
-                log.debug(" Test was not valid. Skip")
-                continue
-
-            # Extract data about OOB, if any
-            # TODO Probably check if test_outcome is FAIL
-            oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
-                    road_data, execution_data)
-
-            if oob_pos is None:
-                continue
-
-            oobs.append(
-                {
-                    'simulation file': sample_file,
-                    'oob point': oob_pos,
-                    'oob side': oob_side,
-                    'road segment before oob': segment_before,
-                    'road segment after oob': segment_after,
-                    # This is the list of points, so we need to extract from LineString objects
-                    'interesting segment': list(segment_before.coords) + list(segment_after.coords)
-                }
-            )
-
-    log.info("Collected data about %d oobs", len(oobs))
-
-    max_distances_starting_from = {}
-
-    for (oob1, oob2) in combinations(oobs, 2):
-        # Compute distance between cells
-        # check edit_distance_polyline.py inside illumination
-        distance = iterative_levenshtein(oob1['interesting segment'], oob2['interesting segment'])
-
-        if oob1['simulation file'] in max_distances_starting_from.keys():
-            max_distances_starting_from[oob1['simulation file']] = max(max_distances_starting_from[oob1['simulation file']], distance)
-        else:
-            max_distances_starting_from[oob1['simulation file']] = distance
-
-    if len(max_distances_starting_from) > 0:
-        mean_distance = np.mean([list(max_distances_starting_from.values())])
-        std_dev = np.std([list(max_distances_starting_from.values())])
-    else:
-        mean_distance = np.NaN
-        std_dev = np.NaN
-
-    log.info("Sparseness: Mean: %.3f, StdDev: %3f", mean_distance , std_dev)
-
-    n_left = 0
-    n_right = 0
-
-    for oob in oobs:
-        if oob['oob side'] == "LEFT":
-            n_left += 1
-        else:
-            n_right += 1
-
-    log.info("Left: %d - Right: %d", n_left, n_right)
-
+    oobAnalyzer = OOBAnalyzer(result_folder)
     oob_summary_file = os.path.join(result_folder, "oob_stats.csv")
+    csv_content = oobAnalyzer.create_summary()
     with open(oob_summary_file, 'w') as output_file:
-        output_file.write("total_oob,left_oob,right_oob,avg_sparseness,stdev_sparseness\n")
-        output_file.write("%d,%d,%d,%.3f,%3.f\n" % (len(oobs), n_left, n_right, mean_distance, std_dev))
+        output_file.write(csv_content)
 
     log.info("OOB  Report available: %s", oob_summary_file)
 
