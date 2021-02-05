@@ -329,9 +329,10 @@ class RoadTestEvaluator:
         self.road_lengrth_after_oob = road_lengrth_after_oob
 
     # Note execution data also contains the road
-    def identify_interesting_road_segments(self, execution_data):
+    def identify_interesting_road_segments(self, road_nodes, execution_data):
         # Interpolate and resample
-        road_points = _interpolate_and_resample_splines(execution_data["road"]["nodes"])
+        # TODO we also have already interpolated points
+        road_points = _interpolate_and_resample_splines(road_nodes)
 
         # Create a LineString out of the road_points
         road_line = LineString([(rp[0], rp[1]) for rp in road_points])
@@ -340,10 +341,10 @@ class RoadTestEvaluator:
         # TODO This should be the last observation, so we should iterate the list from the last
         # Assuming we stop the execution at OBE
         positions = []
-        for record in execution_data["records"]:
-            positions.append(Point(record["pos"][0], record["pos"][1]))
-            if record["is_oob"]:
-                oob_pos = Point(record["pos"][0], record["pos"][1])
+        for record in execution_data:
+            positions.append(Point(record.pos[0], record.pos[1]))
+            if record.is_oob:
+                oob_pos = Point(record.pos[0], record.pos[1])
                 break
 
         if oob_pos == None:

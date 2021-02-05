@@ -21,13 +21,16 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, beamng_home=None, beamng_user=None, time_budget=None, map_size=None, road_visualizer=None):
-        super().__init__(time_budget, map_size)
+    def __init__(self, result_folder, time_budget, map_size, beamng_home=None, beamng_user=None, road_visualizer=None):
+        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size)
         # TODO Is this still valid?
         self.test_time_budget = 250000
+        
         # TODO Expose those as parameters
         self.maxspeed = 70.0
         self.risk_value = 0.7
+        self.oob_tolerance = 0.95
+
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
@@ -136,6 +139,9 @@ class BeamngExecutor(AbstractTestExecutor):
                                                      vehicle_state_reader=vehicle_state_reader,
                                                      simulation_name=name)
 
+        # Hacky - Not sure what's the best way to set this...
+        sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
+
         sim_data_collector.get_simulation_data().start()
         try:
             #start = timeit.default_timer()
@@ -144,6 +150,7 @@ class BeamngExecutor(AbstractTestExecutor):
             # idx = 0
 
             brewer.vehicle.ai_set_aggression(self.risk_value)
+            # TODO This does not seem to take any effect...
             brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
             brewer.vehicle.ai_drive_in_lane(True)
             brewer.vehicle.ai_set_waypoint(waypoint_goal.name)

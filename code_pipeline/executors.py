@@ -18,7 +18,7 @@ class AbstractTestExecutor(ABC):
 
     start_time = None
 
-    def __init__(self, result_folder, time_budget=None, map_size=None, road_visualizer=None):
+    def __init__(self, result_folder, time_budget, map_size, road_visualizer=None):
 
         self.result_folder = result_folder
 

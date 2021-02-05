@@ -7,7 +7,7 @@ from self_driving.vehicle_state_reader import VehicleStateReader
 
 
 class OutOfBoundsMonitor:
-    def __init__(self, road_polygon: RoadPolygon, vehicle_state_reader: VehicleStateReader):
+    def __init__(self, road_polygon: RoadPolygon, vehicle_state_reader: VehicleStateReader, tolerance=0.95):
         assert isinstance(vehicle_state_reader, VehicleStateReader)
         assert isinstance(road_polygon, RoadPolygon)
         self.road_polygon = road_polygon
@@ -15,11 +15,12 @@ class OutOfBoundsMonitor:
         self.oob_counter = 0
         self.last_is_oob = False
         self.last_max_oob_percentage = 0
+        self.tolerance = tolerance
 
     # Why tolerance is 1?
-    def get_oob_info(self, wrt="right", oob_bb=True, tolerance=0.95) -> Tuple[bool, int, float]:
+    def get_oob_info(self, wrt="right", oob_bb=True) -> Tuple[bool, int, float]:
         if oob_bb:
-            is_oob = self.is_oob_bb(tolerance=tolerance, wrt=wrt)
+            is_oob = self.is_oob_bb(wrt=wrt)
             self.update_oob_percentage(is_oob)
         else:
             is_oob = self.is_oob(wrt=wrt)
@@ -57,10 +58,10 @@ class OutOfBoundsMonitor:
             intersection = car_bbox_polygon.intersection(self.road_polygon.polygon)
         return 1 - intersection.area / car_bbox_polygon.area
 
-    def is_oob_bb(self, tolerance=0.05, wrt="right") -> bool:
+    def is_oob_bb(self, wrt="right") -> bool:
         """Returns true if the bounding box of the car is more than tolerance
         percentage outside of the road."""
-        return self.oob_percentage(wrt=wrt) > tolerance
+        return self.oob_percentage(wrt=wrt) > self.tolerance
 
     def oob_distance(self,  wrt="right") -> float:
         """Returns the difference between the width of a lane and

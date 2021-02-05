@@ -15,6 +15,8 @@ import numpy as np
 
 from itertools import combinations
 
+from self_driving.simulation_data import SimulationDataRecords
+
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
@@ -41,6 +43,18 @@ def validate_time_budget(ctx, param, value):
     else:
         return value
 
+# TODO Refactor and move away
+from self_driving.simulation_data import SimulationDataRecord
+
+def _load_test_data(execution_data_file):
+    # Load the execution data
+    with open(execution_data_file) as input_file:
+        # TODO What if the test is not valid?
+        json_data = json.load(input_file)
+        road_data = json_data["road_points"]
+        execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]] \
+            if "execution_data" in json_data else []
+    return road_data, execution_data
 
 def create_summary(result_folder, raw_data):
     log.info("Creating Reports")
@@ -53,7 +67,7 @@ def create_summary(result_folder, raw_data):
             output_file.write( csv_content)
         log.info("Test Statistics Report available: %s", summary_file)
 
-    # TODO Refactor
+    # TODO Refactor and move away
     log.info("Creating OOB Report")
 
     # Go over all the files in the result folder and extract the interesing road segments for each OOB
@@ -63,17 +77,21 @@ def create_summary(result_folder, raw_data):
     oobs = []
     for subdir, dirs, files in os.walk(result_folder, followlinks=False):
         # Consider only the files that match the pattern
-        for sample_file in [os.path.join(subdir, f) for f in files if f.startswith("simulation.full") and f.endswith(".json")]:
+        for sample_file in sorted([os.path.join(subdir, f) for f in files if f.startswith("test.") and f.endswith(".json")]):
 
-            log.debug("Processing simulation file %s", sample_file)
+            log.debug("Processing test file %s", sample_file)
 
-            # Read the file into a Sample, extract the feature data
-            with open(sample_file, 'r') as input_file:
-                execution_data = json.load(input_file)
+            road_data, execution_data = _load_test_data(sample_file)
+
+            # If the test was not valid skip the analysis
+            if len(execution_data) == 0:
+                log.debug(" Test was not valid. Skip")
+                continue
 
             # Extract data about OOB, if any
+            # TODO Probably check if test_outcome is FAIL
             oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
-                    execution_data)
+                    road_data, execution_data)
 
             if oob_pos is None:
                 continue
@@ -85,7 +103,8 @@ def create_summary(result_folder, raw_data):
                     'oob side': oob_side,
                     'road segment before oob': segment_before,
                     'road segment after oob': segment_after,
-                    'interesting segment': list(segment_before + segment_after)
+                    # This is the list of points, so we need to extract from LineString objects
+                    'interesting segment': list(segment_before.coords) + list(segment_after.coords)
                 }
             )
 
@@ -98,10 +117,10 @@ def create_summary(result_folder, raw_data):
         # check edit_distance_polyline.py inside illumination
         distance = iterative_levenshtein(oob1['interesting segment'], oob2['interesting segment'])
 
-        if oob1 in max_distances_starting_from.keys():
-            max_distances_starting_from[oob1] = max(max_distances_starting_from[oob1], distance)
+        if oob1['simulation file'] in max_distances_starting_from.keys():
+            max_distances_starting_from[oob1['simulation file']] = max(max_distances_starting_from[oob1['simulation file']], distance)
         else:
-            max_distances_starting_from[oob1] = distance
+            max_distances_starting_from[oob1['simulation file']] = distance
 
     if len(max_distances_starting_from) > 0:
         mean_distance = np.mean([list(max_distances_starting_from.values())])
@@ -268,11 +287,12 @@ def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_n
     # Setup executor. All the executor must output the execution data into the result_folder
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(result_folder, time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = MockExecutor(result_folder, time_budget, map_size, road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, beamng_user=beamng_user, time_budget=time_budget,
-                                      map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = BeamngExecutor(result_folder, time_budget, map_size,
+                                      beamng_home=beamng_home, beamng_user=beamng_user,
+                                      road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(result_folder, the_executor))

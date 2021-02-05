@@ -92,22 +92,26 @@ class UniqueOBETest(unittest.TestCase):
         uob = UniqueOOBAnalysis('./sample_test_generators_data')
         uob.analyse()
 
-
+from self_driving.simulation_data import SimulationDataRecord
 
 class RoadTestEvaluatorTest(unittest.TestCase):
 
-    def _load_execution_data(self, execution_data_file):
+    def _load_test_data(self, execution_data_file):
         # Load the execution data
         with open(execution_data_file) as input_file:
-            execution_data = json.load(input_file)
-        return execution_data
+            # TODO What if the test is not valid?
+            json_data = json.load(input_file)
+            road_data = json_data["road_points"]
+            execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]] \
+                if "execution_data" in json_data else []
+        return road_data, execution_data
 
     def _plot_execution_data(self, execution_data):
-        for record in execution_data["records"]:
-            if record["is_oob"] == True:
-                plt.plot(record["pos"][0], record["pos"][1], 'ro')
+        for record in execution_data:
+            if record.is_oob:
+                plt.plot(record.pos[0], record.pos[1], 'ro')
             else:
-                plt.plot(record["pos"][0], record["pos"][1], 'go')
+                plt.plot(record.pos[0], record.pos[1], 'go')
 
     def _plot_oob(self, oob_pos, segment_before, segment_after ):
         road_poly = segment_before.buffer(4.0, cap_style=2, join_style=2)
@@ -135,8 +139,7 @@ class RoadTestEvaluatorTest(unittest.TestCase):
         # plt.gca().set(xlim=(-30, map_size + 30), ylim=(-30, map_size + 30))
 
     def test_obe(self):
-        execution_data_1 = self._load_execution_data("./obes/execution_1/simulation.full.json")
-        execution_data_2 = self._load_execution_data("./obes/execution_2/simulation.full.json")
+        road_data, execution_data = self._load_test_data("./test.0001.json")
 
         # Extract the "Interesting" road segment. This returns the interpolated data to ease computing
         # the distances
@@ -145,17 +148,11 @@ class RoadTestEvaluatorTest(unittest.TestCase):
         road_test_evaluation = RoadTestEvaluator(road_length_before_oob=meters_before_oob,
                                                  road_lengrth_after_oob=meters_after_oob)
 
-        oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(execution_data_1)
+        oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.\
+            identify_interesting_road_segments(road_data, execution_data)
         plt.figure()
 
-        self._plot_execution_data(execution_data_1)
-        self._plot_oob(oob_pos, segment_before, segment_after)
-        plt.show()
-
-        oob_pos, segment_before, segment_after = road_test_evaluation.identify_interesting_road_segments(execution_data_2)
-
-        plt.figure()
-        self._plot_execution_data(execution_data_2)
+        self._plot_execution_data(execution_data)
         self._plot_oob(oob_pos, segment_before, segment_after)
         plt.show()
 
