@@ -3,7 +3,7 @@ from shapely.geometry import  LineString
 from scipy.interpolate import splev, splprep
 from numpy.ma import arange
 from shapely.geometry import LineString
-
+import json
 # Constants
 rounding_precision = 3
 interpolation_distance = 1
@@ -93,9 +93,43 @@ class RoadTestFactory:
             self.is_valid = is_valid
             self.validation_message = validation_message
 
+        def to_json(self):
+            theobj = {}
+            # Statically generated attributes
+            theobj['is_valid'] = self.is_valid
+            theobj['validation_message'] = self.validation_message
+            theobj['road_points'] = self.road_points
+            theobj['interpolated_points'] = [(p[0], p[1]) for p in self.interpolated_points]
+            # Dynamically generated attributes.
+            # https://stackoverflow.com/questions/610883/how-to-know-if-an-object-has-an-attribute-in-python
+            # "easier to ask for forgiveness than permission" (EAFP)
+            try:
+                # This might require some trick?
+                theobj['id' ] = self.id
+            except AttributeError:
+                pass
+            try:
+                # This might require some trick?
+                theobj['execution_data' ] = self.execution_data
+            except AttributeError:
+                pass
+            try:
+                # This might require some trick?
+                theobj['test_outcome'] = self.test_outcome
+            except AttributeError:
+                pass
+            try:
+                # This might require some trick?
+                theobj['description'] = self.description
+            except AttributeError:
+                pass
+
+            return json.dumps(theobj)
+
     @staticmethod
     def create_road_test(road_points):
         road_test = RoadTestFactory.RoadTest(road_points)
+        # TODO Why not simply declare the id as field of RoadTest?
         # Generate the new id. Call next otherwise we return the generator
         setattr(road_test, 'id', next(RoadTestFactory.test_id_generator))
         return road_test
@@ -105,6 +139,7 @@ class TestGenerationStatistic:
     """
         Store statistics about test generation
         TODO: Refactor using a RoadTest and RoadTestExecution
+        TODO Move to road_statistics package
     """
 
     def __init__(self):

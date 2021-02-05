@@ -15,6 +15,8 @@ from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
 
+from code_pipeline.tests_evaluation import OOBAnalyzer
+
 OUTPUT_RESULTS_TO = 'results'
 
 
@@ -35,14 +37,30 @@ def validate_time_budget(ctx, param, value):
     else:
         return value
 
+# TODO Refactor and move away
+from self_driving.simulation_data import SimulationDataRecord
+
 
 def create_summary(result_folder, raw_data):
+    log.info("Creating Reports")
+
+    # Refactor this
     if type(raw_data) is TestGenerationStatistic:
+        log.info("Creating Test Statistics Report:")
         summary_file = os.path.join(result_folder, "generation_stats.csv")
         csv_content = raw_data.as_csv()
         with open(summary_file, 'w') as output_file:
-            output_file.write( csv_content )
+            output_file.write( csv_content)
+        log.info("Test Statistics Report available: %s", summary_file)
 
+    log.info("Creating OOB Report")
+    oobAnalyzer = OOBAnalyzer(result_folder)
+    oob_summary_file = os.path.join(result_folder, "oob_stats.csv")
+    csv_content = oobAnalyzer.create_summary()
+    with open(oob_summary_file, 'w') as output_file:
+        output_file.write(csv_content)
+
+    log.info("OOB  Report available: %s", oob_summary_file)
 
 def post_process(result_folder, the_executor):
     """
@@ -52,8 +70,11 @@ def post_process(result_folder, the_executor):
     # Ensure the executor is stopped
     the_executor.close()
 
+    # Plot the stats on the console
     log.info("Test Generation Statistics:")
     log.info(the_executor.get_stats())
+
+    # Generate the actual summary files
     create_summary(result_folder, the_executor.get_stats())
 
 
@@ -75,14 +96,6 @@ def create_post_processing_hook(result_folder, executor):
 
     return _f
 
-
-def create_summary(result_folder, raw_data):
-    if type(raw_data) is TestGenerationStatistic:
-        summary_file = os.path.join(result_folder, "generation_stats.csv")
-        csv_content = raw_data.as_csv()
-        with open(summary_file, 'w') as output_file:
-            output_file.write( csv_content )
-    pass
 
 
 def log_exception(extype, value, trace):
@@ -184,15 +197,15 @@ def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_n
 
     log.info("Outputting results to " + result_folder)
 
-    # Setup executor
+    # Setup executor. All the executor must output the execution data into the result_folder
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(time_budget=time_budget, map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = MockExecutor(result_folder, time_budget, map_size, road_visualizer=road_visualizer)
     elif executor == "beamng":
-        # TODO Make sure this executor outputs the files in the results folder
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(beamng_home=beamng_home, beamng_user=beamng_user, time_budget=time_budget,
-                                      map_size=map_size, road_visualizer=road_visualizer)
+        the_executor = BeamngExecutor(result_folder, time_budget, map_size,
+                                      beamng_home=beamng_home, beamng_user=beamng_user,
+                                      road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(result_folder, the_executor))

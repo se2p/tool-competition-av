@@ -1,10 +1,10 @@
 # TODO Create an abstract class to host the logic for calling the validation and the timing
 # Use this class to output tests in predefined locations after execution
-import json
 import logging as log
 import random
 import time
 import sys
+import os
 
 from abc import ABC, abstractmethod
 
@@ -18,7 +18,9 @@ class AbstractTestExecutor(ABC):
 
     start_time = None
 
-    def __init__(self, time_budget=None, map_size=None, road_visualizer=None):
+    def __init__(self, result_folder, time_budget, map_size, road_visualizer=None):
+
+        self.result_folder = result_folder
 
         self.stats = TestGenerationStatistic()
 
@@ -36,6 +38,12 @@ class AbstractTestExecutor(ABC):
     def is_force_timeout(self):
         return self.timeout_forced == True
 
+    def store_test(self, the_test):
+        # TODO Pad zeros to id
+        output_file_name = os.path.join(self.result_folder, ".".join(["test", str(the_test.id).zfill(4), "json"]))
+        with open(output_file_name, 'w') as test_file:
+            test_file.write(the_test.to_json())
+
     def execute_test(self, the_test):
         # Maybe we can solve this using decorators, but we need the reference to the instance, not sure how to handle
         # that cleanly
@@ -50,6 +58,9 @@ class AbstractTestExecutor(ABC):
 
         # This might be placed inside validate_test
         the_test.set_validity(is_valid, validation_msg)
+
+        # Store the generated tests into the result_folder
+        self.store_test(the_test)
 
         # Visualize the road if a road visualizer is defined. Also includes results for the validation
         if self.road_visualizer:
@@ -66,6 +77,14 @@ class AbstractTestExecutor(ABC):
             # Check that at least one element is there
             if execution_data and len(execution_data) > 0:
                 self.stats.test_execution_simulation_times.append(execution_data[-1].timer)
+
+            # TODO Maybe change the name of the attributes?
+            setattr(the_test, 'execution_data', execution_data)
+            setattr(the_test, 'test_outcome', test_outcome)
+            setattr(the_test, 'description', description)
+
+            # (re)-store the generated tests into the result_folder
+            self.store_test(the_test)
 
             if test_outcome == "ERROR":
                 self.stats.test_in_error += 1
@@ -157,19 +176,3 @@ class MockExecutor(AbstractTestExecutor):
     def _close(self):
         super()._close()
         print("Closing Mock Executor")
-
-if __name__ == '__main__':
-    # TODO Remove this code and create an unit test instead
-    from code_pipeline.beamng_executor import BeamngExecutor
-    executor = BeamngExecutor(time_budget=250000, map_size=250, beamng_home=r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0")
-    ROAD_PATH = r"data\seed0.json"
-    with open(ROAD_PATH, 'r') as f:
-        dict = json.loads(f.read())
-    sample_nodes = [tuple(t) for t in dict['sample_nodes']]
-
-    # nodes should be a list of (x,y) float coordinates
-    nodes = [sample[:2] for sample in sample_nodes]
-    nodes = [(node[0], node[1], -28.0, 8.0) for node in nodes]
-
-    tc = nodes
-    test_outcome, description, execution_data= executor.execute_test(tc)
