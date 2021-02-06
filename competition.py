@@ -10,6 +10,7 @@ import os
 import sys
 import errno
 import logging as log
+import csv
 
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
@@ -17,6 +18,7 @@ from code_pipeline.test_generation_utils import register_exit_fun
 
 from code_pipeline.tests_evaluation import OOBAnalyzer
 
+# TODO Make this configurable?
 OUTPUT_RESULTS_TO = 'results'
 
 
@@ -67,6 +69,20 @@ def validate_time_budget(ctx, param, value):
         return int(value)
 
 
+def create_experiment_description(result_folder, params_dict):
+    log.info("Creating Experiment Description")
+    experiment_description_file = os.path.join(result_folder, "experiment_description.csv")
+    csv_columns = params_dict.keys()
+    try:
+        with open(experiment_description_file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            writer.writerow(params_dict)
+            log.info("Experiment Description available: %s", experiment_description_file)
+    except IOError:
+        log.error("I/O error. Cannot write Experiment Description")
+
+
 def create_summary(result_folder, raw_data):
     log.info("Creating Reports")
 
@@ -89,7 +105,7 @@ def create_summary(result_folder, raw_data):
     log.info("OOB  Report available: %s", oob_summary_file)
 
 
-def post_process(result_folder, the_executor):
+def post_process(ctx, result_folder, the_executor):
     """
         This method is invoked once the test generation is over.
     """
@@ -101,10 +117,16 @@ def post_process(result_folder, the_executor):
     log.info(the_executor.get_stats())
 
     # Generate the actual summary files
+    create_experiment_description(result_folder, ctx.params)
+
+    # Generate the other reports
     create_summary(result_folder, the_executor.get_stats())
 
 
-def create_post_processing_hook(result_folder, executor):
+
+
+
+def create_post_processing_hook(ctx, result_folder, executor):
     """
         Uses HighOrder functions to setup the post processing hooks that will be trigger ONLY AND ONLY IF the
         test generation has been killed by us, i.e., this will not trigger if the user presses Ctrl-C
@@ -118,7 +140,7 @@ def create_post_processing_hook(result_folder, executor):
         if executor.is_force_timeout():
             # The process killed itself because a timeout, so we need to ensure the post_process function
             # is called
-            post_process(result_folder, executor)
+            post_process(ctx, result_folder, executor)
 
     return _f
 
@@ -195,10 +217,18 @@ def setup_logging(log_to, debug):
 @click.option('--debug', required=False, is_flag=True, default=False,
               show_default='Disabled',
               help="Activate debugging (results in more logging)")
-def generate(executor, beamng_home, beamng_user,
+@click.pass_context
+def generate(ctx, executor, beamng_home, beamng_user,
              time_budget, map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
              visualize_tests, log_to, debug):
+    # ensure that ctx.obj exists and is a dict (in case `cli()` is called
+    # by means other than the `if` block below)
+    ctx.ensure_object(dict)
+
+    # TODO Refactor by adding a create summary command and forwarding the output of this run to that command
+
+
     # Setup logging
     setup_logging(log_to, debug)
 
@@ -247,7 +277,7 @@ def generate(executor, beamng_home, beamng_user,
                                       road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results
-    register_exit_fun(create_post_processing_hook(result_folder, the_executor))
+    register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))
 
     try:
         # Instantiate the test generator
@@ -260,7 +290,7 @@ def generate(executor, beamng_home, beamng_user,
         sys.exit(2)
 
     # We still need this here to post process the results if the execution takes the regular flow
-    post_process(result_folder, the_executor)
+    post_process(ctx, result_folder, the_executor)
 
 
 if __name__ == '__main__':
