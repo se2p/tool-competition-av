@@ -24,21 +24,47 @@ def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
-def validate_map_size(ctx, param, value):
-    if value < 100 or value > 1000:
-        raise click.UsageError('The provived value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
+def validate_speed_limit(ctx, param, value):
+    """
+    The speed limit must be a positive integer greater than 10 km/h (lower values might trigger the
+    car-not-moving oracle
+    """
+    if int(value) < 10:
+        raise click.UsageError(
+            'The provided value for ' + str(param) + ' is invalid. Choose a value greater than 10')
+    else:
+        return int(value)
+
+
+def validate_oob_tolerance(ctx, param, value):
+    """
+    OOB tolerance must be a value between 0.0 and 1.0
+    """
+    if value < 0.0 or value > 1.0:
+        raise click.UsageError(
+            'The provided value for ' + str(param) + ' is invalid. Choose a value between 0.0 and 1.0')
     else:
         return value
+
+
+def validate_map_size(ctx, param, value):
+    """
+    The size of the map is defined by its edge. The edge can be any (integer) value between 100 and 1000
+    """
+    if int(value) < 100 or int(value) > 1000:
+        raise click.UsageError('The provided value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
+    else:
+        return int(value)
 
 
 def validate_time_budget(ctx, param, value):
-    if value <= 0:
-        raise click.UsageError('The provived value for ' + str(param) + ' is invalid. Choose a positive integer')
+    """
+    A valid time budget is a positive integer of 'seconds'
+    """
+    if int(value) < 1:
+        raise click.UsageError('The provided value for ' + str(param) + ' is invalid. Choose any positive integer')
     else:
-        return value
-
-# TODO Refactor and move away
-from self_driving.simulation_data import SimulationDataRecord
+        return int(value)
 
 
 def create_summary(result_folder, raw_data):
@@ -62,10 +88,10 @@ def create_summary(result_folder, raw_data):
 
     log.info("OOB  Report available: %s", oob_summary_file)
 
+
 def post_process(result_folder, the_executor):
     """
-        This will be invoked after the generation is over. Whatever results is produced will be copied inside
-        the result_folder
+        This method is invoked once the test generation is over.
     """
     # Ensure the executor is stopped
     the_executor.close()
@@ -97,12 +123,11 @@ def create_post_processing_hook(result_folder, executor):
     return _f
 
 
-
-def log_exception(extype, value, trace):
-    log.exception('Uncaught exception:', exc_info=(extype, value, trace))
-
-
 def setup_logging(log_to, debug):
+
+    def log_exception(extype, value, trace):
+        log.exception('Uncaught exception:', exc_info=(extype, value, trace))
+
     # Disable annoyng messages from matplot lib.
     # See: https://stackoverflow.com/questions/56618739/matplotlib-throws-warning-message-because-of-findfont-python
     log.getLogger('matplotlib.font_manager').disabled = True
@@ -145,6 +170,14 @@ def setup_logging(log_to, debug):
               show_default='200m, which leads to a 200x200m^2 squared map',
               help="The lenght of the size of the squared map where the road must fit."
                    "Expressed in meters.")
+@click.option('--oob-tolerance', type=float, default=0.95, callback=validate_oob_tolerance,
+              show_default='0.95',
+              help="The tolerance value that defines how much of the vehicle should be outside the lane to "
+                   "trigger a failed test. Must be a value between 0.0 (all oob) and 1.0 (no oob)")
+@click.option('--speed-limit', type=int, default=70, callback=validate_speed_limit,
+              show_default='70 Km/h',
+              help="The max speed of the ego-vehicle"
+              "Expressed in Kilometers per hours")
 @click.option('--module-name', required=True, type=str,
               help="Name of the module where your test generator is located.")
 @click.option('--module-path', required=False, type=click.Path(exists=True),
@@ -162,7 +195,10 @@ def setup_logging(log_to, debug):
 @click.option('--debug', required=False, is_flag=True, default=False,
               show_default='Disabled',
               help="Activate debugging (results in more logging)")
-def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_name, module_path, class_name, visualize_tests, log_to, debug):
+def generate(executor, beamng_home, beamng_user,
+             time_budget, map_size, oob_tolerance, speed_limit,
+             module_name, module_path, class_name,
+             visualize_tests, log_to, debug):
     # Setup logging
     setup_logging(log_to, debug)
 
@@ -185,6 +221,7 @@ def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_n
 
     # Create the unique folder that will host the results of this execution using the test generator data and
     # a timestamp as id
+    # TODO Allow to specify a location for this folder and the run id
     timestamp_id = time.time_ns() // 1000000
     result_folder = os.path.join(default_output_folder, "_".join([str(module_name), str(class_name), str(timestamp_id)]))
 
@@ -200,10 +237,12 @@ def generate(executor, beamng_home, beamng_user, time_budget, map_size, module_n
     # Setup executor. All the executor must output the execution data into the result_folder
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(result_folder, time_budget, map_size, road_visualizer=road_visualizer)
+        the_executor = MockExecutor(result_folder, time_budget, map_size,
+                                    road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(result_folder, time_budget, map_size,
+                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
 
