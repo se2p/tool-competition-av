@@ -19,6 +19,7 @@ import logging as log
 import os.path
 FloatDTuple = Tuple[float, float, float, float]
 
+
 class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, time_budget, map_size, beamng_home=None, beamng_user=None, road_visualizer=None):
@@ -39,7 +40,6 @@ class BeamngExecutor(AbstractTestExecutor):
         if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
             log.warning("%s is missing but is required to use BeamNG.research", )
 
-
         # Runtime Monitor about relative movement of the car
         self.last_observation = None
         # Not sure how to set this... How far can a car move in 250 ms at 5Km/h
@@ -51,7 +51,7 @@ class BeamngExecutor(AbstractTestExecutor):
         super()._execute(the_test)
 
         # TODO Show name of the test?
-        log.info("Executing the test")
+        log.info("Executing test %s", the_test.id)
 
         # TODO Not sure why we need to repeat this 2 times...
         counter = 2
