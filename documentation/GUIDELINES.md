@@ -111,6 +111,14 @@ Options:
                             the road must fit.Expressed in meters.  [default:
                             (200m, which leads to a 200x200m^2 squared map)]
 
+  --oob-tolerance FLOAT     The tolerance value that defines how much of the
+                            vehicle should be outside the lane to trigger a
+                            failed test. Must be a value between 0.0 (all oob)
+                            and 1.0 (no oob)  [default: (0.95)]
+
+  --speed-limit INTEGER     The max speed of the ego-vehicleExpressed in
+                            Kilometers per hours  [default: (70 Km/h)]
+
   --module-name TEXT        Name of the module where your test generator is
                             located.  [required]
 
@@ -134,7 +142,7 @@ Options:
 
 ```
 
-> NOTE: We have to introduce the `--beamng-user` option because currently BeamNGpy does not support folders that contain "spaces" in them. By specify this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
+> NOTE: We introduced the `--beamng-user` option because currently BeamNGpy does not support folders/paths containing "spaces" (see [this issue](https://github.com/BeamNG/BeamNGpy/issues/95)]. By specifying this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
 
 ## Example
 
