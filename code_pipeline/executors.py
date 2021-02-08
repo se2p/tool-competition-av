@@ -136,6 +136,7 @@ class AbstractTestExecutor(ABC):
             log.warning("Time budget is over, cannot run more tests. FORCE EXIT")
             sys.exit(123)
 
+
 class MockExecutor(AbstractTestExecutor):
 
     def _execute(self, the_test):
@@ -148,9 +149,9 @@ class MockExecutor(AbstractTestExecutor):
 
         sim_state = SimulationDataRecord(
             timer=3.0,
-            pos= 0.0,
-            dir= 0.0,
-            vel= 0.0,
+            pos=0.0,
+            dir=0.0,
+            vel = 0.0,
             steering= 0.0,
             steering_input= 0.0,
             brake= 0.0,
@@ -159,10 +160,10 @@ class MockExecutor(AbstractTestExecutor):
             throttle_input= 0.0,
             wheelspeed= 0.0,
             vel_kmh = 0.0,
-            is_oob= False,
+            is_oob = False,
             oob_counter = 0,
             max_oob_percentage = 0.0,
-            oob_distance= 0.0,
+            oob_distance = 0.0,
         )
 
         execution_data = [sim_state]
