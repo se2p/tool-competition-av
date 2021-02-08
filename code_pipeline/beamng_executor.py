@@ -22,15 +22,19 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, result_folder, time_budget, map_size, beamng_home=None, beamng_user=None, road_visualizer=None):
+    def __init__(self, result_folder, time_budget, map_size,
+                 oob_tolerance=0.95, max_speed=70,
+                 beamng_home=None, beamng_user=None, road_visualizer=None):
         super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size)
         # TODO Is this still valid?
         self.test_time_budget = 250000
-        
-        # TODO Expose those as parameters
-        self.maxspeed = 70.0
+
+
+        # TODO This is specific to the TestSubject, we should encapsulate this better
         self.risk_value = 0.7
-        self.oob_tolerance = 0.95
+
+        self.oob_tolerance = oob_tolerance
+        self.maxspeed = max_speed
 
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
@@ -139,7 +143,7 @@ class BeamngExecutor(AbstractTestExecutor):
                                                      vehicle_state_reader=vehicle_state_reader,
                                                      simulation_name=name)
 
-        # Hacky - Not sure what's the best way to set this...
+        # TODO: Hacky - Not sure what's the best way to set this...
         sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
 
         sim_data_collector.get_simulation_data().start()

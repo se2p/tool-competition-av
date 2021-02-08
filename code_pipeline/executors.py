@@ -149,9 +149,9 @@ class MockExecutor(AbstractTestExecutor):
 
         sim_state = SimulationDataRecord(
             timer=3.0,
-            pos=0.0,
-            dir=0.0,
-            vel = 0.0,
+            pos= [0.0, 0.0, 1.0],
+            dir= [0.0, 0.0, 1.0],
+            vel= [0.0, 0.0, 1.0],
             steering= 0.0,
             steering_input= 0.0,
             brake= 0.0,
