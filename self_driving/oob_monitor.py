@@ -29,8 +29,9 @@ class OutOfBoundsMonitor:
 
         last_max_oob_percentage = self.last_max_oob_percentage if oob_bb else float("nan")
         oob_distance = self.oob_distance(wrt=wrt)
+        oob_percentage = self.oob_percentage(wrt=wrt)
 
-        return is_oob, self.oob_counter, last_max_oob_percentage, oob_distance
+        return is_oob, self.oob_counter, last_max_oob_percentage, oob_distance, oob_percentage
 
     def update_oob_counter(self, is_oob: bool):
         """Update the OOB counter only when is_oob is True but self.last_is_oob is False."""
