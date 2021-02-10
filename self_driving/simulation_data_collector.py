@@ -30,13 +30,14 @@ class SimulationDataCollector:
         self.vehicle_state_reader.update_state()
         car_state = self.vehicle_state_reader.get_state()
 
-        is_oob, oob_counter, max_oob_percentage, oob_distance = self.oob_monitor.get_oob_info(oob_bb=oob_bb, wrt=wrt)
+        is_oob, oob_counter, max_oob_percentage, oob_distance, oob_percentage = self.oob_monitor.get_oob_info(oob_bb=oob_bb, wrt=wrt)
 
         sim_data_record = SimulationDataRecord(**car_state._asdict(),
                                                is_oob=is_oob,
                                                oob_counter=oob_counter,
                                                max_oob_percentage=max_oob_percentage,
-                                               oob_distance=oob_distance)
+                                               oob_distance=oob_distance,
+                                               oob_percentage=oob_percentage)
         self.states.append(sim_data_record)
 
     def get_simulation_data(self) -> SimulationData:

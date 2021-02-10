@@ -109,9 +109,6 @@ def post_process(ctx, result_folder, the_executor):
     """
         This method is invoked once the test generation is over.
     """
-    # Ensure the executor is stopped
-    the_executor.close()
-
     # Plot the stats on the console
     log.info("Test Generation Statistics:")
     log.info(the_executor.get_stats())
@@ -288,6 +285,10 @@ def generate(ctx, executor, beamng_home, beamng_user,
         log.fatal("An error occurred during test generation")
         traceback.print_exc()
         sys.exit(2)
+    finally:
+        # Ensure the executor is stopped no matter what.
+        # TODO Consider using a ContextManager: With executor ... do
+        the_executor.close()
 
     # We still need this here to post process the results if the execution takes the regular flow
     post_process(ctx, result_folder, the_executor)

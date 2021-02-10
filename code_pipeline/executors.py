@@ -164,6 +164,7 @@ class MockExecutor(AbstractTestExecutor):
             oob_counter = 0,
             max_oob_percentage = 0.0,
             oob_distance = 0.0,
+            oob_percentage= 50.0
         )
 
         execution_data = [sim_state]
