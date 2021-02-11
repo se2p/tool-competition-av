@@ -3,7 +3,7 @@ import logging
 from shapely.geometry import Point, LineString
 from shapely.ops import nearest_points
 
-from code_pipeline.edit_distance_polyline import iterative_levenshtein
+from self_driving.edit_distance_polyline import iterative_levenshtein
 
 from self_driving.simulation_data import SimulationDataRecord
 
