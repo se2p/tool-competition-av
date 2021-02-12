@@ -455,8 +455,11 @@ class OOBAnalyzer:
 
                 test_id, is_valid, test_outcome, road_data, execution_data = self._load_test_data(sample_file)
 
+
                 # If the test is not valid or passed we skip it the analysis
                 if not is_valid or not test_outcome == "FAIL":
+                    self.logger.debug("\t Test is invalid")
+
                     continue
 
                 # Extract data about OOB, if any
@@ -493,9 +496,13 @@ class OOBAnalyzer:
             test_id = json_data["id"]
             road_data = json_data["road_points"]
             is_valid = json_data["is_valid"]
-            test_outcome = json_data["test_outcome"]
-            execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]] \
-                if is_valid else []
+            if is_valid:
+                test_outcome = json_data["test_outcome"]
+                execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]]
+            else:
+                test_outcome = None
+                execution_data = []
+
         return test_id, is_valid, test_outcome, road_data, execution_data
 
     def _compute_sparseness(self):
