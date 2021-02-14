@@ -10,7 +10,7 @@ from Deeper_test_generator.misc import closest_elements
 class GreedyArchive(Archive):
     def process_population(self, pop: List[Individual]):
         for candidate in pop:
-            if candidate.oob_ff < 0 and candidate.m1.distance_to_boundary < (-0.8):
+            if candidate.oob_ff < 0 and candidate.m1.distance_to_boundary < (-0.5):
                 self.add(candidate)
 
 
@@ -22,7 +22,7 @@ class NonGreedyArchive(Archive):
     def process_population(self, pop: List[Individual]):
         for candidate in pop:
             assert candidate.oob_ff, candidate.name
-            if candidate.oob_ff < 0 and candidate.m1.distance_to_boundary < (-0.8):
+            if candidate.oob_ff < 0 and candidate.m1.distance_to_boundary < (-0.5):
                 if len(self) == 0:
                     self._int_add(candidate)
                     log.debug('add initial individual')
