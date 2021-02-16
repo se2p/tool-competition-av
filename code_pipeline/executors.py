@@ -59,8 +59,10 @@ class AbstractTestExecutor(ABC):
         # This might be placed inside validate_test
         the_test.set_validity(is_valid, validation_msg)
 
+        # TODO We do not store the test until is executed, or proven invalid to avoid a data condition:
+        # the test is valid, we store it, but we cannot execute is because there's no more budget.
         # Store the generated tests into the result_folder
-        self.store_test(the_test)
+        # self.store_test(the_test)
 
         # Visualize the road if a road visualizer is defined. Also includes results for the validation
         if self.road_visualizer:
@@ -83,7 +85,7 @@ class AbstractTestExecutor(ABC):
             setattr(the_test, 'test_outcome', test_outcome)
             setattr(the_test, 'description', description)
 
-            # (re)-store the generated tests into the result_folder
+            # Store the generated tests into the result_folder
             self.store_test(the_test)
 
             if test_outcome == "ERROR":
@@ -101,6 +103,9 @@ class AbstractTestExecutor(ABC):
                     self.stats.obes += 1
                 return test_outcome, description, execution_data
         else:
+            # Store the generated tests into the result_folder even if it is not valid
+            self.store_test(the_test)
+
             self.stats.test_invalid += 1
             return "INVALID", validation_msg, []
 
