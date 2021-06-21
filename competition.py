@@ -12,6 +12,7 @@ import errno
 import logging as log
 import csv
 
+from code_pipeline.model_executor import ModelExecutor
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
@@ -171,7 +172,7 @@ def setup_logging(log_to, debug):
 
 
 @click.command()
-@click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock",
+@click.option('--executor', type=click.Choice(['mock', 'beamng', 'model'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
               help="The name of the executor to use. Currently we have 'mock' or 'beamng'.")
 @click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True),
@@ -214,11 +215,12 @@ def setup_logging(log_to, debug):
 @click.option('--debug', required=False, is_flag=True, default=False,
               show_default='Disabled',
               help="Activate debugging (results in more logging)")
+@click.option('--model_path', required=False, default="")
 @click.pass_context
 def generate(ctx, executor, beamng_home, beamng_user,
              time_budget, map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
-             visualize_tests, log_to, debug):
+             visualize_tests, log_to, debug, model_path=None):
     # ensure that ctx.obj exists and is a dict (in case `cli()` is called
     # by means other than the `if` block below)
     ctx.ensure_object(dict)
@@ -272,6 +274,11 @@ def generate(ctx, executor, beamng_home, beamng_user,
                                       oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
+    elif executor == "model":
+        the_executor = ModelExecutor(result_folder, time_budget, map_size,
+                                     oob_tolerance=oob_tolerance, max_speed=speed_limit,
+                                     beamng_home=beamng_home, beamng_user=beamng_user,
+                                     road_visualizer=road_visualizer, model_path=model_path)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))
