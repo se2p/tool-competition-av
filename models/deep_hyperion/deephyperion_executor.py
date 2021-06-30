@@ -6,10 +6,9 @@ class DeepHyperionExecutor(ModelExecutor):
 
     def __init__(self, result_folder, time_budget, map_size,
                  oob_tolerance=0.95, max_speed=70,
-                 beamng_home=None, beamng_user=None, road_visualizer=None, model_path=None, custom_model_path=None):
+                 beamng_home=None, beamng_user=None, road_visualizer=None, model_path=None):
         super(DeepHyperionExecutor, self).__init__(result_folder, time_budget, map_size, oob_tolerance, max_speed,
-                                                   beamng_home, beamng_user, road_visualizer, model_path,
-                                                   custom_model_path)
+                                                   beamng_home, beamng_user, road_visualizer, model_path)
         self.model_path = model_path
         self.model = None
         self.load_model()
