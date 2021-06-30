@@ -21,12 +21,17 @@ import os.path
 import cv2
 import numpy
 
+# use these inputs for dave2
+# IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
+# use these inputs for deep-hyperion
+IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
+
 
 def preprocess_image(image, resize=None):
     image_array = numpy.asarray(image)
     # removes sky and front of car
     image_array = image_array[80:-1, :, :]
-    image_array = cv2.resize(image_array, resize, interpolation=cv2.INTER_AREA)
+    image_array = cv2.resize(image_array, (IMAGE_WIDTH, IMAGE_HEIGHT), cv2.INTER_AREA)
     image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2YUV)
     return image_array
 
@@ -59,10 +64,10 @@ class ModelExecutor(AbstractTestExecutor):
         self.road_visualizer = road_visualizer
         self.driver_camera_name = 'driver_view_camera'
 
-        self.model: tf.keras.Model = tf.keras.models.load_model(model_path)
+        self.model: tf.keras.Model = tf.keras.models.load_model(str(model_path))
         # self.model: tf.keras.Model = tf.keras.models.model_from_json(model_path)
         self.model.compile()
-        # weights_file = model_path
+        # weights_file = model_path.replace('json', 'hdf5')
         # self.model.load_weights(weights_file)
 
         # Check model architecture
@@ -150,7 +155,7 @@ class ModelExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        camera = (self.driver_camera_name, Camera((-0.3, 2.1, 1), (0, 1, 0), 120, (66, 200)))
+        camera = (self.driver_camera_name, Camera((-0.3, 1.7, 1), (0, 1, 0), 120, (66, 200)))
         additional_sensors = [camera]
         vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=additional_sensors)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
