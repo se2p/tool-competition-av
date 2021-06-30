@@ -12,7 +12,7 @@ import errno
 import logging as log
 import csv
 
-from code_pipeline.model_executor import ModelExecutor
+from models.deep_hyperion.deephyperion_executor import DeepHyperionExecutor
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
@@ -55,7 +55,8 @@ def validate_map_size(ctx, param, value):
     The size of the map is defined by its edge. The edge can be any (integer) value between 100 and 1000
     """
     if int(value) < 100 or int(value) > 1000:
-        raise click.UsageError('The provided value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
+        raise click.UsageError(
+            'The provided value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
     else:
         return int(value)
 
@@ -93,7 +94,7 @@ def create_summary(result_folder, raw_data):
         summary_file = os.path.join(result_folder, "generation_stats.csv")
         csv_content = raw_data.as_csv()
         with open(summary_file, 'w') as output_file:
-            output_file.write( csv_content)
+            output_file.write(csv_content)
         log.info("Test Statistics Report available: %s", summary_file)
 
     log.info("Creating OOB Report")
@@ -121,9 +122,6 @@ def post_process(ctx, result_folder, the_executor):
     create_summary(result_folder, the_executor.get_stats())
 
 
-
-
-
 def create_post_processing_hook(ctx, result_folder, executor):
     """
         Uses HighOrder functions to setup the post processing hooks that will be trigger ONLY AND ONLY IF the
@@ -144,7 +142,6 @@ def create_post_processing_hook(ctx, result_folder, executor):
 
 
 def setup_logging(log_to, debug):
-
     def log_exception(extype, value, trace):
         log.exception('Uncaught exception:', exc_info=(extype, value, trace))
 
@@ -158,7 +155,7 @@ def setup_logging(log_to, debug):
 
     if log_to is not None:
         file_handler = log.FileHandler(log_to, 'a', 'utf-8')
-        log_handlers.append( file_handler )
+        log_handlers.append(file_handler)
         start_msg += " ".join(["writing to file: ", str(log_to)])
 
     log_level = log.DEBUG if debug else log.INFO
@@ -168,7 +165,6 @@ def setup_logging(log_to, debug):
     sys.excepthook = log_exception
 
     log.info(start_msg)
-
 
 
 @click.command()
@@ -197,7 +193,7 @@ def setup_logging(log_to, debug):
 @click.option('--speed-limit', type=int, default=70, callback=validate_speed_limit,
               show_default='70 Km/h',
               help="The max speed of the ego-vehicle"
-              "Expressed in Kilometers per hours")
+                   "Expressed in Kilometers per hours")
 @click.option('--module-name', required=True, type=str,
               help="Name of the module where your test generator is located.")
 @click.option('--module-path', required=False, type=click.Path(exists=True),
@@ -227,7 +223,6 @@ def generate(ctx, executor, beamng_home, beamng_user,
 
     # TODO Refactor by adding a create summary command and forwarding the output of this run to that command
 
-
     # Setup logging
     setup_logging(log_to, debug)
 
@@ -252,7 +247,8 @@ def generate(ctx, executor, beamng_home, beamng_user,
     # a timestamp as id
     # TODO Allow to specify a location for this folder and the run id
     timestamp_id = time.time_ns() // 1000000
-    result_folder = os.path.join(default_output_folder, "_".join([str(module_name), str(class_name), str(timestamp_id)]))
+    result_folder = os.path.join(default_output_folder,
+                                 "_".join([str(module_name), str(class_name), str(timestamp_id)]))
 
     try:
         os.makedirs(result_folder)
@@ -275,10 +271,10 @@ def generate(ctx, executor, beamng_home, beamng_user,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
     elif executor == "model":
-        the_executor = ModelExecutor(result_folder, time_budget, map_size,
-                                     oob_tolerance=oob_tolerance, max_speed=speed_limit,
-                                     beamng_home=beamng_home, beamng_user=beamng_user,
-                                     road_visualizer=road_visualizer, model_path=model_path)
+        the_executor = DeepHyperionExecutor(result_folder, time_budget, map_size,
+                                            oob_tolerance=oob_tolerance, max_speed=speed_limit,
+                                            beamng_home=beamng_home, beamng_user=beamng_user,
+                                            road_visualizer=road_visualizer, model_path=model_path)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))

@@ -12,7 +12,7 @@ from self_driving.utils import get_node_coords, points_distance
 from self_driving.vehicle_state_reader import VehicleStateReader
 from beamngpy.sensors import Camera
 import tensorflow as tf
-from tensorflow import keras
+from abc import abstractmethod
 
 from shapely.geometry import Point
 
@@ -25,6 +25,7 @@ import numpy
 # IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
 # use these inputs for deep-hyperion
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
+DRIVER_CAMERA_NAME = 'driver_view_camera'
 
 
 def preprocess_image(image, resize=None):
@@ -43,6 +44,8 @@ class ModelExecutor(AbstractTestExecutor):
                  beamng_home=None, beamng_user=None, road_visualizer=None, model_path=None):
         super(ModelExecutor, self).__init__(result_folder, time_budget, map_size)
         self.test_time_budget = 250000
+        self.MIN_SPEED = 5.0
+        self.MAX_SPEED = max_speed
 
         self.oob_tolerance = oob_tolerance
         self.maxspeed = max_speed
@@ -62,16 +65,14 @@ class ModelExecutor(AbstractTestExecutor):
         # Not sure how to set this... How far can a car move in 250 ms at 5Km/h
         self.min_delta_position = 1.0
         self.road_visualizer = road_visualizer
-        self.driver_camera_name = 'driver_view_camera'
 
-        self.model: tf.keras.Model = tf.keras.models.load_model(str(model_path))
-        # self.model: tf.keras.Model = tf.keras.models.model_from_json(model_path)
-        self.model.compile()
-        # weights_file = model_path.replace('json', 'hdf5')
-        # self.model.load_weights(weights_file)
+    @abstractmethod
+    def load_model(self):
+        print('implement custom load operation')
 
-        # Check model architecture
-        self.model.summary()
+    @abstractmethod
+    def predict(self, image):
+        print('implement custom predict operation')
 
     def _execute(self, the_test):
         # Ensure we do not execute anything longer than the time budget
@@ -155,7 +156,7 @@ class ModelExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        camera = (self.driver_camera_name, Camera((-0.3, 1.7, 1), (0, 1, 0), 120, (66, 200)))
+        camera = (DRIVER_CAMERA_NAME, Camera((-0.3, 1.7, 1), (0, 1, 0), 120, (66, 200)))
         additional_sensors = [camera]
         vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=additional_sensors)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
@@ -175,13 +176,14 @@ class ModelExecutor(AbstractTestExecutor):
             brewer.bring_up()
 
             while True:
+                # get camera image and preprocess it
                 img = self.get_driver_camera_image()
                 img_array = preprocess_image(img, (200, 66))
                 img_array = tf.cast(img_array, tf.float32)
                 img_array = numpy.array([img_array])
-                predicted_values = self.predict(img_array, ['steering_angle'], batch=1)
-                steering_angle = float(predicted_values)
-                self.vehicle.control(steering=steering_angle)
+
+                # predict steering angle from model
+                steering_angle = self.predict(img_array)
 
                 # show driver view with predicted steering angle
                 cv2.putText(img, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
@@ -191,18 +193,27 @@ class ModelExecutor(AbstractTestExecutor):
 
                 sim_data_collector.collect_current_data(oob_bb=False)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
-                # Target point reached
-                if last_state.vel_kmh > self.maxspeed:
-                    self.vehicle.control(throttle=0)
+
+                if last_state.vel_kmh > self.MAX_SPEED:
+                    self.speed_limit = self.MIN_SPEED  # slow down
                 else:
-                    self.vehicle.control(throttle=0.3)
+                    self.speed_limit = self.MAX_SPEED
+
+                # Based on the predicted steering angle the controller sets the speed:
+                # for sharper turns will slow down more than for straight segments
+                throttle = 1.0 - steering_angle ** 2 - (last_state.vel_kmh / self.speed_limit) ** 2
+
+                # pass controls to vehicle
+                self.vehicle.control(steering=steering_angle, throttle=throttle)
+
+                # Target point reached
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
 
                 assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(
                     sim_data_collector.name)
 
-                # assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
+                assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
 
                 beamng.step(steps)
 
@@ -233,14 +244,10 @@ class ModelExecutor(AbstractTestExecutor):
 
     def get_driver_camera_image(self):
         sensors = self.brewer.beamng.poll_sensors(self.vehicle)
-        cam = sensors[self.driver_camera_name]
+        cam = sensors[DRIVER_CAMERA_NAME]
         img = cam['colour'].convert('RGB')
         img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
         return img_cv
-
-    def predict(self, image, properties=None, batch=None):
-        predicted_values = self.model.predict(image, batch_size=batch)
-        return predicted_values
 
     def end_iteration(self):
         try:
