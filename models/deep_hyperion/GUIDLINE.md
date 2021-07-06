@@ -11,7 +11,7 @@ Example usage with one of the models in `models/deep_hyperion`, please add the f
 --executor
 model
 --beamng-home
-C:\Users\tobia\Documents\BeamNG.research
+<<path_to_project_folder>>BeamNG.research
 --map-size
 200
 --module-name

@@ -13,6 +13,8 @@ import logging as log
 import csv
 
 from models.deep_hyperion.deephyperion_executor import DeepHyperionExecutor
+# from models.autumn.autumn_executor import AutumnModelExecutor
+# from models.komanda.komanda_executor import KomandaModelExecutor
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
@@ -275,6 +277,10 @@ def generate(ctx, executor, beamng_home, beamng_user,
                                             oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                             beamng_home=beamng_home, beamng_user=beamng_user,
                                             road_visualizer=road_visualizer, model_path=model_path)
+        # the_executor = AutumnModelExecutor(result_folder, time_budget, map_size,
+        #                                    oob_tolerance=oob_tolerance, max_speed=speed_limit,
+        #                                    beamng_home=beamng_home, beamng_user=beamng_user,
+        #                                    road_visualizer=road_visualizer, model_path=model_path)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))

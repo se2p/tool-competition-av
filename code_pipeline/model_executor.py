@@ -25,6 +25,7 @@ import numpy
 # IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
 # use these inputs for deep-hyperion
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
+
 DRIVER_CAMERA_NAME = 'driver_view_camera'
 
 
@@ -32,7 +33,7 @@ def preprocess_image(image, resize=None):
     image_array = numpy.asarray(image)
     # removes sky and front of car
     image_array = image_array[80:-1, :, :]
-    image_array = cv2.resize(image_array, (IMAGE_WIDTH, IMAGE_HEIGHT), cv2.INTER_AREA)
+    image_array = cv2.resize(image_array, resize, cv2.INTER_AREA)
     image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2YUV)
     return image_array
 
@@ -156,7 +157,14 @@ class ModelExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        camera = (DRIVER_CAMERA_NAME, Camera((-0.3, 1.7, 1), (0, 1, 0), 120, (66, 200)))
+        # camera settings taken from https://github.com/testingautomated-usi/DeepHyperion/blob/main/DeepHyperion-BNG
+        # /udacity_integration/beamng_car_cameras.py
+        cam_pos = (-0.3, 1.7, 1.0)
+        cam_dir = (0, 1, 0)
+        cam_fov = 120
+        cam_res = (IMAGE_WIDTH, IMAGE_HEIGHT)
+        camera = (DRIVER_CAMERA_NAME, Camera(cam_pos, cam_dir, cam_fov, cam_res, colour=True, depth=True,
+                                             annotation=True))
         additional_sensors = [camera]
         vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=additional_sensors)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
@@ -178,12 +186,17 @@ class ModelExecutor(AbstractTestExecutor):
             while True:
                 # get camera image and preprocess it
                 img = self.get_driver_camera_image()
-                img_array = preprocess_image(img, (200, 66))
-                img_array = tf.cast(img_array, tf.float32)
-                img_array = numpy.array([img_array])
-
-                # predict steering angle from model
-                steering_angle = self.predict(img_array)
+                steering_angle = 0
+                is_preprocessing = True
+                # TODO: SOME EXECUTORS DO THEIR OWN IMAGE PROCESSING
+                if is_preprocessing:
+                    img_array = preprocess_image(img, (IMAGE_WIDTH, IMAGE_HEIGHT))
+                    img_array = tf.cast(img_array, tf.float32)
+                    img_array = numpy.array([img_array])
+                    steering_angle = float(self.predict(img_array))
+                else:
+                    # predict steering angle from model
+                    steering_angle = float(self.predict(img))
 
                 # show driver view with predicted steering angle
                 cv2.putText(img, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
