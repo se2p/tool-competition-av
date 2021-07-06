@@ -56,7 +56,12 @@ class BeamNGBrewer:
         self.camera = BeamNGCamera(self.beamng, 'brewer_camera')
         return self.camera
 
+    # TODO COnsider to transform brewer into a ContextManager or get rid of it...
     def bring_up(self):
+        # if not self.beamng.server:
+        self.beamng.open()
+
+        # After 1.18 to make a scenario one needs a running instance of BeamNG
         self.scenario = Scenario('tig', 'tigscenario')
         if self.vehicle:
             self.scenario.add_vehicle(self.vehicle, pos=self.vehicle_start_pose.pos, rot=self.vehicle_start_pose.rot)
@@ -65,12 +70,13 @@ class BeamNGBrewer:
             self.scenario.add_camera(self.camera.camera, self.camera.name)
 
         self.scenario.make(self.beamng)
-        if not self.beamng.server:
-            self.beamng.open()
-        self.beamng.pause()
+
         self.beamng.set_deterministic()
         self.beamng.load_scenario(self.scenario)
         self.beamng.start_scenario()
+
+        # Pause the simulator only after loading and starting the scenario
+        self.beamng.pause()
 
     def __del__(self):
         if self.beamng:

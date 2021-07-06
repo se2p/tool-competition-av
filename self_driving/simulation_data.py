@@ -128,6 +128,23 @@ class SimulationData:
             info=info)
         return self
 
+    @staticmethod
+    def load_from_json(path_json):
+        with open(path_json, 'r') as f:
+            obj = json.loads(f.read())
+        info = SimulationInfo()
+
+        info.__dict__ = obj.get(self.f_info, {})
+        self.set(
+            SimulationParams(**obj[self.f_params]),
+            DecalRoad.from_dict(obj[self.f_road]),
+            [SimulationDataRecord(**r) for r in obj[self.f_records]],
+            info=info)
+        return self
+
+        pass
+
+
     def complete(self) -> bool:
         return self.path_json.exists()
 
