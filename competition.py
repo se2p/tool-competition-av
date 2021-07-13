@@ -1975,46 +1975,46 @@ if __name__ == '__main__':
     # array_of_tests_dict_with_features = create_array_of_computed_features_dictionaries_of_all_tests()
     # print(array_of_tests_dict_with_features)
 
-    max_MinRadius = find_max_value_of_feature('MinRadius')
-    min_MinRadius = find_min_value_of_feature('MinRadius')
-    print(max_MinRadius)
-    print(min_MinRadius)
-    features = []
-    features.append('MinRadius')
-    features.append('DirectionCoverage')
-    features.append('MeanLateralPosition')
-    features.append('SegmentCount')
-    features.append('SDSteeringAngle')
-    features.append('Curvature')
-
-    array = create_array_of_features_for_axis(features)
-    # print(array)
+    # max_MinRadius = find_max_value_of_feature('MinRadius')
+    # min_MinRadius = find_min_value_of_feature('MinRadius')
+    # print(max_MinRadius)
+    # print(min_MinRadius)
+    # features = []
+    # features.append('MinRadius')
+    # features.append('DirectionCoverage')
+    # features.append('MeanLateralPosition')
+    # features.append('SegmentCount')
+    # features.append('SDSteeringAngle')
+    # features.append('Curvature')
     #
-    samples = create_samples()
-    sample1 = samples[1].to_dict()
+    # array = create_array_of_features_for_axis(features)
+    # # print(array)
+    # #
+    # samples = create_samples()
+    # sample1 = samples[1].to_dict()
+    # # print(samples[1].to_dict())
+    # #
+    # #
+    # class Ctx:
+    #     obj = {"show-progress": True}
+    #
+    #
+    # ctx = Ctx()
+    #
+    # tag = []
+    # tag.append("test")
+    # # tag.append(str(datetime.datetime.now().time()))
+    # # print(tag)
+    #
+    #
+    # create_folder("map", "../tool-competition-av/results/")
+    # # if not os.path.exists(os.path.dirname("../tool-competition-av/results/map/")):
+    # #     dir_name = os.path.dirname(filename)
+    # #     os.makedirs(dir_name)
+    #
+    #
+    # # Create the feature map ctx, visualize, drop_outliers, tag, at, run_folder
+    # create_feature_maps(ctx, True, True, tag, "../tool-competition-av/results/map")
     # print(samples[1].to_dict())
-    #
-    #
-    class Ctx:
-        obj = {"show-progress": True}
 
-
-    ctx = Ctx()
-
-    tag = []
-    tag.append("test")
-    # tag.append(str(datetime.datetime.now().time()))
-    # print(tag)
-
-
-    create_folder("map", "../tool-competition-av/results/")
-    # if not os.path.exists(os.path.dirname("../tool-competition-av/results/map/")):
-    #     dir_name = os.path.dirname(filename)
-    #     os.makedirs(dir_name)
-
-
-    # Create the feature map ctx, visualize, drop_outliers, tag, at, run_folder
-    create_feature_maps(ctx, True, True, tag, "../tool-competition-av/results/map")
-    print(samples[1].to_dict())
-
-    # generate()
+    generate()
