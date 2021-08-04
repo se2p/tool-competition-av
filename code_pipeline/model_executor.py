@@ -23,7 +23,9 @@ import numpy
 
 # use these inputs for dave2
 # IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
-# use these inputs for deep-hyperion
+# input shapes for komanda
+# IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 480, 640, 3
+# use these inputs for dave2
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
 
 DRIVER_CAMERA_NAME = 'driver_view_camera'
@@ -186,23 +188,16 @@ class ModelExecutor(AbstractTestExecutor):
             while True:
                 # get camera image and preprocess it
                 img = self.get_driver_camera_image()
-                steering_angle = 0
-                is_preprocessing = True
-                # TODO: SOME EXECUTORS DO THEIR OWN IMAGE PROCESSING
-                if is_preprocessing:
-                    img_array = preprocess_image(img, (IMAGE_WIDTH, IMAGE_HEIGHT))
-                    img_array = tf.cast(img_array, tf.float32)
-                    img_array = numpy.array([img_array])
-                    steering_angle = float(self.predict(img_array))
-                else:
-                    # predict steering angle from model
-                    steering_angle = float(self.predict(img))
+
+                # predict steering angle
+                steering_angle = float(self.predict(img))
 
                 # show driver view with predicted steering angle
-                cv2.putText(img, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
+                img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
+                cv2.putText(img_cv, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
                             cv2.LINE_AA)
-                cv2.imshow('Predicted Steering Angle', img)
-                cv2.waitKey(10)
+                cv2.imshow('Predicted Steering Angle', img_cv)
+                cv2.waitKey(1)
 
                 sim_data_collector.collect_current_data(oob_bb=False)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
@@ -245,7 +240,7 @@ class ModelExecutor(AbstractTestExecutor):
             sim_data_collector.get_simulation_data().end(success=False, exception=ex)
             traceback.print_exception(type(ex), ex, ex.__traceback__)
         finally:
-            sim_data_collector.save()
+            sim_data_collector.save(True)
             try:
                 sim_data_collector.take_car_picture_if_needed()
             except:
@@ -259,8 +254,8 @@ class ModelExecutor(AbstractTestExecutor):
         sensors = self.brewer.beamng.poll_sensors(self.vehicle)
         cam = sensors[DRIVER_CAMERA_NAME]
         img = cam['colour'].convert('RGB')
-        img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
-        return img_cv
+        # img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
+        return img
 
     def end_iteration(self):
         try:
