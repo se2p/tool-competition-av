@@ -1,0 +1,422 @@
+{
+    "Tool": null,
+    "Run ID": null,
+    "Tags": [],
+    "Total Samples": 37,
+    "Valid Samples": 37,
+    "Invalid Samples": 0,
+    "Total Misbehaviors": 0,
+    "MisbehaviorPerSample": 0.0,
+    "Features": {
+        "MinRadius": {
+            "meta": {
+                "name": "MinRadius",
+                "min-value": 49,
+                "max-value": 161,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 82.27027027027027,
+                "stdev": 26.8355575151169,
+                "median": 73
+            }
+        },
+        "DirectionCoverage": {
+            "meta": {
+                "name": "DirectionCoverage",
+                "min-value": 15,
+                "max-value": 50,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 29.16216216216216,
+                "stdev": 9.711143408801371,
+                "median": 26
+            }
+        },
+        "MeanLateralPosition": {
+            "meta": {
+                "name": "MeanLateralPosition",
+                "min-value": 121,
+                "max-value": 181,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 151.6216216216216,
+                "stdev": 14.989535889619336,
+                "median": 150
+            }
+        },
+        "SegmentCount": {
+            "meta": {
+                "name": "SegmentCount",
+                "min-value": 1,
+                "max-value": 6,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 2.972972972972973,
+                "stdev": 1.0668355722125777,
+                "median": 3
+            }
+        },
+        "SDSteeringAngle": {
+            "meta": {
+                "name": "SDSteeringAngle",
+                "min-value": 15,
+                "max-value": 97,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 44,
+                "stdev": 19.713221733423257,
+                "median": 40
+            }
+        },
+        "Curvature": {
+            "meta": {
+                "name": "Curvature",
+                "min-value": 2,
+                "max-value": 6,
+                "num-cells": 5
+            },
+            "stats": {
+                "mean": 3.7837837837837838,
+                "stdev": 1.1579468212490764,
+                "median": 4
+            }
+        }
+    },
+    "Reports": [
+        {
+            "Features": [
+                "MinRadius",
+                "DirectionCoverage"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 13,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.52,
+            "Collisions": 7,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.8461538461538463,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.583333333333333,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.051282051282051,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MinRadius",
+                "MeanLateralPosition"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 14,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.56,
+            "Collisions": 7,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.6428571428571428,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.384615384615385,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.7472527472527473,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MinRadius",
+                "SegmentCount"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 12,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.48,
+            "Collisions": 7,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 2.0833333333333335,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.363636363636363,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.9696969696969697,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MinRadius",
+                "SDSteeringAngle"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 11,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.44,
+            "Collisions": 6,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 2.3636363636363638,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.5,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.054545454545455,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MinRadius",
+                "Curvature"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 8,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.32,
+            "Collisions": 6,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 3.625,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.714285714285714,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.535714285714285,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "DirectionCoverage",
+                "MeanLateralPosition"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 14,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.56,
+            "Collisions": 8,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.6428571428571428,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.923076923076923,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.1318681318681323,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "DirectionCoverage",
+                "SegmentCount"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 15,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.6,
+            "Collisions": 8,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.4666666666666666,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 3.857142857142857,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.9142857142857146,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "DirectionCoverage",
+                "SDSteeringAngle"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 14,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.56,
+            "Collisions": 8,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.6428571428571428,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.6923076923076925,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.0439560439560434,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "DirectionCoverage",
+                "Curvature"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 17,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.68,
+            "Collisions": 9,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.1764705882352942,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 5.25,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 3.25,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MeanLateralPosition",
+                "SegmentCount"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 14,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.56,
+            "Collisions": 9,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.6428571428571428,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 3.6153846153846154,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.736263736263735,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MeanLateralPosition",
+                "SDSteeringAngle"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 13,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.52,
+            "Collisions": 9,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.8461538461538463,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.666666666666667,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.897435897435897,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "MeanLateralPosition",
+                "Curvature"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 17,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.68,
+            "Collisions": 9,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.1764705882352942,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.6875,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.985294117647058,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "SegmentCount",
+                "SDSteeringAngle"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 13,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.52,
+            "Collisions": 9,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.8461538461538463,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.25,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.7179487179487185,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "SegmentCount",
+                "Curvature"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 16,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.64,
+            "Collisions": 8,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.3125,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.8,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.991666666666667,
+            "Avg Misbehavior Distance": NaN
+        },
+        {
+            "Features": [
+                "SDSteeringAngle",
+                "Curvature"
+            ],
+            "Sample Count": 37,
+            "Outlier Count": 0,
+            "Total Cells": 25,
+            "Filled Cells": 14,
+            "Mapped Misbehaviors": 0,
+            "Misbehavior Relative Density": 0.0,
+            "Misbehavior Density": 0.0,
+            "Filled Cells Density": 0.56,
+            "Collisions": 7,
+            "Misbehavior Collisions": 0,
+            "Collision Ratio": 1.6428571428571428,
+            "Misbehavior Collision Ratio": NaN,
+            "Coverage Sparseness": 4.6923076923076925,
+            "Misbehavior Sparseness": NaN,
+            "Avg Sample Distance": 2.9450549450549453,
+            "Avg Misbehavior Distance": NaN
+        }
+    ]
+}

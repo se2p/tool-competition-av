@@ -19,12 +19,16 @@ import os
 
 def create_feature_maps(ctx, visualize, drop_outliers, tag, run_folder):
     '''
+    The main method of the 'feature_maps' package.
     Creates 2D maps for all the features on axis.
 
     Parameters:
+        - ctx: the context
         - visualise: True if is needed to make a visual map
         - drop_outliers: drops all samples which feature values are out of min and max if the value is True
         - run_folder: the folder to save results
+        - tag:
+        - run-folder: the path to the folder to save the maps and the statistics
     '''
     # creates map axes
     map_axis = create_illumination_map_axis()
@@ -464,7 +468,7 @@ if __name__ == '__main__':
     # print(array)
     #
     samples = create_samples()
-    sample1 = samples[1].to_dict()
+    # sample1 = samples[1].to_dict()
     # print(samples[1].to_dict())
     #
     #
@@ -475,7 +479,7 @@ if __name__ == '__main__':
     ctx = Ctx()
 
     tag = []
-    tag.append("test")
+    # tag.append("test")
     # tag.append(str(datetime.datetime.now().time()))
     # print(tag)
 

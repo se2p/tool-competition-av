@@ -1,0 +1,2 @@
+visualize_tests,time_budget,executor,map_size,module_name,class_name,beamng_home,beamng_user,oob_tolerance,speed_limit,module_path,log_to,debug
+True,1800,beamng,200,swat_gen.swat_generator,SwatTestGenerator,,,0.95,70,,,False

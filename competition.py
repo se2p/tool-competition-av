@@ -32,6 +32,7 @@ from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun
 from self_driving.simulation_data import SimulationDataRecord
 from code_pipeline.tests_evaluation import OOBAnalyzer
+import feature_maps.feature_maps
 
 AngleLength = Tuple[float, float]
 ListOfAngleLength = List[AngleLength]
@@ -1456,14 +1457,27 @@ def post_process(ctx, result_folder, the_executor):
     # Generate the other reports
     create_summary(result_folder, the_executor.get_stats())
 
-    # class Ctx:
-    #     obj = {"show-progress": True}
-    #
-    #
-    # ctx = Ctx()
-    #
-    # # Create the feature map ctx, visualize, drop_outliers, tag, at, run_folder
-    # create_feature_maps(ctx, True, True, tag, result_folder + "/map")
+    # Generate feature maps
+    class Ctx:
+        obj = {"show-progress": True}
+
+
+    ctx = Ctx()
+
+    tag = []
+    # tag.append("test")
+    # tag.append(str(datetime.datetime.now().time()))
+    # print(tag)
+
+
+    create_folder("map", "../../tool-competition-av/results/")
+    # if not os.path.exists(os.path.dirname("../tool-competition-av/results/map/")):
+    #     dir_name = os.path.dirname(filename)
+    #     os.makedirs(dir_name)
+
+
+    # Create the feature map ctx, visualize, drop_outliers, tag, at, run_folder
+    create_feature_maps(ctx, True, True, tag, "../../tool-competition-av/results/map")
 
 
 def create_post_processing_hook(ctx, result_folder, executor):
@@ -1989,7 +2003,7 @@ if __name__ == '__main__':
     #
     # array = create_array_of_features_for_axis(features)
     # # print(array)
-    # #
+    # # #
     # samples = create_samples()
     # sample1 = samples[1].to_dict()
     # # print(samples[1].to_dict())
