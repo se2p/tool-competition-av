@@ -3,6 +3,7 @@ from code_pipeline.executors import AbstractTestExecutor
 import time
 import traceback
 
+from models.config import ModelsConfig
 from self_driving.beamng_brewer import BeamNGBrewer
 from self_driving.beamng_tig_maps import maps, LevelsFolder
 from self_driving.beamng_waypoint import BeamNGWaypoint
@@ -11,7 +12,6 @@ from self_driving.simulation_data_collector import SimulationDataCollector
 from self_driving.utils import get_node_coords, points_distance
 from self_driving.vehicle_state_reader import VehicleStateReader
 from beamngpy.sensors import Camera
-import tensorflow as tf
 from abc import abstractmethod
 
 from shapely.geometry import Point
@@ -20,13 +20,6 @@ import logging as log
 import os.path
 import cv2
 import numpy
-
-# use these inputs for dave2
-# IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
-# input shapes for komanda
-# IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 480, 640, 3
-# use these inputs for dave2
-IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
 
 DRIVER_CAMERA_NAME = 'driver_view_camera'
 
@@ -44,7 +37,7 @@ class ModelExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, time_budget, map_size,
                  oob_tolerance=0.95, max_speed=70,
-                 beamng_home=None, beamng_user=None, road_visualizer=None, model_path=None):
+                 beamng_home=None, beamng_user=None, road_visualizer=None):
         super(ModelExecutor, self).__init__(result_folder, time_budget, map_size)
         self.test_time_budget = 250000
         self.MIN_SPEED = 5.0
@@ -55,12 +48,12 @@ class ModelExecutor(AbstractTestExecutor):
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
-        self.model_path = model_path
+        self.config = ModelsConfig()
 
         if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
             log.warning("%s is missing but is required to use BeamNG.research", )
 
-        if self.model_path is None or not os.path.exists(model_path):
+        if self.config.model_path is None or not os.path.exists(self.config.model_path):
             log.warning("Required model not available")
 
         # Runtime Monitor about relative movement of the car
@@ -164,7 +157,7 @@ class ModelExecutor(AbstractTestExecutor):
         cam_pos = (-0.3, 1.7, 1.0)
         cam_dir = (0, 1, 0)
         cam_fov = 120
-        cam_res = (IMAGE_WIDTH, IMAGE_HEIGHT)
+        cam_res = (self.config.IMAGE_WIDTH, self.config.IMAGE_HEIGHT)
         camera = (DRIVER_CAMERA_NAME, Camera(cam_pos, cam_dir, cam_fov, cam_res, colour=True, depth=True,
                                              annotation=True))
         additional_sensors = [camera]
@@ -173,12 +166,11 @@ class ModelExecutor(AbstractTestExecutor):
 
         steps = brewer.params.beamng_steps
         simulation_id = time.strftime('%Y-%m-%d--%H-%M-%S', time.localtime())
-        name = 'beamng_executor/sim_$(id)'.replace('$(id)', simulation_id)
+        name = 'model_executor/{}/sim_{}'.format(self.config.model_name, simulation_id)
         sim_data_collector = SimulationDataCollector(self.vehicle, beamng, brewer.decal_road, brewer.params,
                                                      vehicle_state_reader=vehicle_state_reader,
                                                      simulation_name=name)
 
-        # TODO: Hacky - Not sure what's the best way to set this...
         sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
 
         sim_data_collector.get_simulation_data().start()
@@ -194,6 +186,9 @@ class ModelExecutor(AbstractTestExecutor):
 
                 # show driver view with predicted steering angle
                 img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
+                # draw the same text a bit thicker to create a black outline around the text
+                cv2.putText(img_cv, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2,
+                            cv2.LINE_AA)
                 cv2.putText(img_cv, f"{steering_angle:.9f}", (2, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1,
                             cv2.LINE_AA)
                 cv2.imshow('Predicted Steering Angle', img_cv)
@@ -226,9 +221,6 @@ class ModelExecutor(AbstractTestExecutor):
                 beamng.step(steps)
 
             sim_data_collector.get_simulation_data().end(success=True)
-            # end = timeit.default_timer()
-            # run_elapsed_time = end-start
-            # run_elapsed_time = float(last_state.timer)
             self.total_elapsed_time = self.get_elapsed_time()
         except AssertionError as aex:
             sim_data_collector.save()
@@ -240,7 +232,7 @@ class ModelExecutor(AbstractTestExecutor):
             sim_data_collector.get_simulation_data().end(success=False, exception=ex)
             traceback.print_exception(type(ex), ex, ex.__traceback__)
         finally:
-            sim_data_collector.save(True)
+            sim_data_collector.save()
             try:
                 sim_data_collector.take_car_picture_if_needed()
             except:
@@ -254,7 +246,6 @@ class ModelExecutor(AbstractTestExecutor):
         sensors = self.brewer.beamng.poll_sensors(self.vehicle)
         cam = sensors[DRIVER_CAMERA_NAME]
         img = cam['colour'].convert('RGB')
-        # img_cv = cv2.cvtColor(numpy.asarray(img), cv2.COLOR_RGB2BGR)
         return img
 
     def end_iteration(self):
