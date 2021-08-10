@@ -250,9 +250,8 @@ def generate(ctx, executor, beamng_home, beamng_user,
     # Create the unique folder that will host the results of this execution using the test generator data and
     # a timestamp as id
     # TODO Allow to specify a location for this folder and the run id
-    timestamp_id = time.time_ns() // 1000000
-    result_folder = os.path.join(default_output_folder,
-                                 "_".join([str(module_name), str(class_name), str(timestamp_id)]))
+    timestamp_id = time.time()*100000000 // 1000000
+    result_folder = os.path.join(default_output_folder, "_".join([str(module_name), str(class_name), str(timestamp_id)]))
 
     try:
         os.makedirs(result_folder)

@@ -3,9 +3,9 @@
 Starting this year, the [SBST Workshop](https://sbst21.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst21.github.io/tools/).
 
 ## Important Dates
-The deadline to submit your tool is: **February 12**
+The deadline to submit your tool is: **February 12th 2021**
 
-The results of the evaluation will be communicated to participants on: **March 2**
+The results of the evaluation will be communicated to participants on: **March 2nd 2021**
 
 ## Goal ##
 The competitors should generate virtual roads to test a lane keeping assist system. 
@@ -41,7 +41,7 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 
 Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
 
-Dr. Vincenzo Riccio  - Software Institute @ USI, Lugano, Switzerland - vincenzo.riccio@usi.ch
+Dr. Vincenzo Riccio  - Università della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch
 
 Dr. Fiorella Zampetti  - University of Sannio, Italy - fiorella.zampetti@unisannio.it
 
