@@ -1,16 +1,19 @@
 # Cyber-Physical Systems Testing Competition #
 
-Starting this year, the [SBST Workshop](https://sbst21.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst21.github.io/tools/).
+The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
 
 ## Important Dates
-The deadline to submit your tool is: **February 12th 2021**
 
-The results of the evaluation will be communicated to participants on: **March 2nd 2021**
+The deadline to submit your tool is: **January 14th 2022**
+
+The results of the evaluation will be communicated to participants on: **February 25th 2022**
+
+The camera-ready paper describing your tool is due to: **Sunday March 18th 2020**
 
 ## Goal ##
-The competitors should generate virtual roads to test a lane keeping assist system. 
+The competitors should generate virtual roads to test a lane keeping assist system using the provided code_pipeline.
 
-The generated roads are evaluated in a driving simulator. We partnered with BeamNG GmbH which offers a version of their simulators for researchers, named [BeamNG.research](https://beamng.gmbh/research/). This simulator is ideal for researchers due to its state-of-the-art soft-body physics simulation, ease of access to sensory data, and a Python API to control the simulation.
+The generated roads are evaluated in a driving simulator. We partnered with BeamNG GmbH which offers a version of their simulators for researchers, named [BeamNG.tech](https://www.beamng.tech/). This simulator is ideal for researchers due to its state-of-the-art soft-body physics simulation, ease of access to sensory data, and a Python API to control the simulation.
 
 [![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
 
@@ -18,7 +21,7 @@ The generated roads are evaluated in a driving simulator. We partnered with Beam
 We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](sample_test_generators/README.md) to show how to use our code pipeline.
 
 ## Information About the Competition ##
-More information can be found on the SBST tool competition website: [https://sbst21.github.io/tools/](https://sbst21.github.io/tools/)
+More information can be found on the SBST tool competition website: [https://sbst22.github.io/tools/](https://sbst22.github.io/tools/)
 
 ## Repository Structure ##
 [Code pipeline](code_pipeline): code that integrates your test generator with the simulator
@@ -42,7 +45,3 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
 
 Dr. Vincenzo Riccio  - Università della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch
-
-Dr. Fiorella Zampetti  - University of Sannio, Italy - fiorella.zampetti@unisannio.it
-
-Dr. Sebastiano Panichella - Zurich University of Applied Science (ZHAW), Switzerland - panc@zhaw.ch
