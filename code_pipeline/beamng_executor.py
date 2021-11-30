@@ -117,15 +117,15 @@ class BeamngExecutor(AbstractTestExecutor):
         # For the execution we need the interpolated points
         nodes = the_test.interpolated_points
 
-
         brewer = self.brewer
         brewer.setup_road_nodes(nodes)
         beamng = brewer.beamng
         waypoint_goal = BeamNGWaypoint('waypoint_goal', get_node_coords(nodes[-1]))
 
-        # TODO Make sure that maps points to the right folder !
+        # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
+            # TODO This changed since BeamNG.tech v0.23.5.1
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.23', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
@@ -147,6 +147,9 @@ class BeamngExecutor(AbstractTestExecutor):
         sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
 
         sim_data_collector.get_simulation_data().start()
+
+        # TODO Make brewer a context manager that automatically closes everything
+
         try:
             #start = timeit.default_timer()
             brewer.bring_up()
