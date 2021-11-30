@@ -1,4 +1,5 @@
 import json
+import logging as log
 
 from beamngpy import BeamNGpy, Scenario, Vehicle
 from beamngpy.sensors import Camera
@@ -30,8 +31,23 @@ class BeamNGCamera:
 
 
 class BeamNGBrewer:
-    def __init__(self, beamng_home=None, beamng_user=None, road_nodes: List4DTuple = None):
+    def __init__(self, beamng_home=None, beamng_user=None, reuse_beamng=True, road_nodes: List4DTuple = None):
+        self.reuse_beamng = reuse_beamng
+        if self.reuse_beamng:
+            # This represents the running BeamNG simulator
+            self.beamng_process = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
+            self.beamng_process = self.beamng_process.open(launch=True)
+
+        # This is used to bring up each simulation without restarting the simulator
         self.beamng = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
+
+        # log.info("Disabling BEAMNG logs")
+        # # TODO This probably should be tied to some variable in beamng_executor
+        # LOGGER_ID = "beamngpy"
+        # bngpy_logger = log.getLogger(LOGGER_ID)
+        # module_logger = log.getLogger(f'{LOGGER_ID}.beamngpycommon')
+        # bngpy_logger.disabled
+        # module_logger.disabled
 
         self.vehicle: Vehicle = None
         self.camera: BeamNGCamera = None
@@ -58,8 +74,12 @@ class BeamNGBrewer:
 
     # TODO COnsider to transform brewer into a ContextManager or get rid of it...
     def bring_up(self):
-        # if not self.beamng.server:
-        self.beamng.open()
+
+        if self.reuse_beamng:
+            # This assumes BeamNG is already running
+            self.beamng.open(launch=False)
+        else:
+            self.beamng.open(launch=True)
 
         # After 1.18 to make a scenario one needs a running instance of BeamNG
         self.scenario = Scenario('tig', 'tigscenario')
