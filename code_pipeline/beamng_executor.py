@@ -24,8 +24,9 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, time_budget, map_size,
                  oob_tolerance=0.95, max_speed=70,
-                 beamng_home=None, beamng_user=None, road_visualizer=None):
-        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size)
+                 beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
+        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size, debug)
+
         # TODO Is this still valid?
         self.test_time_budget = 250000
 
