@@ -104,23 +104,27 @@ class RoadTestFactory:
             # https://stackoverflow.com/questions/610883/how-to-know-if-an-object-has-an-attribute-in-python
             # "easier to ask for forgiveness than permission" (EAFP)
             try:
-                # This might require some trick?
                 theobj['id' ] = self.id
             except AttributeError:
                 pass
+
             try:
-                # This might require some trick?
                 theobj['execution_data' ] = self.execution_data
             except AttributeError:
                 pass
+
             try:
-                # This might require some trick?
                 theobj['test_outcome'] = self.test_outcome
             except AttributeError:
                 pass
+
             try:
-                # This might require some trick?
                 theobj['description'] = self.description
+            except AttributeError:
+                pass
+
+            try:
+                theobj['features'] = self.features
             except AttributeError:
                 pass
 
