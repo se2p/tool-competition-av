@@ -38,7 +38,7 @@ activate it, and upgrade `pip` and basic packages:
 
 ```
 py.exe -m pip install --upgrade pip
-pip install whell setuptools --upgrade
+pip install wheel setuptools --upgrade
 ```
 
 Nexy, run the following command to install the basic dependencies of the code pipeline:
