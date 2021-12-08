@@ -36,6 +36,7 @@ interpolated using cubic splines to obtain the final road geometry.
 The following image illustrates how a road is defined from the following _road points_ over a map
 of size 200-by-200 meters: 
 
+
 ```
 [
     (10.0, 20.0), (30.0, 20.0), (40.0, 30.0), 
@@ -183,12 +184,11 @@ Options:
 
 ## Example
 
-As an example, you can use the mock to "pretend to" execute the `one-test-generator.py` as shown below. We suggest you to activate a virtual environment. `cd` to the root of this repository and run the following command:
+As an example, you can use the mock to "pretend to" execute the `one-test-generator.py` as shown below. We suggest you to activate a virtual environment. `cd` to the root of this repository and run the following command after replacing `<BEAMNG_HOME>` and `<BEAMNG_USER>` accordingly:
 
 ``` 
 py.exe competition.py \
-        --visualize-tests \
-        --time-budget 10 \
+        --time-budget 60 \
         --executor beamng \
         --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
         --map-size 200 \

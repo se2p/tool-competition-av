@@ -2,8 +2,9 @@
 
 ## General Information ##
 This project contains the code to take part in the tool competition.
-It is developed in Python and runs on Windows machines (we tested the code also by running Parallel Desktop on a Mac
- Book Pro.)
+It is developed in Python and runs on Windows machines (we tested the code also by running Parallel Desktop on a Mac Book Pro).
+
+> Note: In the following, we assume the use of Windows PowerShell and that you have the rights of executing scripts with it.
 
 ## Dependencies ##
 
@@ -29,6 +30,8 @@ Installing BeamNG.tech is as simple as extracting the files to a target folder i
 
 Please copy the `tech.key` file that you received after registering inside the `<BEAMNG_USER>` folder.
 
+> NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters.
+
 ### Python ###
 
 This code has been tested with **Python 3.7**. 
@@ -36,15 +39,19 @@ This code has been tested with **Python 3.7**.
 ### Other Libraries ###
 
 To easily install the other dependencies with rely on `pip`, we suggest to create a
-dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.7/library/venv.html)), 
-activate it, and upgrade `pip` and basic packages: 
+dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.7/library/venv.html)),activate it, and upgrade `pip` and basic packages: 
+
+```
+<PYTHON_37_HOME>\python.exe -m venv .venv
+.\.venv\Scripts\activate
+```
 
 ```
 py.exe -m pip install --upgrade pip
 pip install wheel setuptools --upgrade
 ```
 
-Nexy, run the following command to install the basic dependencies of the code pipeline:
+Next, install the dependencies of the code pipeline:
 
 ```
 pip install -r requirements.txt
@@ -54,8 +61,7 @@ Otherwise, you can manually install each required library listed in the ```requi
 
 > **Note**: the version of Shapely should match your system (see below).
 
-In case your test generator requires additional library, please store them into an additional requirement file to
-be submitted along with your code.
+In case your test generator requires additional library, please store them into an additional requirement file to be submitted along with your code.
 
 To create such a file you can run the following command from within your active virtual environment:
 
@@ -66,8 +72,7 @@ pip freeze > additional-requirements.txt
 Otherwise, you can manually list the additional libraries your test generator need
 in the `additional-requirements.txt` file.
 
-> **Note**: the format of this file must follow the usual `pip` convention where the library name is
->followed by the target version number separated by `==`, e.g., beamngpy==1.21.1
+> **Note**: the format of this file must follow the usual `pip` convention where the library name is followed by the target version number separated by `==`, e.g., beamngpy==1.21.1
 
 
 ### Shapely ###
