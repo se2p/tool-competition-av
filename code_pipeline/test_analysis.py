@@ -46,122 +46,6 @@ def _calc_dist_angle(points):
         result[i] = (angle, distance, [points[i+1], points[i]])
     return result
 
-def _identify_segment(nodes):
-    # result is angle, distance, [x2,y2], [x1,y1]
-    result = _calc_dist_angle(nodes)
-
-    segments = []
-    SEGMENT_THRESHOLD = 15
-    SEGMENT_THRESHOLD2 = 10
-    ANGLE_THRESHOLD = 0.005
-
-    # iterate over the nodes to get the turns bigger than the threshold
-    # a turn category is assigned to each node
-    # l is a left turn
-    # r is a right turn
-    # s is a straight segment
-    # TODO: first node is always a s
-    turns = []
-    for i in range(0, len(result)):
-        # result[i][0] is the angle
-        angle_1 = (result[i][0] + 180) % 360 - 180
-        if np.abs(angle_1) > ANGLE_THRESHOLD:
-            if (angle_1) > 0:
-                turns.append("l")
-            else:
-                turns.append("r")
-        else:
-            turns.append("s")
-
-    # this generator groups the points belonging to the same category
-    def grouper(iterable):
-        prev = None
-        group = []
-        for item in iterable:
-            if not prev or item == prev:
-                group.append(item)
-            else:
-                yield group
-                group = [item]
-            prev = item
-        if group:
-            yield group
-
-    # this generator groups:
-    # - groups of points belonging to the same category
-    # - groups smaller than 10 elements
-    def supergrouper1(iterable):
-        prev = None
-        group = []
-        for item in iterable:
-            if not prev:
-                group.extend(item)
-            elif len(item) < SEGMENT_THRESHOLD2 and item[0] == "s":
-                item = [prev[-1]] * len(item)
-                group.extend(item)
-            elif len(item) < SEGMENT_THRESHOLD and item[0] != "s" and prev[-1] == item[0]:
-                item = [prev[-1]] * len(item)
-                group.extend(item)
-            else:
-                yield group
-                group = item
-            prev = item
-        if group:
-            yield group
-
-    # this generator groups:
-    # - groups of points belonging to the same category
-    # - groups smaller than 10 elements
-    def supergrouper2(iterable):
-        prev = None
-        group = []
-        for item in iterable:
-            if not prev:
-                group.extend(item)
-            elif len(item) < SEGMENT_THRESHOLD:
-                item = [prev[-1]] * len(item)
-                group.extend(item)
-            else:
-                yield group
-                group = item
-            prev = item
-        if group:
-            yield group
-
-    groups = grouper(turns)
-
-    supergroups1 = supergrouper1(groups)
-
-    supergroups2 = supergrouper2(supergroups1)
-
-    count = 0
-    segment_indexes = []
-    segment_count = 0
-    for g in supergroups2:
-        if g[-1] != "s":
-            segment_count += 1
-        # TODO
-        # count += (len(g) - 1)
-        count += (len(g))
-        # TODO: count -1?
-        segment_indexes.append(count)
-
-    # TODO
-    # segment_indexes.append(len(turns) - 1)
-
-    segment_begin = 0
-    for idx in segment_indexes:
-        segment = []
-        # segment_end = idx + 1
-        segment_end = idx
-        for j in range(segment_begin, segment_end):
-            if j == 0:
-                segment.append([result[j][2][0], result[j][0]])
-            segment.append([result[j][2][1], result[j][0]])
-        segment_begin = segment_end
-        segments.append(segment)
-
-    return segment_count, segments
 
 # TODO Possibly code duplicate
 def _define_circle(p1, p2, p3):
@@ -186,18 +70,8 @@ def _define_circle(p1, p2, p3):
     return center, radius
 
 ####################################################################################
-# Input Features
+# Structural Features
 ####################################################################################
-
-
-# Count how many road segments form the road. A road segment is a segment of the road
-# that has a constant curvature
-# TODO Does this consider only turns?
-def segment_count(the_test):
-    nodes = the_test.interpolated_points
-    count, _ = _identify_segment(nodes)
-    return "COUNT_SEG", count
-
 
 # Measure the coverage of road directions w.r.t. to the North (0,1) using the control points of the given road
 # to approximate the road direction. By default we use 36 bins to have bins of 10 deg each
@@ -239,7 +113,7 @@ def max_curvature(the_test, w=5):
     return "MAX_CURV", curvature
 
 ####################################################################################
-# Output Features
+# Behavioural Features
 ####################################################################################
 
 
@@ -275,30 +149,22 @@ def max_lateral_position(execution_data):
 
 def compute_all_features(the_test, execution_data):
     features = dict()
-    # Input Features
-    input_features = [max_curvature, direction_coverage, segment_count]
+    # Structural Features
+    structural_features = [max_curvature, direction_coverage]
 
-    # Output Features
-    output_features = [sd_steering, mean_lateral_position, max_lateral_position]
+    # Behavioural Features
+    behavioural_features = [sd_steering, mean_lateral_position, max_lateral_position]
 
-    # Mixed Features
-    mixed_features = []
-
-    logger.debug("Computing input features")
-    for h in input_features:
+    logger.debug("Computing structural features")
+    for h in structural_features:
         key, value = h(the_test)
         features[key] = value
 
     # TODO Add minimum value here
     if len(execution_data) > 2:
         logger.debug("Computing output features")
-        for h in output_features:
+        for h in behavioural_features:
             key, value = h(execution_data)
-            features[key] = value
-
-        logger.debug("Computing mixed features")
-        for h in mixed_features:
-            key, value = h(the_test, execution_data)
             features[key] = value
 
     return features
