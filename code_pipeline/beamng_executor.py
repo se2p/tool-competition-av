@@ -125,8 +125,8 @@ class BeamngExecutor(AbstractTestExecutor):
 
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
-            # TODO This changed since BeamNG.tech v0.23.5.1
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.23', 'levels'))
+            # Note This changed since BeamNG.research
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
