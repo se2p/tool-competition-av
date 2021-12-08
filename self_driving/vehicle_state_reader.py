@@ -1,7 +1,7 @@
 from collections import namedtuple
 import numpy as np
 from beamngpy import Vehicle, BeamNGpy
-from beamngpy.sensors import Electrics, Timer, Sensor
+from beamngpy.sensors import Electrics, Timer, Sensor, State
 from typing import List, Tuple
 
 VehicleStateProperties = ['timer', 'pos', 'dir', 'vel', 'steering', 'steering_input',
@@ -14,9 +14,21 @@ VehicleState = namedtuple('VehicleState', VehicleStateProperties)
 class VehicleStateReader:
     def __init__(self, vehicle: Vehicle, beamng: BeamNGpy, additional_sensors: List[Tuple[str, Sensor]] = None):
         self.vehicle = vehicle
+
         self.beamng = beamng
         self.state: VehicleState = None
         self.vehicle_state = {}
+
+        #assert 'state' in self.vehicle.sensors.keys(), "Default state sensor is missing"
+        # Starting from BeamNG.tech 0.23.5_1 once the scenario is over a vehicle's sensors get automatically detached
+        # Including the defatul state sensor... so we need to ensure that is there somehow, or stop reusing the vehicle
+        # object across simulations
+        try:
+            state = State()
+            self.vehicle.attach_sensor('state', state)
+        except:
+            pass
+
 
         electrics = Electrics()
         timer = Timer()
@@ -38,12 +50,10 @@ class VehicleStateReader:
         sensors = self.beamng.poll_sensors(self.vehicle)
         self.sensors = sensors
 
-        self.vehicle.update_vehicle()
-        st = self.vehicle.state
-
+        st = sensors['state']
         ele = sensors['electrics']
-
         vel = tuple(st['vel'])
+
         self.state = VehicleState(timer=sensors['timer']['time']
                                   , pos=tuple(st['pos'])
                                   , dir=tuple(st['dir'])

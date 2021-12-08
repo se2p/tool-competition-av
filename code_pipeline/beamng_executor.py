@@ -24,8 +24,9 @@ class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, time_budget, map_size,
                  oob_tolerance=0.95, max_speed=70,
-                 beamng_home=None, beamng_user=None, road_visualizer=None):
-        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size)
+                 beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
+        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size, debug)
+
         # TODO Is this still valid?
         self.test_time_budget = 250000
 
@@ -117,15 +118,15 @@ class BeamngExecutor(AbstractTestExecutor):
         # For the execution we need the interpolated points
         nodes = the_test.interpolated_points
 
-
         brewer = self.brewer
         brewer.setup_road_nodes(nodes)
         beamng = brewer.beamng
         waypoint_goal = BeamNGWaypoint('waypoint_goal', get_node_coords(nodes[-1]))
 
-        # TODO Make sure that maps points to the right folder !
+        # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
+            # Note This changed since BeamNG.research
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
@@ -147,6 +148,9 @@ class BeamngExecutor(AbstractTestExecutor):
         sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
 
         sim_data_collector.get_simulation_data().start()
+
+        # TODO Make brewer a context manager that automatically closes everything
+
         try:
             #start = timeit.default_timer()
             brewer.bring_up()

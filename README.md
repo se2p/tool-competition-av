@@ -34,7 +34,7 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 [Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes 
 
-[Requirements](requirements-37.txt): contains the list of the required packages.
+[Requirements](requirements.txt): contains the list of the required packages.
 
 
 ## License ##
@@ -44,4 +44,4 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 
 Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
 
-Dr. Vincenzo Riccio  - Università della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch
+Dr. Vincenzo Riccio  - Universita' della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch

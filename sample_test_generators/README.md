@@ -44,8 +44,7 @@ The following figure shows that the shape of the splines is determined by the co
 To invoke this generator please run the following code from the root of the project (activate your `venv` before):
 
 ```
-python competition.py
---time-budget 10 --executor mock --map-size 200 --module-name sample_test_generators.deepjanus_seed_generator --class-name JanusGenerator
+python competition.py --time-budget 10 --executor mock --map-size 200 --module-name sample_test_generators.deepjanus_seed_generator --class-name JanusGenerator
 ```
 
 Change `mock` to `beamng` if you wish to run it using the BeamNG simulator (this assumes you have installed it correctly).

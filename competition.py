@@ -18,7 +18,6 @@ from code_pipeline.test_generation_utils import register_exit_fun
 
 from code_pipeline.tests_evaluation import OOBAnalyzer
 
-# TODO Make this configurable?
 OUTPUT_RESULTS_TO = 'results'
 
 
