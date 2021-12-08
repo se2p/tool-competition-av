@@ -170,9 +170,9 @@ def setup_logging(log_to, debug):
 
 
 @click.command()
-@click.option('--executor', type=click.Choice(['mock', 'beamng'], case_sensitive=False), default="mock",
+@click.option('--executor', type=click.Choice(['mock', 'beamng', 'dave2'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
-              help="The name of the executor to use. Currently we have 'mock' or 'beamng'.")
+              help="The name of the executor to use. Currently we have 'mock', 'beamng' or 'dave2'.")
 @click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True),
               show_default='None',
               help="Customize BeamNG executor by specifying the home of the simulator.")
@@ -268,6 +268,13 @@ def generate(ctx, executor, beamng_home, beamng_user,
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(result_folder, time_budget, map_size,
+                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
+                                      beamng_home=beamng_home, beamng_user=beamng_user,
+                                      road_visualizer=road_visualizer)
+
+    elif executor == "dave2":
+        from code_pipeline.dave2_executor import Dave2Executor
+        the_executor = Dave2Executor(result_folder, time_budget, map_size,
                                       oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
