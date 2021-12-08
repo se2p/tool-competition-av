@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 
 from code_pipeline.validation import TestValidator
 from code_pipeline.tests_generation import TestGenerationStatistic
-
+from code_pipeline.test_analysis import compute_all_features
 from self_driving.simulation_data import SimulationDataRecord
 
 
@@ -78,6 +78,7 @@ class AbstractTestExecutor(ABC):
 
             end_execution_real_time = time.monotonic()
             self.stats.test_execution_real_times.append(end_execution_real_time - start_execution_real_time)
+
             # Check that at least one element is there
             if execution_data and len(execution_data) > 0:
                 self.stats.test_execution_simulation_times.append(execution_data[-1].timer)
@@ -86,6 +87,13 @@ class AbstractTestExecutor(ABC):
             setattr(the_test, 'execution_data', execution_data)
             setattr(the_test, 'test_outcome', test_outcome)
             setattr(the_test, 'description', description)
+
+            # Compute the features dict of this test and
+            features = compute_all_features(the_test, execution_data)
+
+            # Extend the the_test object with the features
+            setattr(the_test, 'features', features)
+
 
             # Store the generated tests into the result_folder
             self.store_test(the_test)
