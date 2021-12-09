@@ -173,8 +173,8 @@ def setup_logging(log_to, debug):
 @click.option('--executor', type=click.Choice(['mock', 'beamng', 'dave2'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
               help="The name of the executor to use. Currently we have 'mock', 'beamng' or 'dave2'.")
-@click.option('--ai-path', required=False, type=click.Path(exists=True),
-              help="Path of the AI-based driving agent.")
+@click.option('--dave2-model', required=False, type=click.Path(exists=True),
+              help="Path of the pre-trained Dave2 driving AI model (in .h5 format).")
 @click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True),
               show_default='None',
               help="Customize BeamNG executor by specifying the home of the simulator.")
@@ -216,7 +216,7 @@ def setup_logging(log_to, debug):
               show_default='Disabled',
               help="Activate debugging (results in more logging)")
 @click.pass_context
-def generate(ctx, executor, ai_path, beamng_home, beamng_user,
+def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
              time_budget, map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
              visualize_tests, log_to, debug):
@@ -279,7 +279,7 @@ def generate(ctx, executor, ai_path, beamng_home, beamng_user,
         the_executor = Dave2Executor(result_folder, time_budget, map_size,
                                       oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
-                                      road_visualizer=road_visualizer, ai_path=ai_path)
+                                      road_visualizer=road_visualizer, dave2_model=dave2_model)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))

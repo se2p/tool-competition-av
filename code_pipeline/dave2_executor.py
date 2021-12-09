@@ -25,10 +25,10 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class Dave2Executor(AbstractTestExecutor):
 
-    def __init__(self, result_folder, time_budget, map_size, ai_path,
+    def __init__(self, result_folder, time_budget, map_size, dave2_model,
                  oob_tolerance=0.95, max_speed=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
-        super(Dave2Executor, self).__init__(result_folder, time_budget, map_size, debug, ai_path)
+        super(Dave2Executor, self).__init__(result_folder, time_budget, map_size, debug, dave2_model)
 
         # TODO Is this still valid?
         self.test_time_budget = 250000
@@ -41,8 +41,7 @@ class Dave2Executor(AbstractTestExecutor):
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
-        self.model_file = ai_path
-        #"code_pipeline/self-driving-car-190-2020.h5"
+        self.model_file = dave2_model
 
         if not os.path.exists(self.model_file):
             raise Exception(f'File {self.model_file} does not exist!')
@@ -163,14 +162,12 @@ class Dave2Executor(AbstractTestExecutor):
         try:
             #start = timeit.default_timer()
             brewer.bring_up()
-            # TODO
             if not self.model:
                 self.model = load_model(self.model_file)
-            predict = NvidiaPrediction(self.model)
+            predict = NvidiaPrediction(self.model, self.maxspeed)
 
             # iterations_count = int(self.test_time_budget/250)
             # idx = 0
-            # TODO
             #brewer.vehicle.ai_set_aggression(self.risk_value)
             #brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
             #brewer.vehicle.ai_drive_in_lane(True)
