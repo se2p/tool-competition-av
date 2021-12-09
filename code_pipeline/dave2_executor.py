@@ -42,7 +42,6 @@ class Dave2Executor(AbstractTestExecutor):
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
         self.model_file = ai_path
-        #"code_pipeline/self-driving-car-190-2020.h5"
 
         if not os.path.exists(self.model_file):
             raise Exception(f'File {self.model_file} does not exist!')
