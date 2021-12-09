@@ -36,6 +36,7 @@ class VehicleStateReader:
         self.vehicle.attach_sensor('electrics', electrics)
         self.vehicle.attach_sensor('timer', timer)
 
+        #TODO
         if additional_sensors:
             for (name, sensor) in additional_sensors:
                 self.vehicle.attach_sensor(name, sensor)

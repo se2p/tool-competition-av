@@ -93,7 +93,9 @@ class BeamNGBrewer:
         self.scenario.make(self.beamng)
 
         self.beamng.set_deterministic()
+
         self.beamng.load_scenario(self.scenario)
+
         self.beamng.start_scenario()
 
         # Pause the simulator only after loading and starting the scenario
