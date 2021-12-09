@@ -134,7 +134,7 @@ Options:
                             'mock', 'beamng' or 'dave2'. [default: (Mock Executor
                             (meant for debugging))]
                             
-  --ai-path PATH            Path of the AI-based driving agent (used only when executor 
+  --dave2-model PATH        Path of the pre-trained Dave2 driving AI model, in h5 format (used only when executor 
                             is 'dave2'). 
 
   --beamng-home PATH        Customize BeamNG executor by specifying the home
