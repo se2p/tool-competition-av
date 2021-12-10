@@ -130,9 +130,12 @@ Usage (from command line):
 Usage: competition.py [OPTIONS]
 
 Options:
-  --executor [mock|beamng]  The name of the executor to use. Currently we have
-                            'mock' or 'beamng'.  [default: (Mock Executor
+  --executor [mock|beamng|dave2]  The name of the executor to use. Currently we have
+                            'mock', 'beamng' or 'dave2'. [default: (Mock Executor
                             (meant for debugging))]
+                            
+  --dave2-model PATH        Path of the pre-trained Dave2 driving AI model, in h5 format (used only when executor 
+                            is 'dave2'). 
 
   --beamng-home PATH        Customize BeamNG executor by specifying the home
                             of the simulator.
