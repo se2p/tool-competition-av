@@ -21,6 +21,31 @@ from code_pipeline.tests_evaluation import OOBAnalyzer
 OUTPUT_RESULTS_TO = 'results'
 
 
+def command_required_option_if_another_option_takes_value(parameter_map):
+
+    class CommandOptionRequiredClass(click.Command):
+
+        def invoke(self, ctx):
+            for requiring_tuple, required_parameters in parameter_map.items():
+                if requiring_tuple[0] in ctx.params and ctx.params[requiring_tuple[0]] == requiring_tuple[1]:
+                    # All the required parameters must be declared
+                    for required_parameter in required_parameters:
+                        if ctx.params[required_parameter] is None:
+                            # Retrieve the name users use to set this option
+                            option_name = None
+                            for param in self.params:
+                                if param.name == required_parameter:
+                                    option_name = param.opts[0]
+                            # Show the error message
+                            raise click.ClickException(f"If {requiring_tuple[0]} is set to {requiring_tuple[1]}"
+                                                       f" the option {option_name} must be specified")
+
+
+            super(CommandOptionRequiredClass, self).invoke(ctx)
+
+    return CommandOptionRequiredClass
+
+
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -31,7 +56,7 @@ def validate_speed_limit(ctx, param, value):
     car-not-moving oracle
     """
     if int(value) < 10:
-        raise click.UsageError(
+        raise click.BadParameter(
             'The provided value for ' + str(param) + ' is invalid. Choose a value greater than 10')
     else:
         return int(value)
@@ -42,7 +67,7 @@ def validate_oob_tolerance(ctx, param, value):
     OOB tolerance must be a value between 0.0 and 1.0
     """
     if value < 0.0 or value > 1.0:
-        raise click.UsageError(
+        raise click.BadParameter(
             'The provided value for ' + str(param) + ' is invalid. Choose a value between 0.0 and 1.0')
     else:
         return value
@@ -53,7 +78,8 @@ def validate_map_size(ctx, param, value):
     The size of the map is defined by its edge. The edge can be any (integer) value between 100 and 1000
     """
     if int(value) < 100 or int(value) > 1000:
-        raise click.UsageError('The provided value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
+        raise click.BadParameter(
+            'The provided value for ' + str(param) + ' is invalid. Choose an integer between 100 and 1000')
     else:
         return int(value)
 
@@ -63,7 +89,7 @@ def validate_time_budget(ctx, param, value):
     A valid time budget is a positive integer of 'seconds'
     """
     if int(value) < 1:
-        raise click.UsageError('The provided value for ' + str(param) + ' is invalid. Choose any positive integer')
+        raise click.BadParameter('The provided value for ' + str(param) + ' is invalid. Choose any positive integer')
     else:
         return int(value)
 
@@ -91,7 +117,7 @@ def create_summary(result_folder, raw_data):
         summary_file = os.path.join(result_folder, "generation_stats.csv")
         csv_content = raw_data.as_csv()
         with open(summary_file, 'w') as output_file:
-            output_file.write( csv_content)
+            output_file.write(csv_content)
         log.info("Test Statistics Report available: %s", summary_file)
 
     log.info("Creating OOB Report")
@@ -119,9 +145,6 @@ def post_process(ctx, result_folder, the_executor):
     create_summary(result_folder, the_executor.get_stats())
 
 
-
-
-
 def create_post_processing_hook(ctx, result_folder, executor):
     """
         Uses HighOrder functions to setup the post processing hooks that will be trigger ONLY AND ONLY IF the
@@ -142,7 +165,6 @@ def create_post_processing_hook(ctx, result_folder, executor):
 
 
 def setup_logging(log_to, debug):
-
     def log_exception(extype, value, trace):
         log.exception('Uncaught exception:', exc_info=(extype, value, trace))
 
@@ -156,7 +178,7 @@ def setup_logging(log_to, debug):
 
     if log_to is not None:
         file_handler = log.FileHandler(log_to, 'a', 'utf-8')
-        log_handlers.append( file_handler )
+        log_handlers.append(file_handler)
         start_msg += " ".join(["writing to file: ", str(log_to)])
 
     log_level = log.DEBUG if debug else log.INFO
@@ -167,19 +189,18 @@ def setup_logging(log_to, debug):
 
     log.info(start_msg)
 
-
-
-@click.command()
+# Pay attention that here we use the names of Python parameters, so we use dave2_model instead of dave2-model
+@click.command(cls=command_required_option_if_another_option_takes_value({('executor', 'dave2'): ['dave2_model']}))
 @click.option('--executor', type=click.Choice(['mock', 'beamng', 'dave2'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
               help="The name of the executor to use. Currently we have 'mock', 'beamng' or 'dave2'.")
 @click.option('--dave2-model', required=False, type=click.Path(exists=True),
-              help="Path of the pre-trained Dave2 driving AI model (in .h5 format).")
+              help="Path of the pre-trained Dave2 driving AI model (in .h5 format). Mandatory if the executor is dave2")
 @click.option('--beamng-home', required=False, default=None, type=click.Path(exists=True),
               show_default='None',
               help="Customize BeamNG executor by specifying the home of the simulator.")
 @click.option('--beamng-user', required=False, default=None, type=click.Path(exists=True),
-              show_default='Currently Active User (~/BeamNG.research/)',
+              show_default='Currently Active User (~/BeamNG.tech/)',
               help="Customize BeamNG executor by specifying the location of the folder "
                    "where levels, props, and other BeamNG-related data will be copied."
                    "** Use this to avoid spaces in URL/PATHS! **")
@@ -197,7 +218,7 @@ def setup_logging(log_to, debug):
 @click.option('--speed-limit', type=int, default=70, callback=validate_speed_limit,
               show_default='70 Km/h',
               help="The max speed of the ego-vehicle"
-              "Expressed in Kilometers per hours")
+                   "Expressed in Kilometers per hours")
 @click.option('--module-name', required=True, type=str,
               help="Name of the module where your test generator is located.")
 @click.option('--module-path', required=False, type=click.Path(exists=True),
@@ -226,7 +247,6 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
 
     # TODO Refactor by adding a create summary command and forwarding the output of this run to that command
 
-
     # Setup logging
     setup_logging(log_to, debug)
 
@@ -250,8 +270,9 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     # Create the unique folder that will host the results of this execution using the test generator data and
     # a timestamp as id
     # TODO Allow to specify a location for this folder and the run id
-    timestamp_id = time.time()*100000000 // 1000000
-    result_folder = os.path.join(default_output_folder, "_".join([str(module_name), str(class_name), str(timestamp_id)]))
+    timestamp_id = time.time() * 100000000 // 1000000
+    result_folder = os.path.join(default_output_folder,
+                                 "_".join([str(module_name), str(class_name), str(timestamp_id)]))
 
     try:
         os.makedirs(result_folder)
@@ -277,9 +298,9 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     elif executor == "dave2":
         from code_pipeline.dave2_executor import Dave2Executor
         the_executor = Dave2Executor(result_folder, time_budget, map_size,
-                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
-                                      beamng_home=beamng_home, beamng_user=beamng_user,
-                                      road_visualizer=road_visualizer, dave2_model=dave2_model)
+                                     oob_tolerance=oob_tolerance, max_speed=speed_limit,
+                                     beamng_home=beamng_home, beamng_user=beamng_user,
+                                     road_visualizer=road_visualizer, dave2_model=dave2_model)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))
