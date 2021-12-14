@@ -34,17 +34,17 @@ class BeamNGBrewer:
     def __init__(self, beamng_home=None, beamng_user=None, reuse_beamng=True, road_nodes: List4DTuple = None):
         self.reuse_beamng = reuse_beamng
         if self.reuse_beamng:
-            # This represents the running BeamNG simulator
-            # TODO If I recall right this might automatically shut down when the main python process exits
+            # This represents the running BeamNG simulator. Since we use launch=True this should automatically
+            # shut down when the main python process exits or when we call self.beamng_process.stop()
             self.beamng_process = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
             self.beamng_process = self.beamng_process.open(launch=True)
 
         # This is used to bring up each simulation without restarting the simulator
         self.beamng = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
 
-        # TODO Why do we need to wait until this point? otherwise the loggers will be reconfigures?
+        # We need to wait until this point otherwise the BeamNG loggers's level will be (re)configured by BeamNGpy
         log.info("Disabling BEAMNG logs")
-        for id in ["beamngpy.BeamNGpy", "beamngpy.beamng", "beamngpy.Scenario", "beamngpy.Vehicle"]:
+        for id in ["beamngpy", "beamngpy.beamngpycommon", "beamngpy.BeamNGpy", "beamngpy.beamng", "beamngpy.Scenario", "beamngpy.Vehicle"]:
             logger = log.getLogger(id)
             logger.setLevel(log.CRITICAL)
             logger.disabled = True
