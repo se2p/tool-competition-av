@@ -44,11 +44,10 @@ class BeamNGBrewer:
 
         # TODO Why do we need to wait until this point? otherwise the loggers will be reconfigures?
         log.info("Disabling BEAMNG logs")
-        LOGGER_ID = "beamngpy"
-        bngpy_logger = log.getLogger(LOGGER_ID)
-        module_logger = log.getLogger(f'{LOGGER_ID}.beamngpycommon')
-        bngpy_logger.disabled
-        module_logger.disabled
+        for id in ["beamngpy.BeamNGpy", "beamngpy.beamng", "beamngpy.Scenario", "beamngpy.Vehicle"]:
+            logger = log.getLogger(id)
+            logger.setLevel(log.CRITICAL)
+            logger.disabled = True
 
         self.vehicle: Vehicle = None
         self.camera: BeamNGCamera = None
