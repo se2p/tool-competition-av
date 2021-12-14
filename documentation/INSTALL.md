@@ -34,7 +34,7 @@ Please copy the `tech.key` file that you received after registering inside the `
 
 ### Python ###
 
-This code has been tested with **Python 3.7**. 
+This code requires **Python 3.7**.
 
 ### Other Libraries ###
 
