@@ -102,7 +102,7 @@ pip install /path/to/shapely/file
 * Storage: 20 GB available space
 * Additional Notes: Recommended spec based on 1080p resolution. Installing game mods will increase required storage space. Gamepad recommended.
 
->**Note**: BeamNG.research can run also on Mac Book provided you boot them on Windows or use a system virtualization
+>**Note**: BeamNG.tech can run also on Mac Book provided you boot them on Windows or use a system virtualization
 >software like Parallel Desktop. In the past, others managed to run the pipeline on the Amazon Cloud using an appropriate 
 >AMI.
  
