@@ -224,7 +224,7 @@ def setup_logging(log_to, debug):
 @click.option('--module-path', required=False, type=click.Path(exists=True),
               help="Path of the module where your test generator is located.")
 @click.option('--class-name', required=True, type=str,
-              help="Name of the (main) class implementing your test generator.")
+              help="Name of the class implementing your test generator.")
 # Visual Debugging
 @click.option('--visualize-tests', required=False, is_flag=True, default=False,
               show_default='Disabled',
@@ -241,8 +241,7 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
              time_budget, map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
              visualize_tests, log_to, debug):
-    # ensure that ctx.obj exists and is a dict (in case `cli()` is called
-    # by means other than the `if` block below)
+
     ctx.ensure_object(dict)
 
     # TODO Refactor by adding a create summary command and forwarding the output of this run to that command
@@ -251,7 +250,12 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     setup_logging(log_to, debug)
 
     # Setup test generator by dynamically loading it
-    module = importlib.import_module(module_name, module_path)
+    if module_path:
+        log.info(f"Loading module from {module_path}")
+        sys.path.append(module_path)
+        
+    log.info(f"Try to import {class_name} from {module_name}")
+    module = importlib.import_module(module_name)
     the_class = getattr(module, class_name)
 
     road_visualizer = None
