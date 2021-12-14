@@ -291,7 +291,7 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(result_folder, time_budget, map_size,
-                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
+                                      oob_tolerance=oob_tolerance, max_speed_in_kmh=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
 

@@ -23,7 +23,7 @@ FloatDTuple = Tuple[float, float, float, float]
 class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, time_budget, map_size,
-                 oob_tolerance=0.95, max_speed=70,
+                 oob_tolerance=0.95, max_speed_in_kmh=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size, debug)
 
@@ -35,7 +35,7 @@ class BeamngExecutor(AbstractTestExecutor):
         self.risk_value = 0.7
 
         self.oob_tolerance = oob_tolerance
-        self.maxspeed = max_speed
+        self.max_speed_in_ms = max_speed_in_kmh * 0.277778
 
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
@@ -158,8 +158,8 @@ class BeamngExecutor(AbstractTestExecutor):
             # idx = 0
 
             brewer.vehicle.ai_set_aggression(self.risk_value)
-            # TODO This does not seem to take any effect...
-            brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
+            #  Sets the target speed for the AI in m/s, limit means this is the maximum value (not the reference one)
+            brewer.vehicle.ai_set_speed(self.max_speed_in_ms, mode='limit')
             brewer.vehicle.ai_drive_in_lane(True)
             brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
 
