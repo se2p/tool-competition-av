@@ -19,26 +19,71 @@ from code_pipeline.test_generation_utils import register_exit_fun
 from code_pipeline.tests_evaluation import OOBAnalyzer
 
 OUTPUT_RESULTS_TO = 'results'
+# Sentinel values
+ANY = object()
+ANY_NOT_NONE = object()
+DEFAULT = object()
 
-
-def command_required_option_if_another_option_takes_value(parameter_map):
+# Probably this could be simplified with HO functions?
+def check_command_with_complex_conditions(
+        check_option_is_defined_when_another_is_defined = {},
+        at_least_one_must_be_defined = [],
+        mutually_exclusive = []
+):
 
     class CommandOptionRequiredClass(click.Command):
 
+        def _get_real_names(self, parameter_list):
+            # Retrieve the name users use to set this option
+            parameter_list_names = []
+            for param_object in parameter_list:
+                option_name = None
+                for param in self.params:
+                    if param.name == param_object:
+                        option_name = param.opts[0]
+                        break
+                parameter_list_names.append(option_name)
+            return parameter_list_names
+
+        def _is_option_defined(self, ctx, option):
+            return option in ctx.params and ctx.params[option] is not None
+
         def invoke(self, ctx):
-            for requiring_tuple, required_parameters in parameter_map.items():
-                if requiring_tuple[0] in ctx.params and ctx.params[requiring_tuple[0]] == requiring_tuple[1]:
-                    # All the required parameters must be declared
-                    for required_parameter in required_parameters:
-                        if ctx.params[required_parameter] is None:
-                            # Retrieve the name users use to set this option
-                            option_name = None
-                            for param in self.params:
-                                if param.name == required_parameter:
-                                    option_name = param.opts[0]
-                            # Show the error message
-                            raise click.ClickException(f"If {requiring_tuple[0]} is set to {requiring_tuple[1]}"
-                                                       f" the option {option_name} must be specified")
+            # cannot_be_defined_at_the_same_time
+            for option1, option2 in mutually_exclusive:
+                a = self._is_option_defined(ctx, option1)
+                b = self._is_option_defined(ctx, option2)
+                # They cannot be active at the same time
+                if a and b:
+                    # Show the error message
+                    raise click.ClickException(
+                        f"Only one of those options must be defined {self._get_real_names([option1, option2])}")
+
+            # at_least_one_must_be_defined
+            for list_of_options in at_least_one_must_be_defined:
+                at_least_one_defined = False
+                for option in list_of_options:
+                    if option in ctx.params and ctx.params[option] is not None:
+                        at_least_one_defined = True
+                if not at_least_one_defined:
+                    # Show the error message
+                    raise click.ClickException(f"At least one of those options must be defined {self._get_real_names(list_of_options)}")
+
+            # check_option_is_defined_when_another_is_defined
+            for requiring_tuple, required_parameters in check_option_is_defined_when_another_is_defined.items():
+                # Check if the requiring parameter is set
+                if requiring_tuple[0] in ctx.params:
+                    # Check if the value of the requiring parameter is the expected one
+                    if requiring_tuple[0] == str(ANY) or (ctx.params[requiring_tuple[0]] is not None and requiring_tuple[0] == str(ANY_NOT_NONE)) or ctx.params[requiring_tuple[0]] == requiring_tuple[1]:
+                        # In this case, all the required parameters must be declared. Note we do not check their value.
+                        # Note each parameter is validated by a callback, so at this point we assume that if their value
+                        #   is given, it is correct
+                        for required_parameter in required_parameters:
+                            if ctx.params[required_parameter] is None:
+                                option_name = self._get_real_names([required_parameter])[0]
+                                # Show the error message
+                                raise click.ClickException(f"If {requiring_tuple[0]} is set to {requiring_tuple[1]}"
+                                                           f" the option {option_name} must be specified")
 
 
             super(CommandOptionRequiredClass, self).invoke(ctx)
@@ -84,14 +129,16 @@ def validate_map_size(ctx, param, value):
         return int(value)
 
 
-def validate_time_budget(ctx, param, value):
+def validate_optional_time_budget(ctx, param, value):
     """
-    A valid time budget is a positive integer of 'seconds'
+    A valid time budget is a positive integer of 'seconds' or it should not be set, i.e., set to str(DEFAULT).
+    Note we need str(DEFAULT) because click works only with strings
     """
-    if int(value) < 1:
+    if value != str(DEFAULT) and int(value) < 1:
         raise click.BadParameter('The provided value for ' + str(param) + ' is invalid. Choose any positive integer')
-    else:
-        return int(value)
+
+    # Transform the default value to None after checking the condition
+    return int(value) if value != str(DEFAULT) else None
 
 
 def create_experiment_description(result_folder, params_dict):
@@ -190,7 +237,21 @@ def setup_logging(log_to, debug):
     log.info(start_msg)
 
 # Pay attention that here we use the names of Python parameters, so we use dave2_model instead of dave2-model
-@click.command(cls=command_required_option_if_another_option_takes_value({('executor', 'dave2'): ['dave2_model']}))
+@click.command(cls=check_command_with_complex_conditions(
+    # Conditionally check one option if others are set
+    check_option_is_defined_when_another_is_defined = {
+        # If executor is dave2 then the dave2_model becomes mandatory
+        ('executor', 'dave2'): ['dave2_model'],
+        # If generation_budget is given then the execution_budget must be given as well
+        ('generation_budget', ANY_NOT_NONE ): ['execution_budget'],
+        # If execution_budget is given then the generation_budget must be given as well
+        ('execution_budget', ANY_NOT_NONE ): ['generation_budget'],
+    },
+    # Conditionally check that at least one option among the defined is set
+    at_least_one_must_be_defined = [ ['time_budget', 'generation_budget', 'execution_budget'] ],
+    mutually_exclusive = [('time_budget', 'generation_budget'), ('time_budget', 'execution_budget')]
+
+))
 @click.option('--executor', type=click.Choice(['mock', 'beamng', 'dave2'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
               help="The name of the executor to use. Currently we have 'mock', 'beamng' or 'dave2'.")
@@ -204,9 +265,16 @@ def setup_logging(log_to, debug):
               help="Customize BeamNG executor by specifying the location of the folder "
                    "where levels, props, and other BeamNG-related data will be copied."
                    "** Use this to avoid spaces in URL/PATHS! **")
-@click.option('--time-budget', required=True, type=int, callback=validate_time_budget,
+# Budgeting options
+@click.option('--generation-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
+              help="Time budget for the test generation. Expressed in 'real-time' seconds.")
+@click.option('--execution-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
+              help="Time budget for the test execution. Expressed in 'simulated-time' seconds.")
+@click.option('--time-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
               help="Overall budget for the generation and execution. Expressed in 'real-time'"
-                   "seconds.")
+                   "seconds. This option is here to be back-ward compatible and will take "
+                   "precedence over generation-budget and execution-budget")
+
 @click.option('--map-size', type=int, default=200, callback=validate_map_size,
               show_default='200m, which leads to a 200x200m^2 squared map',
               help="The lenght of the size of the squared map where the road must fit."
@@ -238,7 +306,8 @@ def setup_logging(log_to, debug):
               help="Activate debugging (results in more logging)")
 @click.pass_context
 def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
-             time_budget, map_size, oob_tolerance, speed_limit,
+             generation_budget, execution_budget, time_budget,
+             map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
              visualize_tests, log_to, debug):
 
