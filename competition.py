@@ -359,28 +359,35 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     # Setup executor. All the executor must output the execution data into the result_folder
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
-        the_executor = MockExecutor(result_folder, time_budget, map_size,
+        the_executor = MockExecutor(result_folder, map_size,
+                                    generation_budget=generation_budget, execution_budget=execution_budget,
+                                    time_budget=time_budget,
                                     road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
-        the_executor = BeamngExecutor(result_folder, time_budget, map_size,
+        the_executor = BeamngExecutor(result_folder, map_size,
+                                      generation_budget=generation_budget, execution_budget=execution_budget,
+                                      time_budget=time_budget,
                                       oob_tolerance=oob_tolerance, max_speed_in_kmh=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
 
+    #     def __init__(self, result_folder, map_size, dave2_model,
     elif executor == "dave2":
         from code_pipeline.dave2_executor import Dave2Executor
-        the_executor = Dave2Executor(result_folder, time_budget, map_size,
+        the_executor = Dave2Executor(result_folder, map_size, dave2_model,
+                                     generation_budget=generation_budget, execution_budget=execution_budget,
+                                     time_budget=time_budget,
                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                      beamng_home=beamng_home, beamng_user=beamng_user,
-                                     road_visualizer=road_visualizer, dave2_model=dave2_model)
+                                     road_visualizer=road_visualizer)
 
     # Register the shutdown hook for post processing results
     register_exit_fun(create_post_processing_hook(ctx, result_folder, the_executor))
 
     try:
         # Instantiate the test generator
-        test_generator = the_class(time_budget=time_budget, executor=the_executor, map_size=map_size)
+        test_generator = the_class(executor=the_executor, map_size=map_size)
         # Start the generation
         test_generator.start()
     except Exception:

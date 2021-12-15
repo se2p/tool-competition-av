@@ -451,23 +451,43 @@ class OOBAnalyzer:
             for sample_file in sorted(
                     [os.path.join(subdir, f) for f in files if f.startswith("test.") and f.endswith(".json")]):
 
-                self.logger.debug("Processing test file %s", sample_file)
+                try:
+                    self.logger.debug("Processing test file %s", sample_file)
 
-                test_id, is_valid, test_outcome, road_data, execution_data = self._load_test_data(sample_file)
+                    test_id, is_valid, test_outcome, road_data, execution_data = self._load_test_data(sample_file)
 
 
-                # If the test is not valid or passed we skip it the analysis
-                if not is_valid or not test_outcome == "FAIL":
-                    self.logger.debug("\t Test is invalid")
+                    # If the test is not valid or passed we skip it the analysis
+                    if not is_valid or not test_outcome == "FAIL":
+                        self.logger.debug("\t Test is invalid")
 
-                    continue
+                        continue
 
-                # Extract data about OOB, if any
-                oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
-                    road_data, execution_data)
+                    # Extract data about OOB, if any
+                    oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
+                        road_data, execution_data)
 
-                # A test might fail also without OOB
-                if oob_pos is None:
+                    # A test might fail also without OOB
+                    if oob_pos is None:
+                        continue
+                except:
+                    # Using logger.exception generates logs that are a bit worrysome
+                    self.logger.warning(f"Failed to process OOB for test {sample_file}")
+                    oobs.append(
+                        {
+                            'test id': test_id,
+                            'simulation file': sample_file,
+                            # Point
+                            'oob point': None,
+                            # LEFT/RIGHT
+                            'oob side': None,
+                            # LineStrings representing the center of the road, interpolated points
+                            'road segment before oob': None,
+                            'road segment after oob': None,
+                            # This is the list of points, so we need to extract from LineString objects
+                            'interesting segment': []
+                        }
+                    )
                     continue
 
                 oobs.append(

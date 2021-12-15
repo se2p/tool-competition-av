@@ -86,6 +86,7 @@ def register_exit_fun(fun=None, signals=[signal.SIGTERM],
             if signum == signal.SIGINT:
                 raise KeyboardInterrupt
             # XXX - should we do the same for SIGTERM / SystemExit?
+            print("DEBUG calling sys.exit with ", signum)
             sys.exit(signum)
 
     def register_fun(fun, signals):

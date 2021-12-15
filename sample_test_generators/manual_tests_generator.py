@@ -11,8 +11,7 @@ class ManualTestsGenerator():
         road points. We assume a map of 200x200
     """
 
-    def __init__(self, time_budget=None, executor=None, map_size=None):
-        self.time_budget = time_budget
+    def __init__(self, executor=None, map_size=None):
         self.executor = executor
         self.map_size = map_size
 
@@ -145,7 +144,6 @@ class ManualTestsGenerator():
         # Test 1 and test 2 are the same test, we need them to check if distance is computed correctly
         test_1 = self._generate_test_1()
         test_2 = self._generate_test_2()
-
         test_3 = self._generate_test_3()
 
         self._execute(test_1)
