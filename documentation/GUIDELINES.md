@@ -185,9 +185,17 @@ Options:
 
 > NOTE: We introduced the `--beamng-user` option because currently BeamNGpy does not support folders/paths containing "spaces" (see [this issue](https://github.com/BeamNG/BeamNGpy/issues/95)]. By specifying this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
 
-## Example
+## Examples
 
-As an example, you can use the mock to "pretend to" execute the `one-test-generator.py` as shown below. We suggest you to activate a virtual environment. `cd` to the root of this repository and run the following command after replacing `<BEAMNG_HOME>` and `<BEAMNG_USER>` accordingly:
+The following sections exemplifies how to use the code_pipeline with sample generators and custom generators.
+
+### Use the sample test generators
+
+As an example, you can use the `mock` executor to "pretend to" execute the `one-test-generator.py`, or you can use `beamng` executor as shown below. 
+
+In any case, we **strongly** suggest you to activate a virtual environment (see [installation instructions](./INSTALL.md)). 
+
+`cd` to the root of this repository and run the following command after replacing `<BEAMNG_HOME>` and `<BEAMNG_USER>` accordingly:
 
 ``` 
 py.exe competition.py \
@@ -197,4 +205,57 @@ py.exe competition.py \
         --map-size 200 \
         --module-name sample_test_generators.one_test_generator \
         --class-name OneTestGenerator
+```
+
+Similarly, you can run the `RandomTestGenerator` from the `random_generator` module or the `JanusGenerator` from the `deepjanus_seed_generator` module by updating the above command with the following options:
+
+```
+        --module-name sample_test_generators.random_generator \
+        --class-name RandomTestGenerator
+```
+or 
+
+```
+        --module-name sample_test_generators.deepjanus_seed_generator \
+        --class-name JanusGenerator
+```
+
+### Use the public test generators submitted to previous SBST competitions
+
+To exemplify how one can use a custom generator, we imported existing test generators that have been submitted to past editions of the competition as git submodules (read more about this [here](https://git-scm.com/book/it/v2/Git-Tools-Submodules)).
+
+> Note: we included only **publicly available** generators
+
+To use them, first initialize and update their submodules:
+
+```
+git submodule init
+git submodule update
+```
+
+Then you can invoke by specifying their location (`--module-path`), module fully qualified name (`--module-name`), and class name (`--class-name`).
+
+For instance, you can run [Frenetic](https://ieeexplore.ieee.org/document/9476234) by
+Ezequiel Castellano, Ahmet Cetinkaya, Cédric Ho Thanh, Stefan Klikovits, Xiaoyi Zhang, and Paolo Arcaini as follows:
+``` 
+py.exe competition.py \
+        --time-budget 60 \
+        --executor beamng \
+        --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
+        --map-size 200 \
+        --module-path frenetic-sbst2021 \
+        --module-name src.generators.random_frenet_generator \
+        --class-name Frenetic
+```
+Likewise, you can run [SWAT](https://ieeexplore.ieee.org/document/9476167) by Dmytro Humeniuk, Giuliano Antoniol, and Foutse Khomh as follows:
+
+``` 
+py.exe competition.py \
+        --time-budget 60 \
+        --executor beamng \
+        --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
+        --map-size 200 \
+        --module-path swat-sbst21 \
+        --module-name swat_gen.swat_generator \
+        --class-name SwatTestGenerator
 ```
