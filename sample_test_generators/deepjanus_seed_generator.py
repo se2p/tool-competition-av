@@ -209,8 +209,7 @@ class RoadGenerator:
 
 
 class JanusGenerator():
-    def __init__(self, time_budget=None, executor=None, map_size=None):
-        self.time_budget = time_budget
+    def __init__(self, executor=None, map_size=None):
         self.executor = executor
         self.map_size = map_size
 
@@ -226,7 +225,9 @@ class JanusGenerator():
         test_outcome = None
         count = 0
 
-        while(test_outcome != "FAIL"):
+        # while(test_outcome != "FAIL"):
+        while not self.executor.is_over():
+
             road_points = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
                                  num_spline_nodes=NUM_SPLINE_NODES).generate()
 

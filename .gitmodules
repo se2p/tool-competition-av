@@ -1,6 +1,6 @@
 [submodule "frenetic-sbst21"]
 	path = frenetic-sbst2021
-	url = git@github.com:ERATOMMSD/frenetic-sbst21.git
+	url = git@github.com:se2p/frenetic-sbst21.git
 [submodule "swat-sbst2021"]
 	path = swat-sbst2021
-	url = git@github.com:dgumenyuk/tool-competition-av.git
+	url = git@github.com:alessiogambi/swat-sbst2021.git

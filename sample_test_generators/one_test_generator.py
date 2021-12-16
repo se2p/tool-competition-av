@@ -12,8 +12,7 @@ class OneTestGenerator():
         road points. We assume a map of 200x200
     """
 
-    def __init__(self, time_budget=None, executor=None, map_size=None):
-        self.time_budget = time_budget
+    def __init__(self, executor=None, map_size=None):
         self.executor = executor
         self.map_size = map_size
 

@@ -22,13 +22,16 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class BeamngExecutor(AbstractTestExecutor):
 
-    def __init__(self, result_folder, time_budget, map_size,
+    def __init__(self, result_folder, map_size,
+                 generation_budget=None, execution_budget=None, time_budget=None,
                  oob_tolerance=0.95, max_speed_in_kmh=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
-        super(BeamngExecutor, self).__init__(result_folder, time_budget, map_size, debug)
+        super(BeamngExecutor, self).__init__(result_folder, map_size,
+                                             generation_budget=generation_budget, execution_budget=execution_budget,
+                                             time_budget=time_budget, debug=debug)
 
         # TODO Is this still valid?
-        self.test_time_budget = 250000
+        # self.test_time_budget = 250000
 
 
         # TODO This is specific to the TestSubject, we should encapsulate this better
@@ -183,7 +186,7 @@ class BeamngExecutor(AbstractTestExecutor):
             #end = timeit.default_timer()
             #run_elapsed_time = end-start
             #run_elapsed_time = float(last_state.timer)
-            self.total_elapsed_time = self.get_elapsed_time()
+            # self.total_elapsed_time = self.get_elapsed_time()
         except AssertionError as aex:
             sim_data_collector.save()
             # An assertion that trigger is still a successful test execution, otherwise it will count as ERROR

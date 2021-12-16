@@ -189,7 +189,7 @@ Options:
 
 The following sections exemplifies how to use the code_pipeline with sample generators and custom generators.
 
-### Use the sample test generators
+### Using the sample test generators
 
 As an example, you can use the `mock` executor to "pretend to" execute the `one-test-generator.py`, or you can use `beamng` executor as shown below. 
 
@@ -220,23 +220,24 @@ or
         --class-name JanusGenerator
 ```
 
-### Use the public test generators submitted to previous SBST competitions
+### Using the public test generators submitted to previous SBST competitions
 
 To exemplify how one can use a custom generator, we imported existing test generators that have been submitted to past editions of the competition as git submodules (read more about this [here](https://git-scm.com/book/it/v2/Git-Tools-Submodules)).
 
-> Note: we included only **publicly available** generators
+> Note: we included only **publicly available** generators but forked the original repositories to port the test generators to the updated code_pipeline API
 
-To use them, first initialize and update their submodules:
+To use the custom generators, first initialize and update their submodules:
 
 ```
 git submodule init
 git submodule update
 ```
 
-Then you can invoke by specifying their location (`--module-path`), module fully qualified name (`--module-name`), and class name (`--class-name`).
+Then you can invoke them by specifying their location (`--module-path`), module's fully qualified name (`--module-name`), and test generator main class's name (`--class-name`).
 
 For instance, you can run [Frenetic](https://ieeexplore.ieee.org/document/9476234) by
 Ezequiel Castellano, Ahmet Cetinkaya, Cédric Ho Thanh, Stefan Klikovits, Xiaoyi Zhang, and Paolo Arcaini as follows:
+
 ``` 
 py.exe competition.py \
         --time-budget 60 \
@@ -247,6 +248,7 @@ py.exe competition.py \
         --module-name src.generators.random_frenet_generator \
         --class-name Frenetic
 ```
+
 Likewise, you can run [SWAT](https://ieeexplore.ieee.org/document/9476167) by Dmytro Humeniuk, Giuliano Antoniol, and Foutse Khomh as follows:
 
 ``` 
