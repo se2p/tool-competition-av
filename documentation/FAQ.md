@@ -50,3 +50,6 @@ Note: do not worry if you see a message like this:
 W tensorflow/stream_executor/platform/default/dso_loader.cc:60] Could not load dynamic library 'cudart64_110.dll'; dlerror: cudart64_110.dll not found
 I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 ```
+### 4. BeamNG starts but the pipeline cannot load the level/map
+
+We noticed that setting the `beamng-user` and `beamng-home` options to point to the same folder the simulators starts but the pipeline fails. Despite this setting worked in the past, we suggest you use different folders to host the simulator (`beamng-home`) and the user data (`beamng-user`).
