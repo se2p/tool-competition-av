@@ -50,7 +50,7 @@ class BaseFrenetGenerator(BaseGenerator):
         """
         min_xs = min(xs)
         min_ys = min(ys)
-        road_width = self.margin  # TODO: How to get the exact road width?
+        road_width = 4 # According to the doc
         if (max(xs) - min_xs + road_width > self.map_size - self.margin) \
                 or (max(ys) - min_ys + road_width > self.map_size - self.margin):
             log.info("Skip: Road won't fit")
