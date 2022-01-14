@@ -1,4 +1,24 @@
-# Cyber-Physical Systems Testing Competition #
+# Adapted-Frenetic at CPS Testing Competition #
+
+This is a fork of [sbst-tool-competition-av](https://github.com/se2p/tool-competition-av) to develop our algorithms, which are inside folder src.
+
+This tool is an optimized version of [Frenetic](https://github.com/ERATOMMSD/frenetic-sbst21) which was desigened by ERATO-Team.
+
+An example of config is as below:
+
+```shell
+python competition.py ^
+        --time-budget 7200 ^
+        --executor beamng ^
+        --beamng-home "E:\BeamNG.drive-0.24.0.2.13392" --beamng-user "E:\BeamNG.drive-0.24.0.2.13392_user" ^
+        --map-size 200 ^
+        --module-path src ^
+        --module-name generators.adaptive_random_frenet_generator ^
+        --class-name AdaFrenetic ^
+        --speed-limit 70 ^
+        --oob-tolerance 0.85
+```
+# Adapted-Frenetic at Cyber-Physical Systems Testing Competition #
 
 The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
 
