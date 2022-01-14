@@ -270,7 +270,7 @@ class CustomFrenetGenerator(BaseFrenetGenerator):
         return kappas
 
 
-class Frenetic(CustomFrenetGenerator):
+class AdaFrenetic(CustomFrenetGenerator):
     def __init__(self, time_budget=None, executor=None, map_size=None):
         super().__init__(executor=executor, map_size=map_size,
                          kill_ancestors=0, strict_father=False, random_budget=3600,
