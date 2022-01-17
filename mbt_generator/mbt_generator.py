@@ -50,7 +50,7 @@ class MBTGenerator():
     def start(self):
         cnt_tests=0
         cnt_invalid=0
-        total_budget = 10000  # get from the execution environment
+        total_budget = 100  # get from the execution environment
         startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
         from eu.fbk.iv4xr.mbt import SBSTMain
         mbt = SBSTMain(int(total_budget * 0.1), 'sbst2022.nine_states')
@@ -163,13 +163,13 @@ class MBTGenerator():
                 return 0 < min_x or min_x > self.map_size and \
                        0 < max_x or max_x > self.map_size and \
                        0 < min_y or min_y > self.map_size and \
-                       0 < max_y or max_y > self.map_size
+                       0 < max_y or max_y > self.map_size and the_test.get_road_length() > 20
 
             # return RoadPolygon.from_nodes(_interpolate(road_points)).is_valid()
             return road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon) \
                    or not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid() \
                    or not is_inside_map(_interpolate(road_points)) \
-                   or is_too_sharp(_interpolate(road_points)) or the_test.get_road_length() <= 20
+                   or is_too_sharp(_interpolate(road_points))
         while not self.executor.is_over() and mbt.hasMoreTests():
             # Some debugging
 
