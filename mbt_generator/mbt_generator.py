@@ -48,7 +48,9 @@ class MBTGenerator():
         self.map_size = map_size
 
     def start(self):
-        total_budget = 1000  # get from the execution environment
+        cnt_tests=0
+        cnt_invalid=0
+        total_budget = 10000  # get from the execution environment
         startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
         from eu.fbk.iv4xr.mbt import SBSTMain
         mbt = SBSTMain(int(total_budget * 0.1), 'sbst2022.nine_states')
@@ -167,13 +169,17 @@ class MBTGenerator():
             return road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon) \
                    or not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid() \
                    or not is_inside_map(_interpolate(road_points)) \
-                   or is_too_sharp(_interpolate(road_points))
+                   or is_too_sharp(_interpolate(road_points)) or the_test.get_road_length() <= 20
         while not self.executor.is_over() and mbt.hasMoreTests():
             # Some debugging
+
             log.info(f"Starting test generation. Remaining time {self.executor.get_remaining_time()}")
             # Load the points from the csv file. They will be interpolated anyway to generate the road
             raw_mbt_points = mbt.getNextTest()  # read_points_from_csv(test_files[count])
-            if check(raw_mbt_points): continue
+            cnt_tests+=1
+            if check(raw_mbt_points):
+                cnt_invalid+=1
+                continue
 
             road_points = []
             for mbt_point in raw_mbt_points:
@@ -204,6 +210,8 @@ class MBTGenerator():
             # Print the result from the test and continue
             log.info("test_outcome %s", test_outcome)
             log.info("description %s", description)
+            print("total tests generated",cnt_tests)
+            print("total invalid generated", cnt_invalid)
         #java.lang.System.exit(0)
         #shutdownJVM()
         log.info("MBTGenerator has finished.")
