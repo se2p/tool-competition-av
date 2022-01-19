@@ -53,12 +53,39 @@ class MBTGenerator():
         total_budget = 100  # get from the execution environment
         startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
         from eu.fbk.iv4xr.mbt import SBSTMain
-        mbt = SBSTMain(int(total_budget * 0.1), 'sbst2022.nine_states')
-        log.info("MBT generated %s tests", mbt.totalTests())
+
+        # static model: uncomment to use it
+        # mbt = SBSTMain(int(total_budget * 0.1), 'sbst2022.nine_states')
+
+        # dynamic model parameters
+
+        # compute the map size
+        map_border_size = 10
+        min_x = map_border_size
+        min_y = map_border_size
+        max_x = self.map_size - map_border_size
+        max_y = self.map_size - map_border_size
+
+        # initial position in the map
+        initial_x = 40
+        initial_y = 40
+
+        # from the current position the street can proceed with a certain angle
+        n_rotation = 16 # the minimum angle is 360/n_rotation
+        max_rotation_angle = 45 # the max rotation from the current position
+
+        # a street chunck can have size between a minimum and a maximum
+        min_street_length = 10
+        max_street_length = 20
+        street_length_step = 10
+
+        mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
+        log.info("MBT generated %s tests with budget %i", mbt.totalTests(), total_budget * 0.1)
         #test_files = get_tests('X:/projects/iv4xr/MBT/iv4xr-mbt/mbt-files/tests/sbst2022.nine_states/MOSA/1641376546606')
         #count = 0
         box = (0, 0, self.map_size, self.map_size)
         road_bbox = RoadBoundingBox(box)
+        test_number = 0
 
         def check(road_points):
             # Constants
@@ -66,6 +93,11 @@ class MBTGenerator():
             interpolation_distance = 1
             smoothness = 0
             min_num_nodes = 20
+
+            def is_too_short(the_test):
+                if (len(the_test) < 4):
+                    return True
+                return False
 
             def _interpolate(the_test):
                 """
@@ -169,16 +201,20 @@ class MBTGenerator():
             return road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon) \
                    or not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid() \
                    or not is_inside_map(_interpolate(road_points)) \
-                   or is_too_sharp(_interpolate(road_points))
+                   or is_too_sharp(_interpolate(road_points)) \
+                    or is_too_short(road_points)
         while not self.executor.is_over() and mbt.hasMoreTests():
             # Some debugging
+            test_number = test_number + 1
 
             log.info(f"Starting test generation. Remaining time {self.executor.get_remaining_time()}")
+            log.info("Test %i",test_number)
             # Load the points from the csv file. They will be interpolated anyway to generate the road
             raw_mbt_points = mbt.getNextTest()  # read_points_from_csv(test_files[count])
             cnt_tests+=1
             if check(raw_mbt_points):
                 cnt_invalid+=1
+                # for debugging purpouse comment continue and compare with competition check
                 continue
 
             road_points = []
@@ -206,12 +242,13 @@ class MBTGenerator():
             # plt.figure()
             # plt.plot(oob_percentage, 'bo')
             # plt.show()
-            RoadTestVisualizer(self.map_size).visualize_road_test(the_test, test_outcome, str(test_outcome), True)
+            # RoadTestVisualizer(self.map_size).visualize_road_test(the_test, test_outcome, str(test_outcome), True)
+            RoadTestVisualizer(self.map_size).visualize_road_test(the_test)
             # Print the result from the test and continue
             log.info("test_outcome %s", test_outcome)
             log.info("description %s", description)
-            print("total tests generated",cnt_tests)
-            print("total invalid generated", cnt_invalid)
+            log.info("total tests generated %i",cnt_tests)
+            log.info("total invalid generated %i", cnt_invalid)
         #java.lang.System.exit(0)
         #shutdownJVM()
         log.info("MBTGenerator has finished.")
