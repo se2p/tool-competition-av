@@ -50,7 +50,8 @@ class MBTGenerator():
     def start(self):
         cnt_tests=0
         cnt_invalid=0
-        total_budget = 100  # get from the execution environment
+        total_budget = float(str(self.executor.get_remaining_time()).split(" ")[-1][:-1])
+  # get from the execution environment
         startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
         from eu.fbk.iv4xr.mbt import SBSTMain
 
@@ -79,7 +80,7 @@ class MBTGenerator():
         max_street_length = 20
         street_length_step = 10
 
-        mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
+        mbt = SBSTMain(int(total_budget * 0.01), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
         log.info("MBT generated %s tests with budget %i", mbt.totalTests(), total_budget * 0.1)
         #test_files = get_tests('X:/projects/iv4xr/MBT/iv4xr-mbt/mbt-files/tests/sbst2022.nine_states/MOSA/1641376546606')
         #count = 0
@@ -203,52 +204,65 @@ class MBTGenerator():
                    or not is_inside_map(_interpolate(road_points)) \
                    or is_too_sharp(_interpolate(road_points)) \
                     or is_too_short(road_points)
-        while not self.executor.is_over() and mbt.hasMoreTests():
-            # Some debugging
-            test_number = test_number + 1
-
-            log.info(f"Starting test generation. Remaining time {self.executor.get_remaining_time()}")
-            log.info("Test %i",test_number)
-            # Load the points from the csv file. They will be interpolated anyway to generate the road
-            raw_mbt_points = mbt.getNextTest()  # read_points_from_csv(test_files[count])
-            cnt_tests+=1
-            if check(raw_mbt_points):
-                cnt_invalid+=1
-                # for debugging purpouse comment continue and compare with competition check
-                continue
-
-            road_points = []
-            for mbt_point in raw_mbt_points:
-                road_points.append([mbt_point[0], mbt_point[1]])
-
-            # Some more debugging
-            log.info("Generated test using: %s", road_points)
-            # Decorate the_test object with the id attribute
-            the_test = RoadTestFactory.create_road_test(road_points)
-            # Some more debugging
-            log.info("Decorated points: %s", the_test.interpolated_points)
-            log.info(f"Remaining time {self.executor.get_remaining_time()}")
-
-            # Visualise test
 
 
-            # Try to execute the test
-            test_outcome, description, execution_data = self.executor.execute_test(the_test)
-            log.info(f"Executed test {the_test.id}. Remaining time {self.executor.get_remaining_time()}")
+        while not self.executor.is_over():
+            while not self.executor.is_over() and mbt.hasMoreTests():
+                # Some debugging
+                test_number = test_number + 1
 
-            # oob_percentage = [state.oob_percentage for state in execution_data]
-            # log.info("Collected %d states information. Max is %.3f", len(oob_percentage), max(oob_percentage))
-            #
-            # plt.figure()
-            # plt.plot(oob_percentage, 'bo')
-            # plt.show()
-            # RoadTestVisualizer(self.map_size).visualize_road_test(the_test, test_outcome, str(test_outcome), True)
-            RoadTestVisualizer(self.map_size).visualize_road_test(the_test)
-            # Print the result from the test and continue
-            log.info("test_outcome %s", test_outcome)
-            log.info("description %s", description)
-            log.info("total tests generated %i",cnt_tests)
-            log.info("total invalid generated %i", cnt_invalid)
-        #java.lang.System.exit(0)
-        #shutdownJVM()
+                log.info(f"Starting test generation. Remaining time {self.executor.get_remaining_time()}")
+                log.info("Test %i",test_number)
+                # Load the points from the csv file. They will be interpolated anyway to generate the road
+                raw_mbt_points = mbt.getNextTest()  # read_points_from_csv(test_files[count])
+                cnt_tests+=1
+                if check(raw_mbt_points):
+                    cnt_invalid+=1
+                    # for debugging purpouse comment continue and compare with competition check
+                    continue
+
+                road_points = []
+                for mbt_point in raw_mbt_points:
+                    road_points.append([mbt_point[0], mbt_point[1]])
+
+                # Some more debugging
+                log.info("Generated test using: %s", road_points)
+                # Decorate the_test object with the id attribute
+                the_test = RoadTestFactory.create_road_test(road_points)
+                # Some more debugging
+                log.info("Decorated points: %s", the_test.interpolated_points)
+                log.info(f"Remaining time {self.executor.get_remaining_time()}")
+
+                # Visualise test
+
+
+                # Try to execute the test
+                test_outcome, description, execution_data = self.executor.execute_test(the_test)
+                log.info(f"Executed test {the_test.id}. Remaining time {self.executor.get_remaining_time()}")
+
+                # oob_percentage = [state.oob_percentage for state in execution_data]
+                # log.info("Collected %d states information. Max is %.3f", len(oob_percentage), max(oob_percentage))
+                #
+                # plt.figure()
+                # plt.plot(oob_percentage, 'bo')
+                # plt.show()
+                # RoadTestVisualizer(self.map_size).visualize_road_test(the_test, test_outcome, str(test_outcome), True)
+                #RoadTestVisualizer(self.map_size).visualize_road_test(the_test, test_outcome,str(road_points),True)
+                # Print the result from the test and continue
+                log.info("test_outcome %s", test_outcome)
+                log.info("description %s", description)
+                log.info("total tests generated %i",cnt_tests)
+                log.info("total invalid generated %i", cnt_invalid)
+            """
+            Check if there is still time to generate more tests
+            """
+            if not self.executor.is_over():
+                total_budget = float(str(self.executor.get_remaining_time()).split(" ")[-1][:-1])
+
+                mbt = SBSTMain(int(total_budget * 0.01), 'beamng_model', min_x, min_y, max_x, max_y, initial_x,
+                                   initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length,
+                                   street_length_step)
+                print("remaining budget:", total_budget * 0.1)
+
+            #shutdownJVM()
         log.info("MBTGenerator has finished.")
