@@ -1,3 +1,12 @@
+# AmbieGen generator
+This a gnetic algorithm based road topology generator. The road generation is based on the SWAT tool, introduced by our team last year.  
+Our team: Dmytro Humeniuk, Foutse Khomh, Giuliano Antoniol. Polytechnique Montreal, Canada.  
+For information contact: dmytro.humeniuk@polymtl.ca  
+##  How to run  
+We have added some additional requirements to requirements.txt.  
+Most importantly, Pymoo pymoo==0.4.2.2 should be installed.
+Here is an example of the command to launch the algorithm:   
+```competition.py --visualize-tests --time-budget 7200 --executor beamng --map-size 200 --module-name ambiegen.ambiegen_generator --class-name AmbieGenTestGenerator --beamng-home  C:\Users\gumen\Downloads\BeamNG.tech.v0.24.0.2\BeamNG.drive-0.24.0.2.13392 --beamng-user C:\Users\gumen\Documents\BeamNG.tech```
 # Cyber-Physical Systems Testing Competition #
 
 The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
