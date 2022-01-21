@@ -72,15 +72,15 @@ class MBTGenerator():
         initial_y = 40
 
         # from the current position the street can proceed with a certain angle
-        n_rotation = 16 # the minimum angle is 360/n_rotation
+        n_rotation = 12 # the minimum angle is 360/n_rotation
         max_rotation_angle = 45 # the max rotation from the current position
 
         # a street chunck can have size between a minimum and a maximum
         min_street_length = 10
-        max_street_length = 20
+        max_street_length = 40
         street_length_step = 10
 
-        mbt = SBSTMain(int(total_budget * 0.01), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
+        mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
         log.info("MBT generated %s tests with budget %i", mbt.totalTests(), total_budget * 0.1)
         #test_files = get_tests('X:/projects/iv4xr/MBT/iv4xr-mbt/mbt-files/tests/sbst2022.nine_states/MOSA/1641376546606')
         #count = 0
@@ -259,7 +259,7 @@ class MBTGenerator():
             if not self.executor.is_over():
                 total_budget = float(str(self.executor.get_remaining_time()).split(" ")[-1][:-1])
 
-                mbt = SBSTMain(int(total_budget * 0.01), 'beamng_model', min_x, min_y, max_x, max_y, initial_x,
+                mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x,
                                    initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length,
                                    street_length_step)
                 print("remaining budget:", total_budget * 0.1)
