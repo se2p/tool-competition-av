@@ -50,7 +50,7 @@ class MBTGenerator():
     def start(self):
         cnt_tests=0
         cnt_invalid=0
-        total_budget = float(str(self.executor.get_remaining_time()).split(" ")[-1][:-1])
+
   # get from the execution environment
         startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
         from eu.fbk.iv4xr.mbt import SBSTMain
@@ -79,9 +79,9 @@ class MBTGenerator():
         min_street_length = 10
         max_street_length = 40
         street_length_step = 10
-
-        mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
-        log.info("MBT generated %s tests with budget %i", mbt.totalTests(), total_budget * 0.1)
+        total_budget=self.executor.get_remaining_time()["generation-budget"]
+        mbt = SBSTMain(int(total_budget*0.5), 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
+        log.info("MBT generated %s tests with budget %i", mbt.totalTests(), total_budget)
         #test_files = get_tests('X:/projects/iv4xr/MBT/iv4xr-mbt/mbt-files/tests/sbst2022.nine_states/MOSA/1641376546606')
         #count = 0
         box = (0, 0, self.map_size, self.map_size)
@@ -206,8 +206,8 @@ class MBTGenerator():
                     or is_too_short(road_points)
 
 
-        while not self.executor.is_over():
-            while not self.executor.is_over() and mbt.hasMoreTests():
+        while not self.executor.is_over() and mbt.hasMoreTests():
+
                 # Some debugging
                 test_number = test_number + 1
 
@@ -253,16 +253,7 @@ class MBTGenerator():
                 log.info("description %s", description)
                 log.info("total tests generated %i",cnt_tests)
                 log.info("total invalid generated %i", cnt_invalid)
-            """
-            Check if there is still time to generate more tests
-            """
-            if not self.executor.is_over():
-                total_budget = float(str(self.executor.get_remaining_time()).split(" ")[-1][:-1])
 
-                mbt = SBSTMain(int(total_budget * 0.1), 'beamng_model', min_x, min_y, max_x, max_y, initial_x,
-                                   initial_y, n_rotation, max_rotation_angle, min_street_length, max_street_length,
-                                   street_length_step)
-                print("remaining budget:", total_budget * 0.1)
 
             #shutdownJVM()
         log.info("MBTGenerator has finished.")
