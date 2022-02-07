@@ -7,38 +7,33 @@ import logging as log
 from csv import reader
 import os
 import glob
-from jpype import startJVM, shutdownJVM, java, addClassPath, JClass, JInt
-from random import randint
 from code_pipeline.tests_generation import RoadTestFactory
-from time import  sleep
-from math import sqrt
 from self_driving.bbox import RoadBoundingBox
 import numpy as np
 import logging as log
 from self_driving.road_polygon import RoadPolygon
-from shapely.geometry import  LineString
 from scipy.interpolate import splev, splprep
 from numpy.ma import arange
 from shapely.geometry import LineString
-from code_pipeline.visualization import RoadTestVisualizer
-import jpype
-import jpype.imports
-from jpype.types import *
-import matplotlib.pyplot as plt
+import subprocess
+
 
 def read_points_from_csv(filename):
     list_of_rows = []
+    print(filename)
     with open(filename, 'r') as f:
         for line in f:
             values = line.strip().split(",")
-            list_of_rows.append([int(values[0]), int(values[1])])
+            list_of_rows.append([float(values[0]), float(values[1])])
     print(list_of_rows)
     return list_of_rows
+
 
 def get_tests(tests_dir):
     return glob.glob(os.path.join(tests_dir, '*.csv'))
 
-class MBTGenerator():
+
+class MBTGenerator:
     """
         This is a wrapper for the MBT generator in Java
     """
@@ -47,72 +42,37 @@ class MBTGenerator():
         self.executor = executor
         self.map_size = map_size
 
+    def run_mbt(self, generation_budget, map_size, tests_dir):
+        subprocess.call(['java', '-jar', 'mbt-1.0.2-jar-with-dependencies.jar', str(generation_budget), str(map_size), tests_dir])
+
     def start(self):
-        cnt_tests = 0
-        cnt_invalid = 0
-
-        startJVM(convertStrings=False, classpath=['./mbt-1.0.2-jar-with-dependencies.jar'])
-        from eu.fbk.iv4xr.mbt import SBSTMain
-
-        # static model: uncomment to use it
-        # mbt = SBSTMain(int(total_budget * 0.1), 'sbst2022.nine_states')
-
-        # dynamic model parameters
-
-        # compute the map size
-        map_border_size = 10
-        min_x = map_border_size
-        min_y = map_border_size
-        max_x = self.map_size - map_border_size
-        max_y = self.map_size - map_border_size
-
-        # initial position in the map
-        initial_x = 40
-        initial_y = 40
-
-        # from the current position the street can proceed with a certain angle
-        n_rotation = 12 # the minimum angle is 360/n_rotation
-        max_rotation_angle = 45 # the max rotation from the current position
-
-        # a street chunck can have size between a minimum and a maximum
-        min_street_length = 10
-        max_street_length = 40
-        street_length_step = 10
+        # temporary directory where MBT writes tests
+        tests_dir = 'tmp_mbt'
 
         generation_budget = self.executor.get_remaining_time()["generation-budget"]
-
         # proportion represents the percentage of the generation-budget
         # to be used by MBT for test generation
         proportion = 0.8
         mbt_generation_budget = int(generation_budget * proportion)
-
         log.info("Starting test generation using MBT with generation budget %i ...", mbt_generation_budget)
-        mbt = SBSTMain(mbt_generation_budget, 'beamng_model', min_x, min_y, max_x, max_y, initial_x, initial_y,
-                       n_rotation, max_rotation_angle, min_street_length, max_street_length, street_length_step)
+        self.run_mbt(mbt_generation_budget, self.map_size, tests_dir)
 
-        log.info("MBT generated %s tests with budget %i", mbt.totalTests(), mbt_generation_budget)
-        #test_files = get_tests('X:/projects/iv4xr/MBT/iv4xr-mbt/mbt-files/tests/sbst2022.nine_states/MOSA/1641376546606')
-        #count = 0
+        test_files = get_tests(tests_dir)
+        total_tests = len(test_files)
+        log.info("MBT generated %s tests with budget %i", total_tests, mbt_generation_budget)
 
         test_number = 0
-
-        while not self.executor.is_over() and mbt.hasMoreTests():
-            # Some debugging
-            test_number = test_number + 1
-
+        cnt_invalid = 0
+        while not self.executor.is_over() and test_number < total_tests:
             log.info(f"Starting test execution. Remaining time {self.executor.get_remaining_time()}")
-            log.info("Test %i", test_number)
-            # Load the points from the csv file. They will be interpolated anyway to generate the road
-            raw_mbt_points = mbt.getNextTest()  # read_points_from_csv(test_files[count])
-            cnt_tests += 1
-            if self.check(raw_mbt_points, self.map_size):
+            log.info("Test %i", test_number+1)
+            # Load the points from the csv file
+            road_points = read_points_from_csv(test_files[test_number])
+            if self.invalid(road_points, self.map_size):
+                test_number += 1
                 cnt_invalid += 1
-                # for debugging purpouse comment continue and compare with competition check
+                # for debugging purpose comment continue and compare with competition check
                 continue
-
-            road_points = []
-            for mbt_point in raw_mbt_points:
-                road_points.append([mbt_point[0], mbt_point[1]])
 
             # Some more debugging
             log.info("Generated test using: %s", road_points)
@@ -129,14 +89,12 @@ class MBTGenerator():
             # Print the result from the test and continue
             log.info("test_outcome %s", test_outcome)
             log.info("description %s", description)
-            log.info("total tests generated %i", cnt_tests)
-            log.info("total invalid generated %i", cnt_invalid)
+            test_number += 1
 
-        log.info("Exiting the jvm ...")
-        shutdownJVM()
+        log.info("total invalid generated %i", cnt_invalid)
         log.info("MBTGenerator has finished.")
 
-    def check(self, road_points, map_size):
+    def invalid(self, road_points, map_size):
         # Constants
         rounding_precision = 3
         interpolation_distance = 1
