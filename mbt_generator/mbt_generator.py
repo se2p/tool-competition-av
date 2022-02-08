@@ -43,7 +43,11 @@ class MBTGenerator:
         self.map_size = map_size
 
     def run_mbt(self, generation_budget, map_size, tests_dir):
-        subprocess.call(['java', '-jar', 'mbt-1.0.2-jar-with-dependencies.jar', str(generation_budget), str(map_size), tests_dir])
+        import os
+        folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        jar_file = os.path.join(folder, 'mbt-1.0.2-jar-with-dependencies.jar')
+        print(f"Jar File {jar_file}")
+        subprocess.call(['java', '-jar', jar_file, str(generation_budget), str(map_size), tests_dir])
 
     def start(self):
         # temporary directory where MBT writes tests
