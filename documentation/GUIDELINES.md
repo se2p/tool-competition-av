@@ -126,64 +126,29 @@ The competition code can be run by executing `competition.py` from the main fold
 Usage (from command line): 
 
 ```
+Usage: competition.py [OPTIONS]Options:  --executor [mock|beamng|dave2]  The name of the executor to use. Currently                                  we have 'mock', 'beamng' or 'dave2'.                                  [default: (Mock Executor (meant for                                  debugging))]
+                                    --dave2-model PATH              Path of the pre-trained Dave2 driving AI                                  model (in .h5 format). Mandatory if the                                  executor is dave2
+                                    --beamng-home PATH              Customize BeamNG executor by specifying the                                  home of the simulator.  [default: (None)]
+                                    --beamng-user PATH              Customize BeamNG executor by specifying the                                  location of the folder where levels, props,                                  and other BeamNG-related data will be                                  copied.** Use this to avoid spaces in                                  URL/PATHS! **  [default: (Currently Active                                  User (~/BeamNG.tech/))]
+                                    --generation-budget TEXT        Time budget for the test generation.                                  Expressed in 'real-time' seconds.
+                                    --execution-budget TEXT         Time budget for the test execution.                                  Expressed in 'simulated-time' seconds.
+                                    --time-budget TEXT              Overall budget for the generation and                                  execution. Expressed in 'real-time'seconds.                                  This option is here to be back-ward                                  compatible and will take precedence over                                  generation-budget and execution-budget
+                                    --map-size INTEGER              The lenght of the size of the squared map                                  where the road must fit.Expressed in meters.                                  [default: (200m, which leads to a 200x200m^2                                  squared map)]
 
-Usage: competition.py [OPTIONS]
-
-Options:
-  --executor [mock|beamng|dave2]  The name of the executor to use. Currently we have
-                            'mock', 'beamng' or 'dave2'. [default: (Mock Executor
-                            (meant for debugging))]
-                            
-  --dave2-model PATH        Path of the pre-trained Dave2 driving AI model, in h5 format (used only when executor 
-                            is 'dave2'). 
-
-  --beamng-home PATH        Customize BeamNG executor by specifying the home
-                            of the simulator.
-
-  --beamng-user PATH        Customize BeamNG executor by specifying the
-                            location of the folder where levels, props, and
-                            other BeamNG-related data will be copied.** Use
-                            this to avoid spaces in URL/PATHS! **
-
-  --time-budget INTEGER     Overall budget for the generation and execution.
-                            Expressed in 'real-time'seconds.  [required]
-
-  --map-size INTEGER        The lenght of the size of the squared map where
-                            the road must fit.Expressed in meters.  [default:
-                            (200m, which leads to a 200x200m^2 squared map)]
-
-  --oob-tolerance FLOAT     The tolerance value that defines how much of the
-                            vehicle should be outside the lane to trigger a
-                            failed test. Must be a value between 0.0 (all oob)
-                            and 1.0 (no oob)  [default: (0.95)]
-
-  --speed-limit INTEGER     The max speed of the ego-vehicleExpressed in
-                            Kilometers per hours  [default: (70 Km/h)]
-
-  --module-name TEXT        Name of the module where your test generator is
-                            located.  [required]
-
-  --module-path PATH        Path of the module where your test generator is
-                            located.
-
-  --class-name TEXT         Name of the (main) class implementing your test
-                            generator.  [required]
-
-  --visualize-tests         Visualize the last generated test, i.e., the test
-                            sent for the execution. Invalid tests are also
-                            visualized.  [default: (Disabled)]
-
-  --log-to PATH             Location of the log file. If not specified logs
-                            appear on the console
-
-  --debug                   Activate debugging (results in more logging)
-                            [default: (Disabled)]
-
-  --help                    Show this message and exit.
-
+  --oob-tolerance FLOAT           The tolerance value that defines how much of                                  the vehicle should be outside the lane to                                  trigger a failed test. Must be a value                                  between 0.0 (all oob) and 1.0 (no oob)                                  [default: (0.95)]
+                                    --speed-limit INTEGER           The max speed of the ego-vehicleExpressed in                                  Kilometers per hours  [default: (70 Km/h)]
+                                    --module-name TEXT              Name of the module where your test generator                                  is located.  [required]
+                                    --module-path PATH              Path of the module where your test generator                                  is located.
+                                    --class-name TEXT               Name of the class implementing your test                                  generator.  [required]
+                                    --visualize-tests               Visualize the last generated test, i.e., the                                  test sent for the execution. Invalid tests                                  are also visualized.  [default: (Disabled)]
+                                    --log-to PATH                   Location of the log file. If not specified                                  logs appear on the console
+                                    --debug                         Activate debugging (results in more logging)                                  [default: (Disabled)]
+                                    --help                          Show this message and exit.
 ```
 
-> NOTE: We introduced the `--beamng-user` option because currently BeamNGpy does not support folders/paths containing "spaces" (see [this issue](https://github.com/BeamNG/BeamNGpy/issues/95)]. By specifying this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
+> NOTE: We introduced the `--beamng-user` option because currently BeamNGpy does not support folders/paths containing "spaces" (see [issue 95](https://github.com/BeamNG/BeamNGpy/issues/95)). By specifying this option, you can customize where BeamNG will save the data required for running the simulations (levels, props, 3D models, etc.)
+
+> NOTE: We introduced `--generation-time` and `--execution-time` to improve the reproducibility of our results (see [issue #99](https://github.com/se2p/tool-competition-av/issues/99))
 
 ## Examples
 
@@ -219,6 +184,21 @@ or
         --module-name sample_test_generators.deepjanus_seed_generator \
         --class-name JanusGenerator
 ```
+
+Instead, if you want to give the test generator 300 seconds to generate the tests but 600 (simulated) seconds to execute them, you need to update the command as follows:
+
+``` 
+py.exe competition.py \
+        --generation-budget 300 \
+        --execution-budget 600 \
+        --executor beamng \
+        --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
+        --map-size 200 \
+        --module-name sample_test_generators.one_test_generator \
+        --class-name OneTestGenerator
+```
+
+> Note: `time-budget` and `generation-/execution-budget` cannot be used together. If you provide all options, `time-budget` takes over the other settings.
 
 ### Using the public test generators submitted to previous SBST competitions
 
