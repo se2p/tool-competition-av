@@ -1,4 +1,4 @@
-# Cyber-Physical Systems Testing Competition #
+# Cyber-Physical Systems Testing Tool Competition #
 
 The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
 
