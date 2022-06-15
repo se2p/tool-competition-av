@@ -24,7 +24,7 @@ copy of BeamNG.tech
 > **Note**: as stated on the BeamNG registration page, **please use your university email address**. 
 If you do not own a university email address, please contact the organizers of the tool competition. 
 
-For the competition we use `BeamNG.tech v0.24.1`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.24.0.1.zip`.
+For the competition we use `BeamNG.tech v0.24.0.1`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.24.0.1.zip`.
 
 Installing BeamNG.tech is as simple as extracting the files to a target folder in your system (e.g., `C:\BeamNG.tech.v0.24.0.1`). We call this folder `<BEAMNG_HOME>`. Additionally, we suggest you create another folder (e.g., `C:\BeamNG.tech.v0.24.0.1_userpath`) that will act as BeamNG.tech working dir. BeamNG.tech will copy in this directory the levels and its cache. We call this folder `<BEAMNG_USER>`.
 
