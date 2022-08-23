@@ -53,8 +53,13 @@ class BeamNGBrewer:
         self.camera: BeamNGCamera = None
         if road_nodes:
             self.setup_road_nodes(road_nodes)
-        steps = 5
-        self.params = SimulationParams(beamng_steps=steps, delay_msec=int(steps * 0.05 * 1000))
+
+        # TODO Make this configurable
+        # Configure the simulator to monitor at 20Hz frequency, i.e., every 60/3 steps in a second
+        steps_per_second = 60
+        steps = 3
+        #
+        self.params = SimulationParams(beamng_steps=steps, beamng_steps_per_second=steps_per_second, delay_msec=int(steps * 0.05 * 1000))
         self.vehicle_start_pose = BeamNGPose()
 
     def setup_road_nodes(self, road_nodes):
@@ -91,14 +96,23 @@ class BeamNGBrewer:
 
         self.scenario.make(self.beamng)
 
-        self.beamng.set_deterministic()
-
         self.beamng.load_scenario(self.scenario)
 
+        # Ensure the simulation runs deterministically at the given frequency
+        self.beamng.set_deterministic()
+        self.beamng.set_steps_per_second(self.params.beamng_steps_per_second)
+
+        # Start the simulation but pause it rightaway
         self.beamng.start_scenario()
 
         # Pause the simulator only after loading and starting the scenario
         self.beamng.pause()
+
+        frequency = self.params.beamng_steps_per_second / self.params.beamng_steps
+        log.info("Starting a new simulation with params: Step %s, Step/Second %s (Freq %s Hz)", self.params.beamng_steps, self.params.beamng_steps_per_second, frequency)
+
+
+
 
     def __del__(self):
         if self.beamng:

@@ -19,7 +19,7 @@ SimulationDataRecordProperties = ['timer', 'pos', 'dir', 'vel', 'steering',
 SimulationDataRecord = namedtuple('SimulationDataRecord', SimulationDataRecordProperties)
 SimulationDataRecords = List[SimulationDataRecord]
 
-SimulationParams = namedtuple('SimulationParameters', ['beamng_steps', 'delay_msec'])
+SimulationParams = namedtuple('SimulationParameters', ['beamng_steps', 'beamng_steps_per_second', 'delay_msec'])
 
 def delete_folder_recursively(path: Union[str, Path], exception_if_fail: bool = True):
     path = str(path)
