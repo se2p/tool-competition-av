@@ -1,10 +1,10 @@
-# Cyber-Physical Systems Testing Competition #
+# Cyber-Physical Systems Testing Tool Competition #
 
 The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
 
 ## Important Dates
 
-The deadline to submit your tool is: **January 14th 2022**
+The deadline to submit your tool is: **January 21st 2022**
 
 The results of the evaluation will be communicated to participants on: **February 25th 2022**
 
