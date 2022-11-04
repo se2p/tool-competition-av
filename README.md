@@ -1,16 +1,21 @@
-# Cyber-Physical Systems Testing Tool Competition #
+# Cyber-Physical Systems Testing Tool Competition [OUTDATED] #
+
+This repository refers to the 2022 edition, to check the latest version and join the current competition, you can visit the [current repository](https://github.com/sbft-cps-tool-competition/cps-tool-competition.git)
+
+## Contacts ##
+
+For more information on the 2022 edition, contact:
+
+Dr. Alessio Gambi  - IMC Krems, Austria
+
+Dr. Vincenzo Riccio  - Università  di Udine, Italy
+
+## Goal ##
+
 
 The [SBST Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
 
-## Important Dates
 
-The deadline to submit your tool is: **January 21st 2022**
-
-The results of the evaluation will be communicated to participants on: **February 25th 2022**
-
-The camera-ready paper describing your tool is due to: **Sunday March 18th 2020**
-
-## Goal ##
 The competitors should generate virtual roads to test a lane keeping assist system using the provided code_pipeline.
 
 The generated roads are evaluated in the [**BeamNG.tech**](https://www.beamng.tech/) driving simulator.
@@ -79,9 +84,3 @@ More information can be found on the SBST tool competition website: [https://sbs
 
 ## License ##
 The software we developed is distributed under GNU GPL license. See the [LICENSE.md](LICENSE.md) file.
-
-## Contacts ##
-
-Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
-
-Dr. Vincenzo Riccio  - Universita' della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch
