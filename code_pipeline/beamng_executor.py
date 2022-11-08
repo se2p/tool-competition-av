@@ -128,8 +128,21 @@ class BeamngExecutor(AbstractTestExecutor):
 
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
+            # Parse BeamNG version
+            version = '0.24'
+            directory = self.beamng_user
+            if '/' in self.beamng_user:
+                directory = self.beamng_user.split('/')[-1]
+            prefix = 'BeamNG.tech.v'
+            if directory.startswith(prefix):
+                v = directory[len(prefix):len(prefix) + 4]
+                try:
+                    float(v)
+                    version = v
+                except:
+                    pass
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, version, 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
