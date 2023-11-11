@@ -24,3 +24,4 @@ Shapely==1.8.0
 tensorflow==2.4.1
 tomli==1.2.2
 zipp==3.6.0
+jpype1
