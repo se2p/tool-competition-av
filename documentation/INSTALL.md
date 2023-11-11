@@ -36,6 +36,21 @@ Please copy the `tech.key` file that you received after registering inside the `
 
 This code requires **Python 3.7**.
 
+### Shapely ###
+
+You can obtain Shapely from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely). 
+
+You should download the wheel file matching you Python version, i.e., download the file with cp37 in
+the name if you use Python 3.7. The wheel file should also match the architecture of your machine,
+i.e., you should install the file with either `win32` or `win_amd64` in the name.
+
+After downloading the wheel file, you can install Shapely by running (in an active virtual environment)
+the following command:
+
+```
+pip install /path/to/shapely/file
+```
+
 ### Other Libraries ###
 
 To easily install the other dependencies with rely on `pip`, we suggest to create a
@@ -73,22 +88,6 @@ Otherwise, you can manually list the additional libraries your test generator ne
 in the `additional-requirements.txt` file.
 
 > **Note**: the format of this file must follow the usual `pip` convention where the library name is followed by the target version number separated by `==`, e.g., beamngpy==1.21.1
-
-
-### Shapely ###
-
-You can obtain Shapely from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely). 
-
-You should download the wheel file matching you Python version, i.e., download the file with cp37 in
-the name if you use Python 3.7. The wheel file should also match the architecture of your machine,
-i.e., you should install the file with either `win32` or `win_amd64` in the name.
-
-After downloading the wheel file, you can install Shapely by running (in an active virtual environment)
-the following command:
-
-```
-pip install /path/to/shapely/file
-```
 
 ## Recommended Requirements ##
 
